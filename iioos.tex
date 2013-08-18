@@ -36,9 +36,55 @@ We evaluate the practical performance and convergence rate of OOS and two recent
 
 \section{Introduction}
 
-Blabla
+Main points: 
+\begin{itemize}
+\item motivate importance of convergence to NE. 
+\item existing methods may not converge over time (it would be great to have a motivating example that convinces the reader that any determinization-based II search algorithm cannot converge in general)
+\item we intoduce the first one that does, and show that it can compete with the others in practice
+\end{itemize}
 
-%\bibliographystyle\{aaai\}
-%\bibliography\{bibfile1,bibfile2,...\}
+\section{Background and Related Work}
+
+Overview of past algorithms and the current state-of-the-art (we have to ``weave'' the related work below into a nice overview).
+Define determinization, strategy fusion, non-locality, disambiguation factor. 
+
+References to help:
+\begin{itemize}
+\item Original/first II search~\cite{Frank98Finding}
+\item Work on Bridge~\cite{Ginsberg01}
+\item Work on Hearts / Spades~\cite{Sturtevant08An}
+\item PIMC~\cite{long2010understanding} and other work on Skat (Jeff's thesis)
+\item Counter-examples in simple games~\cite{Shafiei09,Ponsen11Computing} 
+\item MMCTS~\cite{Auger11Multiple}
+\item Work on Exp3 for Urban rivals~\cite{Teytaud11Upper,StPierre12Online}
+\item IS-MCTS~\cite{Cowling12ISMCTS} and other work by that group (on Dou di Zhu, MTG, Lord of the Rings, etc.)
+\item IIMC~\cite{Furtak13Recursive}
+\item Scotland Yard~\cite{Nijssen12SY}
+\item Maybe quick mention of recent excitment in simultaneous move games (SMAB, double-oracle and serialized AB algorithm that doesn't have a name, SM-MCTS, and (hopefully!) NIPS paper)
+\end{itemize}
+
+\subsection{Extensive Games and Equilibrium Computation}
+
+Basic game theoretic definitions. Behavioral strategies. 
+CFR~\cite{CFR} and MCCFR~\cite{Lanctot09Sampling}. Success in Poker.
+
+\section{Online Outcome Sampling}
+
+Complexities of online search vs. offline equilibrium computation. Notions of subgame perfection (sequential equilibrium). Information set targeted search. Epistemic depth.
+Convergence theorems. Algorithm description.
+
+\section{Empirical Evaluation}
+
+Try it in a few complex domains, but some smaller ones as well to compare to offline-computed approximate equilibrium strategies and compute exploitability, and in random games. 
+Hopefully it works well. {\tt :)} I think to convince people doing work in this area, we'll need 
+to compare to one or two of the state-of-the-art algorithms. 
+
+\section{Conclusion}
+
+OOS rocks the body that rocks the party! {\tt :-p}  
+
+
+\bibliographystyle{aaai}
+\bibliography{iioos}
 
 \end{document}
