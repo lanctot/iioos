@@ -1,0 +1,1577 @@
+@incollection{veness2011,
+ title ={Variance Reduction in {Monte-Carlo Tree Search}},
+ author={J. Veness and M. Lanctot and M. Bowling},
+ booktitle = {Advances in Neural Information Processing Systems 24},
+ editor = {J. Shawe-Taylor and R.S. Zemel and P. Bartlett and F.C.N. Pereira and K.Q. Weinberger},
+ pages = {1836--1844},
+ year = {2011}
+}
+
+@inproceedings{Lanctot12sparse,
+  author    = {M. Lanctot and A. Saffidine and J. Veness and C. Archibald}, 
+  title     = {Sparse Sampling for Adversarial Games},
+  booktitle = {Proceedings of Computer Games Worksop, {ECAI 2012}},
+  year      = 2012
+}
+
+
+@article{Lanctot13MCMS-TR,
+  author    = {M. Lanctot and A. Saffidine and J. Veness and C. Archibald and M.H.M. Winands},
+  title     = {Monte Carlo *-Minimax Search},
+  journal   = {CoRR},
+  year      = 2013,
+  volume    = {abs/1304.6057},
+  note      = {\url{http://arxiv.org/abs/1304.6057}},
+  ee        = {http://arxiv.org/abs/1304.6057},
+  bibsource = {DBLP, http://dblp.uni-trier.de}
+}
+
+@article{hoeffding1963,
+     title = {Probability Inequalities for Sums of Bounded Random Variables},
+     author = {Hoeffding, Wassily},
+     journal = {Journal of the American Statistical Association},
+     volume = {58},
+     number = {301},
+     pages = {pp. 13-30},
+     abstract = {Upper bounds are derived for the probability that the sum S of n independent random variables exceeds its mean ES by a positive number nt. It is assumed that the range of each summand of S is bounded or bounded above. The bounds for <tex-math>$\Pr \{ S - ES \geq nt \}$</tex-math> depend only on the endpoints of the ranges of the summands and the mean, or the mean and the variance of S. These results are then used to obtain analogous inequalities for certain sums of dependent random variables such as U statistics and the sum of a random sample without replacement from a finite population.},
+     language = {English},
+     year = {1963},
+     publisher = {American Statistical Association},
+}
+
+@article{fang08retrograde,
+  author = {H. Fang and J. Glenn and C. Kruskal},
+  title = {Retrograde approximation algorithms for jeopardy stochastic games},
+  journal = {{ICGA} journal},
+  volume = 31,
+  number = 2,
+  pages = {77--96},
+  year = 2008
+}
+
+@inproceedings{glenn09generalized,
+  author = {J. Glenn and C. Aloi},
+  title = {Optimizing Genetic Algorithm Parameters for a Stochastic Game},
+  booktitle = {Proceedings of 22nd FLAIRS Conference},
+  pages = {421--426},
+  year = {2009}, 
+}
+
+@inproceedings{glenn07retrograde,
+  author = {J. Glenn and H.-r. Fang and C. Kruskal},
+  title = {A Retrograde Approximation Algorithm for Two-player {C}an't {S}top},
+  booktitle = {Proceedings of Computers and Games Workshop},
+  year = {2007}, 
+}
+
+@inproceedings{glenn:optimizing,
+  author = "J. Glenn",
+  title = "Optimizing Genetic Algorithm Parameters for a Stochastic Game",
+  booktitle = "IJCCI (ICEC)'10",
+  pages = {199--206},
+  year = {2010}, 
+}
+
+@article{knuth75, key="knuth75", author="D.E. Knuth and R.W. Moore",
+    title="An Analysis of Alpha-Beta Pruning",
+    journal="Artificial Intelligence",
+    volume= 6,
+    number = 4,
+    pages = "293--326",
+    year=1975}
+
+@inproceedings{schadd2009,
+  author = "M.P.D. Schadd and M.H.M. Winands and J.W.H.M. Uiterwijk",
+  title = "{ChanceProbcut}: {F}orward Pruning in Chance Nodes",
+  booktitle = "2009 IEEE Symposium on Computational Intelligence and Games (CIG'09)",
+  pages = {178--185},
+	editor = {P.L. Lanzi},
+  year = {2009}, 
+}
+
+
+@techreport{smith1993,
+  author = {S.J.J. Smith and D.S. Nau},
+  title = {Toward an Analysis of Forward Pruning},
+  institution = {University of Maryland at College Park, College
+Park}, 
+  number = {CS-TR-3096},
+  year = 1993
+}
+
+@inproceedings{Coutoux11a,
+title = {Adding Double Progressive Widening to Upper Confidence Trees to Cope With Uncertainty in Planning Problems},
+author = {Couetoux, A. and Doghmen, H.},
+booktitle={The 9th European Workshop on Reinforcement Learning (EWRL)},
+year = {2011},
+}
+
+@inproceedings{Coutoux11b,
+    hal_id = {hal-00542673},
+    url = {http://hal.archives-ouvertes.fr/hal-00542673},
+    title = {Continuous Upper Confidence Trees},
+    author = {Couetoux, A. and Hoock, J-B. and Sokolovska, N. and Teytaud, O. and Bonnard, N.},
+    abstract = {{Upper Confidence Trees are a very efficient tool for solving Markov Decision Processes; originating in difficult games like the game of Go, it is in particular surprisingly efficient in high dimensional problems. It is known that it can be adapted to continuous domains in some cases (in particular continuous action spaces). We here present an extension of Upper Confidence Trees to continuous stochastic problems. We (i) show a deceptive problem on which the classical Upper Confidence Tree approach does not work, even with arbitrarily large computational power and with progressive widening (ii) propose an improvement, termed double-progressive widening, which takes care of the compromise between variance (we want infinitely many simulations for each action/state) and bias (we want sufficiently many nodes to avoid a bias by the first nodes) and which extends the classical progressive widening (iii) discuss its consistency and show experimentally that it performs well on the deceptive problem and on experimental benchmarks. We guess that the double-progressive widening trick can be used for other algorithms as well, as a general tool for ensuring a good bias/variance compromise in search algorithms.}},
+    language = {English},
+    affiliation = {Laboratoire de Recherche en Informatique - LRI , TAO - INRIA Saclay - Ile de France , Chercheur Ind{\'e}pendant},
+    booktitle = {{LION'11: Proceedings of the 5th International Conference on Learning and Intelligent OptimizatioN}},
+    address = {Italy},
+    audience = {international},
+    year = {2011},
+    pdf = {http://hal.archives-ouvertes.fr/hal-00542673/PDF/c0mcts.pdf},
+}
+
+
+@inproceedings{Coulom06,
+ author = {Coulom, R.},
+ title = {Efficient selectivity and backup operators in {Monte-Carlo} tree search},
+ booktitle = {Proceedings of the 5th international conference on Computers and games},
+ series = {CG'06},
+ year = {2007},
+ isbn = {3-540-75537-3, 978-3-540-75537-1},
+ location = {Turin, Italy},
+ pages = {72--83},
+ numpages = {12},
+ url = {http://dl.acm.org/citation.cfm?id=1777826.1777833},
+ acmid = {1777833},
+ publisher = {Springer-Verlag},
+ address = {Berlin, Heidelberg},
+} 
+
+
+@inproceedings{DBLP:conf/lion/CouetouxHSTB11,
+  author    = {A. Cou{\"e}toux and
+               J-B.  Hoock and
+               N. Sokolovska and
+               O. Teytaud and
+               N. Bonnard},
+  title     = {Continuous Upper Confidence Trees},
+  booktitle = {LION},
+  year      = {2011},
+  pages     = {433-445},
+  ee        = {http://dx.doi.org/10.1007/978-3-642-25566-3_32},
+  bibsource = {DBLP, http://dblp.uni-trier.de}
+}
+
+@article{DBLP:journals/ai/Ballard83,
+  author    = {B.W. Ballard},
+  title     = {The *-Minimax Search Procedure for Trees Containing Chance
+               Nodes},
+  journal   = {Artificial Intelligence},
+  volume    = {21},
+  number    = {3},
+  year      = {1983},
+  pages     = {327-350},
+  ee        = {http://dx.doi.org/10.1016/S0004-3702(83)80015-0},
+  bibsource = {DBLP, http://dblp.uni-trier.de}
+}
+
+@inproceedings{RamanujanS11,
+  author    = {R. Ramanujan and
+               B. Selman},
+  title     = {Trade-Offs in Sampling-Based Adversarial Planning},
+  booktitle = {ICAPS},
+  year      = {2011},
+  ee        = {http://aaai.org/ocs/index.php/ICAPS/ICAPS11/paper/view/2708},
+  bibsource = {DBLP, http://dblp.uni-trier.de}
+}
+
+@inproceedings{citeulike:7458873,
+    author = {Ramanujan, R. and Sabharwal, A. and Selman, B.},
+    booktitle = {Proceedings of Uncertainty in Artificial Intelligence},
+    citeulike-article-id = {7458873},
+    keywords = {comparison, empirical, sampling, uct},
+    posted-at = {2010-07-11 17:09:59},
+    priority = {4},
+    title = {{Understanding Sampling Style Adversarial Search Methods}},
+    year = {2010}
+}
+
+@inproceedings{DBLP:conf/aips/RamanujanSS10,
+  author    = {R. Ramanujan and
+               A. Sabharwal and
+               B. Selman},
+  title     = {On Adversarial Search Spaces and Sampling-Based Planning},
+  booktitle = {ICAPS},
+  year      = {2010},
+  pages     = {242-245},
+  ee        = {http://www.aaai.org/ocs/index.php/ICAPS/ICAPS10/paper/view/1458},
+  crossref  = {DBLP:conf/aips/2010},
+  bibsource = {DBLP, http://dblp.uni-trier.de}
+}
+
+
+@book{russellnorvig,
+  author    = {Stuart J. Russell and
+               Peter Norvig},
+  title     = {Artificial Intelligence - A Modern Approach (3. internat.
+               ed.)},
+  publisher = {Pearson Education},
+  year      = {2010},
+  isbn      = {978-0-13-207148-2},
+  pages     = {I-XVIII, 1-1132},
+  ee        = {http://vig.pearsoned.com/store/product/1,1207,store-12521_isbn-0136042597,00.html},
+  bibsource = {DBLP, http://dblp.uni-trier.de}
+}
+
+@inproceedings{walsh10,
+  author    = {T.J. Walsh and
+               S. Goschin and
+               M.L. Littman},
+  title     = {Integrating Sample-Based Planning and Model-Based Reinforcement
+               Learning},
+  booktitle = {AAAI},
+  year      = {2010},
+  ee        = {http://www.aaai.org/ocs/index.php/AAAI/AAAI10/paper/view/1880},
+  bibsource = {DBLP, http://dblp.uni-trier.de}
+}
+
+@inproceedings{kocsis06,
+  author    = {L. Kocsis and
+               C. Szepesv{\'a}ri},
+  title     = {Bandit Based {M}onte-{C}arlo Planning},
+  booktitle = {ECML},
+  year      = {2006},
+  pages     = {282-293}
+}
+
+@MastersThesis{heyden09,
+  author = 	 {C. Heyden},
+  title = 	 {{Implementing a Computer Player for Carcassonnne}},
+  school = 	 {Department of Knowledge Engineering, Maastricht University},
+  year = 	 {2009}
+}
+
+@INPROCEEDINGS{veness07,
+author={Veness, J. and Blair, A.},
+booktitle={Computational Intelligence and Games, 2007. CIG 2007. IEEE Symposium on},
+title={Effective Use of Transposition Tables in Stochastic Game Tree Search},
+year={2007},
+month={april},
+volume={},
+number={},
+pages={112 -116},
+keywords={Ballard Star2 algorithm;alpha-beta searcher;stochastic game tree search;transposition tables;search problems;stochastic games;trees (mathematics);},
+doi={10.1109/CIG.2007.368086},
+ISSN={},}
+
+@article{chang2005,
+    author = {Chang, H.S. and Fu, M.C. and Hu, J. and Marcus, S.I.},
+    keywords = {bandits, forward, greedy, mdps, search, upper-confidence-bound},
+    month = {January},
+    number = {1},
+    pages = {126--139},
+    posted-at = {2010-08-24 01:45:41},
+    priority = {0},
+    title = {An Adaptive Sampling Algorithm for Solving Markov Decision Processes},
+    volume = {53},
+    year = {2005},
+    journal = {Operations Research}
+}
+
+
+@techreport{gelly06,
+  author = {S. Gelly and Y. Wang and R. Munos and  O. Teytaud},
+  title = {Modification of {UCT} with Patterns in {Monte-Carlo Go}},
+  institution = {Institut National de Recherche en Informatique et en Automatique ({INRIA})}, 
+  number = {RR-6062},
+  month = {November},
+  year = 2006
+}
+
+
+
+
+
+@inproceedings{chaslot08,
+  author = {G. and S. Bakkes and I. Szita and P. Spronck},
+  title = {Monte-{C}arlo Tree Search: A New Framework for Game AI},
+  booktitle = {Proceedings of the Fourth Artificial Intelligence and Interactive Digital Entertainment Conference},
+  publisher = {AAAI Press},
+  year = 2008
+}
+
+@inproceedings{bjornsson08, 
+  author = {H. Finnsson and Y. Bj\"{o}rnsson},
+  title = {Simulation-Based Approach to General Game Playing},
+  booktitle = {The Twenty-Third AAAI Conference on Artificial Intelligence}, 
+  pages = {259--264}, 
+  publisher = {AAAI Press},
+  year = 2008
+}
+
+@article{winands10,
+  author = {M.H.M. Winands and Y. Bj\"{o}rnsson and J-T. Saito},
+  title = {{Monte Carlo Tree Search in Lines of Action}},
+  journal = {{IEEE} Transactions on Computational Intelligence and {AI} in Games},
+  volume = 2,
+  number = 4,
+  pages = {239--250},
+  year = 2010
+}
+
+@article{lee09,
+  author = {C-S. Lee and M-H. Wang and G. Chaslot and J-B. Hoock and A. Rimmel and O. Teytaud and S-R. Tsai and S-C. Hsu and T-P. Hong},
+  title = {The Computational Intelligence of {M}o{G}o Revealed in {T}aiwan's Computer {G}o Tournaments},
+  journal = {{IEEE} Transactions on Computational Intelligence and {AI} in Games},
+  volume = 1,
+  number = 1,
+  pages = {73--89},
+  year = 2009
+}
+
+@inproceedings{szita10,
+  author = {I. Szita and G. Chaslot and P. Spronck},
+  title = {{Monte-Carlo Tree Search in Settlers of Catan}},
+  booktitle = {Proceedings of Advances in Computer Games (ACG 2009)}, 
+  pages = {21--34},
+  year = 2010
+}
+
+@article{ciancarini10,
+  author = {P. Ciancarini and G.P. Favini},
+  title = {{M}onte {C}arlo tree search in {K}riegspiel},
+  journal = {Artificial Intelligence}, 
+  pages = {670--684},
+  volume = 174,
+  number = 11,
+  year = 2010
+}
+
+@inproceedings{auger11,
+  author    = {D. Auger},
+  title     = {Multiple Tree for Partially Observable Monte-Carlo Tree Search},
+  booktitle = {Proceedings of the 2011 International Conference on Applications of Evolutionary Computation},
+  year      = 2011,
+  pages     = {53--62}
+}
+
+@article{mctssurvey,
+  author={Browne, C.B. and Powley, E. and Whitehouse, D. and Lucas, S.M. and Cowling, P.I. and Rohlfshagen, P. and Tavener, S. and Perez, D. and Samothrakis, S. and Colton, S.},
+  journal={Computational Intelligence and AI in Games, IEEE Transactions on},
+  title={A Survey of {M}onte {C}arlo Tree Search Methods},
+  year={2012},
+  month={march },
+  volume={4},
+  number={1},
+  pages={1 -43},
+  keywords={},
+  doi={10.1109/TCIAIG.2012.2186810},
+  ISSN={1943-068X},
+}
+
+@article{gelly12,
+  title = {The Grand Challenge of Computer Go: Monte Carlo Tree Search and Extensions},
+  author = {Sylvain Gelly and Levente Kocsis and Marc Schoenauer and Mich\`{e}le Sebag and David Silver, Csaba Szepesv\'{a}ri and Olivier Teytaud},
+  journal = {Communications of the {ACM}},
+  year = 2012,
+  month = March,
+  volume = 55, 
+  number = 3,
+  pages = {106--113}
+}
+
+@inproceedings{mcgammon,
+  author = {Francois Van Lishout and Guillaume Chaslot and Jos W.H.M. Uiterwijk},
+  title = {Monte-Carlo Tree Search in Backgammon},
+  booktitle = {Proceedings of the Computer Games Workshop},
+  year = 2007,
+  pages = {175--184}
+}
+
+
+@book{bertsekas1996,
+ author = {Bertsekas, Dimitri P. and Tsitsiklis, John N.},
+ title = {Neuro-Dynamic Programming},
+ year = {1996},
+ isbn = {1886529108},
+ edition = {1st},
+ publisher = {Athena Scientific},
+} 
+
+@article{pig, 
+  title = {Scarne on {D}ice},
+  author = {J. Scarne}, 
+  journal = {Harrisburg, PA: Military Service Publishing Co}, 
+  year = {1945}, 
+}
+
+% Computing "Elo Ratings" of Move Patterns in the Game of Go. ICGA Journal 30(4): 198-208 (2007).
+@article{Coulom07,
+  title = {Computing ``{ELO} Ratings'' of Move Patterns in the game of {G}o},
+  author = {R. Coulom},
+  journal = {ICGA Journal}, 
+  volume = 30,
+  number = 4, 
+  pages = {198--208},
+  year = 2007
+}
+
+@Book{Russell2003, 
+   AUTHOR = {Stuart Russell and Peter Norvig},
+   TITLE = {Artificial Intelligence: A Modern Approach},
+   PUBLISHER = {Prentice-Hall, Englewood Cliffs, NJ},
+   YEAR = {2003},
+   EDITION = {2nd edition}
+}
+
+@INPROCEEDINGS{Coulom06efficientselectivity,
+    author = {R. Coulom},
+    title = {{Efficient selectivity and backup operators in {M}onte-{C}arlo tree search}},
+    booktitle = {Proceedings Computers and Games 2006},
+    year = {2006},
+    publisher = {Springer-Verlag}
+}
+
+@inproceedings{silver09b,
+  author    = {David Silver and
+               Gerald Tesauro},
+  title     = {{Monte-Carlo simulation balancing}},
+  booktitle = {ICML},
+  year      = {2009},
+  pages     = {119},
+  ee        = {http://doi.acm.org/10.1145/1553374.1553495},
+  bibsource = {DBLP, http://dblp.uni-trier.de}
+}
+
+@inproceedings{silver10,
+ title = {{Monte-Carlo Planning in Large POMDPs}},
+ author = {D. Silver and J. Veness},
+ booktitle = {Advances in Neural Information Processing Systems 23},
+ pages = {2164--2172},
+ year = {2010}
+}
+
+@article{bertsekas99,
+ author = {Bertsekas, Dimitri P. and Castanon, David A.},
+ title = {Rollout Algorithms for Stochastic Scheduling Problems},
+ journal = {Journal of Heuristics},
+ volume = {5},
+ number = {1},
+ year = {1999},
+ issn = {1381-1231},
+ pages = {89--108},
+ doi = {http://dx.doi.org/10.1023/A:1009634810396},
+ publisher = {Kluwer Academic Publishers},
+ address = {Hingham, MA, USA},
+}
+
+@InProceedings(09ijcai-mivat,
+  Title = "Learning a Value Analysis Tool For Agent Evaluation",
+  Author = "Martha White and Michael Bowling",
+  Booktitle = "Proceedings of the Twenty-First International Joint Conference on Artificial Intelligence (IJCAI)",
+  Year = "2009",
+  Pages = "1976--1981",
+  AcceptRate = "26\%",
+  AcceptNumbers = "331 of 1290"
+)
+ 
+@book{ross-simul,
+ title =	"Simulation",
+ author =	"Sheldon M. Ross",
+ publisher =	"Academic Press",
+ address =	"San Diego",
+ year =		"2006",
+ edition =	"4th"
+}
+
+@inproceedings{lec1994,
+ author = {L'Ecuyer, Pierre},
+ title = {Efficiency improvement and variance reduction},
+ booktitle = {Proceedings of the 26th conference on Winter simulation},
+ series = {WSC '94},
+ year = {1994},
+ isbn = {0-7803-2109-X},
+ location = {Orlando, Florida, United States},
+ pages = {122--132},
+ numpages = {11},
+ url = {http://portal.acm.org/citation.cfm?id=193201.193994},
+ acmid = {193994},
+ publisher = {Society for Computer Simulation International},
+ address = {San Diego, CA, USA},
+} 
+
+@article{nelson1990,
+     jstor_articletype = {research-article},
+     title = {Control Variate Remedies},
+     author = {Nelson, Barry L.},
+     journal = {Operations Research},
+     jstor_issuetitle = {},
+     volume = {38},
+     number = {6},
+     jstor_formatteddate = {Nov. - Dec., 1990},
+     pages = {pp. 974-992},
+     url = {http://www.jstor.org/stable/170965},
+     ISSN = {0030364X},
+     abstract = {Other than common random numbers, control variates is the most promising variance reduction technique in terms of its potential for widespread use: Control variates is applicable in single or multiple response simulation, it does not require altering the simulation run in any way, and any stochastic simulation contains potential control variates. A rich theory of control variates has been developed in recent years. Most of this theory assumes a specific probabilistic structure for the simulation output process, usually joint normality of the response and the control variates. When these assumptions are not satisfied, desirable properties of the estimator, such as unbiasedness, may be lost. A number of remedies for violations of the assumptions have been proposed, including jackknifing and splitting. However, there has been no systematic analytical and empirical evaluation of these remedies. This paper presents such an evaluation, including evaluation of the small-sample statistical properties of the proposed remedies.},
+     language = {English},
+     year = {1990},
+     publisher = {INFORMS},
+     copyright = {Copyright © 1990 INFORMS},
+    }
+
+@article{neller10,
+  author = {T.W. Neller and C.G.M. Presser}, 
+  title = {Practical Play of the Dice Game {P}ig}, 
+  journal = {Undergraduate Mathematics and Its Applications}, 
+  volume = {26}, 
+  number = {4}, 
+  year = {2010}, 
+  pages = {443--458}
+}
+
+@article{neller04,
+  author = {Todd W. Neller and Clifton G.M. Pressor},
+  title = {Optimal Play of the Dice Game Pig}, 
+  journal = {Undergraduate Mathematics and Its Applications},
+  volume = {25}, 
+  number = {1},
+  year = {2004}, 
+  pages = {25--47}
+}
+
+@article{dominion, 
+  title = {Dominion},
+  author = {Donald X. Vaccarino}, 
+  journal = {Rio Grande Games}, 
+  year = {2008}, 
+}
+
+@article{cantstop, 
+  title = {{C}an't {S}top},
+  author = {S. Sackson}, 
+  journal = {Ravensburger}, 
+  year = {1980}, 
+}
+
+@article{antos10,
+ author = {Antos, Andr\'{a}s and Grover, Varun and Szepesv\'{a}ri, Csaba},
+ title = {Active learning in heteroscedastic noise},
+ journal = {Theoretical Computer Science},
+ volume = {411},
+ number = {29-30},
+ year = {2010},
+ issn = {0304-3975},
+ pages = {2712--2728},
+ doi = {http://dx.doi.org/10.1016/j.tcs.2010.04.007},
+ publisher = {Elsevier Science Publishers Ltd.},
+ address = {Essex, UK},
+ }
+
+
+@MISC{csaba09reinforcementlearning,
+    author = {Csaba Szepesv\'{a}ri},
+    title = {Reinforcement Learning Algorithms for {MDPs}},
+    year = {2009}
+}
+
+@article {Veness:arXiv0909.0801,
+author={Joel Veness and Kee Siong Ng and Marcus Hutter and David Silver},
+title={A {M}onte {C}arlo {AIXI} {A}pproximation},
+year="2009",
+journal="CoRR",
+volume="abs/0909.0801",
+doi=""
+} 
+
+@inproceedings{pascal08,
+	author = {Pascal Poupart and Nikos Vlassis},
+	title = "Model-based {B}ayesian {R}einforcement {L}earning in {P}artially {O}bservable {D}omains",
+	booktitle = "ISAIM",
+	year = 2008
+}
+
+@inproceedings{hoehn05,
+ author = {Hoehn, Bret and Southey, Finnegan and Holte, Robert C. and Bulitko, Valeriy},
+ title = {Effective short-term opponent exploitation in simplified poker},
+ booktitle = {AAAI'05},
+ year = {2005},
+ pages = {783--788}
+ }
+
+@Book{ cesa-bianchi,
+  author = 	 {N. Cesa-Bianchi and G. Lugosi},
+  title = 	 {Prediction, Learning, and Games},
+  publisher = 	 {CUP},
+  year = 	 {2006}
+}
+
+@inproceedings{strens00,
+   author = "M. Strens",
+   title = "A {B}ayesian framework for reinforcement learning",
+   booktitle = "ICML",
+   year = "2000",
+   pages = "943-950"
+}
+
+@article{ veness09,
+   author = {Veness, Joel and Silver, David and Uther, William and Blair, Alan},
+   title  = "Bootstrapping from Game Tree Search",
+   journal = "NIPS",
+   year   = "2009",
+   note   = "To appear"
+}
+
+@inproceedings{wang05,
+  author    = {T. Wang and
+               D.J. Lizotte and
+               M.H. Bowling and
+               D. Schuurmans},
+  title     = {Bayesian sparse sampling for on-line reward optimization},
+  booktitle = {ICML},
+  year      = {2005},
+  pages     = {956-963},
+}
+
+@article{hutter07topdown,
+  author    = {Marcus Hutter},
+  title     = {Universal Algorithmic Intelligence: A mathematical top-$>$down
+               approach},
+  journal   = {CoRR},
+  volume    = {abs/cs/0701125},
+  year      = {2007}
+}
+
+@inproceedings{hutter02,
+  author    = {Marcus Hutter},
+  title     = {Self-Optimizing and Pareto-Optimal Policies in General Environments
+               Based on Bayes-Mixtures},
+  booktitle = {COLT},
+  year      = {2002},
+  pages     = {364-379}
+}
+
+@Book{ sipser05,
+  author = 	 {Michael Sipser},
+  title = 	 {Introduction to the Theory of Computation},
+  publisher = 	 {Course Technology},
+  year = 	 {2005},
+  edition = 	 {2nd}
+}
+
+@Book{ boolos02,
+  author = 	 {George S. Boolos and John P. Burgess and Richard C. Jeffrey},
+  title = 	 {Computability and Logic},
+  publisher = 	 {Cambridge University Press},
+  year = 	 {2002},
+  edition = 	 {4th}
+}
+
+@PhdThesis{ LeggPHD08,
+  author = 	 {Shane Legg},
+  title = 	 {Machine Super Intelligence},
+  school = 	 {Department of Informatics, University of Lugano},
+  year = 	 {2008}
+}
+
+
+@inproceedings{makino09,
+ author = {Makino, Takaki},
+ title = {Proto-predictive representation of states with simple recurrent temporal-difference networks},
+ booktitle = {ICML},
+ year = {2009},
+ isbn = {978-1-60558-516-1},
+ pages = {697--704}
+ }
+
+
+@article{Willems94ctwext,
+    author = {Frans M. J. Willems},
+    title = {The Context-Tree Weighting Method: Extensions},
+    journal = {IEEE Transactions on Information Theory},
+    year = {1998},
+    volume = {44},
+    pages = {792--798}
+}
+
+@book{ wallace05,
+  author = "C.S. Wallace",
+  title  = "Statistical and Inductive Inference by Minimum Message Length",
+  publisher = "Springer",
+  year      = 2005
+}
+
+@inproceedings{SuttonT04,
+  author    = {Richard S. Sutton and
+               Brian Tanner},
+  title     = {Temporal-Difference Networks},
+  booktitle = {NIPS},
+  year      = {2004}
+}
+
+@inproceedings{gelly07,
+	Author = {S. Gelly and D. Silver},
+	Title = {Combining Online and Offline Learning in {UCT}},
+	Booktitle = {Proceedings of the 17th International Conference on Machine Learning},
+	Year = {2007},
+	 Pages = {273-280}
+}
+
+@INPROCEEDINGS{chrisman92,
+    author = {Lonnie Chrisman},
+    title = {Reinforcement Learning with Perceptual Aliasing: The Perceptual Distinctions Approach},
+    booktitle = {Proceedings of the Tenth National Conference on Artificial Intelligence},
+    year = {1992},
+    pages = {183--188}
+}
+
+@book{ li-vitanyi,
+   author = "Ming Li and Paul Vit{\'a}nyi",
+   title  = "An Introduction to Kolmogorov Complexity and Its Applications",
+   year    = 2008,
+   publisher = "Springer"
+}
+
+@article{ kt-estimator,
+   author = "R.E. Krichevsky and V.K. Trofimov",
+   title  = "The performance of universal coding",
+   journal = "IEEE Transactions on Information Theory",
+   volume  = "IT-27",
+   pages   = "199-207",
+   year    = 1981
+}
+
+@article{farias07,
+  author    = {V. Farias and
+               C. Moallemi and
+               T. Weissman and
+               B. Van Roy},
+  title     = {Universal {R}einforcement {L}earning},
+  journal   = {CoRR},
+  volume    = {abs/0707.3087},
+  year      = {2007}
+}
+
+@article{farias09b,
+   author = {Farias, Vivek F. and Moallemi, Ciamac C. and Weissman, Tsachy and Van Roy, Benjamin},
+   title  = "Universal Reinforcement Learning",
+   journal = "IEEE Transactions on Information Theory",
+   year   = "2009",
+   note   = "To appear"
+}
+
+@inproceedings{kearns99,
+   author = "M.J. Kearns and Y. Mansour and A.Y. Ng",
+   title  = "A sparse sampling algorithm for near-optimal planning in
+             large {M}arkov {D}ecision {P}rocesses",
+   booktitle = "IJCAI",
+   pages  = "1324-1331",
+   year   = 1999
+}
+
+@inproceedings{ psr04,
+   author = "Satinder Singh and Michael James and Matthew Rudary",
+   title  = "Predictive state representations: {A} new theory for modeling dynamical systems",
+   booktitle = "UAI",
+   pages  = "512-519",
+   year   = 2004
+}
+
+@inproceedings{ psr02,
+   author = "Michael Littman and Richard Sutton and Satinder Singh",
+   title  = "Predictive representations of state",
+   booktitle = "NIPS",
+   pages  = "1555-1561",
+   year   = 2002
+}
+
+@article{ lempel-ziv77,
+   author = "Jacob Ziv and Abraham Lempel",
+   title  = "A universal algorithm for sequential data compression",
+   journal = "IEEE Transactions on Information Theory",
+   volume = "23",
+   number = 3,
+   pages  = "337-343",
+   year   = 1977
+}
+
+@inproceedings{ shani04,
+  author = "Guy Shani and Ronen Brafman",
+  title  = "Resolving perceptual aliasing in the presence of noisy sensors",
+  booktitle = "NIPS",
+  year = 2004
+}
+
+@PhdThesis{ shani07,
+  author = 	 {Guy Shani},
+  title = 	 {Learning and Solving Partially Observable Markov 
+                  Decision Processes},
+  school = 	 {Ben-Gurion University of the Negev},
+  year = 	 {2007}
+}
+
+@article{ watkins92,
+   author = "Christopher Watkins and Peter Dayan", 
+   title  = "Q-learning",
+   journal = "Machine Learning",
+   volume = 8,
+   pages = "279-292",
+   year  = 1992
+}
+
+@inproceedings{ volf95,
+   author = "Paul A.J. Volf and Frans M.J. Willems",
+   title  = "A Study of the Context Tree Maximizing Method",
+   booktitle = "16th Symposium on Information Theory in the Benelux",
+   pages =  "3-9",
+   year  = 1995
+}
+
+
+@inproceedings{ suematsu99,
+   author = "Nobuo Suematsu and Akira Hayashi",
+   title = "A reinforcement learning algorithm in partially observable
+            environments using short-term memory",
+   booktitle = "NIPS",
+   pages = "1059-1065",
+   year = 1999
+}
+
+@inproceedings{ suematsu97,
+   author = "Nobuo Suematsu and Akira Hayashi and Shigang Li",
+   title = "A {B}ayesian approach to model learning in non-{M}arkovian environment",
+   booktitle = "ICML",
+   pages = "349-357",
+   year = "1997"
+}
+
+@inproceedings{Ponsen10a, 
+  title = {{Integrating Opponent Models with Monte-Carlo Tree Search in Poker}}, 
+  author = {Marc Ponsen and Geert Gerritsen and Guillaume Chaslot}, 
+  booktitle = {Proceedings of {Interactive Decision Theory and Game Theory} Workshop at the Twenty-Fourth Conference on Artificial Intelligence (AAAI-10)}, 
+  publisher = {AAAI press}, 
+  year = {2010}, 
+}  
+
+@inproceedings{BjarnasonFT09,
+  author    = {Ronald Bjarnason and
+               Alan Fern and
+               Prasad Tadepalli},
+  title     = {{Lower Bounding Klondike Solitaire with Monte-Carlo Planning}},
+  booktitle = {ICAPS},
+  year      = {2009},
+}
+
+@inproceedings{BallaF09,
+  author    = {Radha-Krishna Balla and
+               Alan Fern},
+  title     = {{UCT for Tactical Assault Planning in Real-Time Strategy
+               Games}},
+  booktitle = {IJCAI},
+  year      = {2009},
+  pages     = {40-45},
+}
+
+@inproceedings{Finnsson08, 
+  author = {Hilmar Finnsson and Yngvi Bjornsson},
+  title = {{Simulation-based Approach to General Game Playing}}, 
+  booktitle = {Twenty-Third AAAI Conference on Artificial Intelligence (AAAI 2008)}, 
+  pages = {259--264},
+  year = 2008
+}
+
+@article{mueller09, 
+  author = {David Tom and Martin Mueller}, 
+  title = {{A Study of UCT and Its Enhancements in an Artificial Game}}, 
+  journal = {Lecture Notes in Computer Science}, 
+  volume = {6048/2010}, 
+  year = 2010, 
+  pages = {55--64}
+}
+
+@inproceedings{chaslot08mcts, 
+  title = {Monte-Carlo Tree Search: A New Framework for Game {AI}}, 
+  author = {G. Chaslot and S. Bakkes and I. Szita and P. Spronck},
+  booktitle = {Fourth Artificial Intelligence and Interactive Digital Entertainment Conference (AIIDE 2008)}, 
+  year = 2008
+}
+
+@article{chaslot08cem-mcts,
+  title = {{Cross-entropy for Monte-Carlo Tree Search}},
+  author = {Guillaume M.J-B. Chaslot and Mark H.M. Winands and Istvan Szita and H. Jaap van den Herik},
+  journal = {{ICGA}}, 
+  volume = 31, 
+  number = 3, 
+  pages = {145--156},
+  year = {2008}
+}
+
+@inproceedings{chaslot08,
+ author = {Chaslot, Guillaume M. and Winands, Mark H. and Herik, H. Jaap},
+ title = {{Parallel Monte-Carlo Tree Search}},
+ booktitle = {Proceedings of the 6th International Conference on Computers and Games},
+ year = {2008},
+ isbn = {978-3-540-87607-6},
+ pages = {60--71},
+ location = {Beijing, China},
+ doi = {http://dx.doi.org/10.1007/978-3-540-87608-3_6},
+ publisher = {Springer-Verlag},
+ address = {Berlin, Heidelberg},
+ }
+
+@article{ChaslotWHUB2008,
+  title = {Progressive strategies for Monte-Carlo Tree Search},
+  author = {G.M.J-B. Chaslot and M.H.M. Winands and H.J. van den Herik and J.W.H.M. Uiterwijk and B. Bouzy},
+  journal = {New Mathematics and Natural Computation},
+  volume = {4},
+  number = {3},
+  pages = {343--357},
+  year = {2008},
+  publisher = {World Scientific Publishing Company}
+}
+
+
+@techreport{gelly2006tr,
+	abstract = {Algorithm UCB1 for multi-armed bandit problem has already been extended to Algorithm UCT (Upper bound Confidence for Tree) which works for minimax tree search. We have developed a Monte-Carlo Go program, MoGo, which is the first computer Go program using UCT. We explain our modification of UCT for Go application and also the intelligent random simulation with patterns which has improved significantly the performance of MoGo. UCT combined with pruning techniques for large Go board is discussed, as well as parallelization of UCT. MoGo is now a top level Go program on 9x9 and 13x13 Go boards.},
+	author = {Gelly, Sylvain and Wang, Yizao and Munos, R\'{e}mi and Teytaud, Olivier},
+	citeulike-article-id = {2990556},
+	citeulike-linkout-0 = {http://hal.inria.fr/docs/00/12/15/16/PDF/RR-6062.pdf},
+	institution = {INRIA, France},
+	keywords = {computer-go, mogo, monte-carlo, ucb1, uct},
+	month = {November},
+	number = {6062},
+	posted-at = {2008-07-11 21:02:49},
+	priority = {2},
+	title = {Modification of {UCT} with Patterns in {M}onte-{C}arlo {G}o},
+	url = {http://hal.inria.fr/docs/00/12/15/16/PDF/RR-6062.pdf},
+	year = {2006}
+}
+
+
+
+@Article{ legg07,
+  author = 	 {Shane Legg and Marcus Hutter},
+  title = 	 {Universal Intelligence: A Definition of Machine Intelligence},
+  journal = 	 {Minds and Machines},
+  year = 	 {2007},
+  volume = 	 {17},
+  number = 	 {4},
+  pages = 	 {391-444}
+}
+
+@Book{ sutton-barto98,
+  author = 	 {Richard S. Sutton and Andrew G. Barto},
+  title = 	 {Reinforcement Learning: An Introduction},
+  publisher = 	 {MIT Press},
+  year = 	 {1998}
+}
+
+@Unpublished{ uther09,
+  author = 	 {William Uther},
+  title = 	 {An Ontology of Partially Observable Reinforcement Learning 
+                  Methods},
+  note = 	 {NICTA Tech report},
+  year = 	 {2009}
+}
+
+@Article{ pereira99,
+  author = 	 {Fernando C. Pereira and Yoram Singer},
+  title = 	 {An efficient extension to mixture techniques for 
+                  prediction and decision trees},
+  journal = 	 {Machine Learning},
+  year = 	 {1999},
+  volume = 	 {36},
+  number = 	 {3},
+  pages = 	 {183-199}
+}
+
+@book{ breiman84classification,
+  author = "Leo Breiman and Jerome Friedman and Richard Olshen and 
+            Charles Stone",
+  title = "Classification and Regression Trees",
+  publisher = "Chapman \& Hall",
+  year = "1984" 
+}
+
+@article{ freund97decision-theoretic,
+   author = "Yoav Freund and Robert E. Schapire",
+   title = "A decision-theoretic generalization of on-line learning and an
+            application to boosting",
+   journal = "Journal of Computer and System Sciences",
+   volume = "55",
+   number = "1",
+   pages = "119--139",
+   year = "1997"
+}
+
+@book{ cesa-bianchi06,
+   author = "Nicol{\`o} Cesa-Bianchi and Gabor Lugosi",
+   title = "Prediction, Learning, and Games",
+   publisher = "Cambridge University Press",
+   year = 2006
+}
+
+@Article{ littlestone94,
+  author = 	 {Nick Littlestone and Manfred K. Warmuth},
+  title = 	 {The weighted majority algorithm},
+  journal = 	 {Information and Computation},
+  year = 	 {1994},
+  volume = 	 {108},
+  pages = 	 {212-261}
+}
+
+@article{ littlestone88,
+   author = "Nick Littlestone",
+   title = "Learning quickly when irrelevant attributes abound: A new
+            linear-threshold algorithm",
+   journal = "Machine Learning",
+   volume = "2",
+   pages = "285--318",
+   year = 1988
+}
+
+@InProceedings{ cesa-bianchi93,
+  author = 	 {Nicol{\`o} Cesa-Bianchi and Yoav Freund and David P. Helmbold
+                  and David Haussler and Robert E. Schapire and Manfred K. Warmuth},
+  title = 	 {How to use expert advice},
+  booktitle = {Proc. 25th Annual ACM Symposium on the Theory of Computing},
+  pages = 	 {382-391},
+  year = 	 {1993}
+}
+
+@Article{ helmbold97,
+  author = 	 {David P. Helmbold and Robert E. Schapire},
+  title = 	 {Predicting nearly as well as the best pruning of a 
+                  decision tree},
+  journal = 	 {Machine Learning},
+  year = 	 {1997},
+  volume = 	 {27},
+  number = 	 {1},
+  pages = 	 {51-68}
+}
+
+@inproceedings{Cassandra94actingoptimally,
+  author    = {Anthony R. Cassandra and
+               Leslie Pack Kaelbling and
+               Michael L. Littman},
+  title     = {Acting Optimally in Partially Observable Stochastic Domains},
+  booktitle = {AAAI},
+  year      = {1994},
+  pages     = {1023-1028}
+}
+
+@inproceedings{schmidhuber06,
+  author    = {J{\"u}rgen Schmidhuber},
+  title     = {G{\"o}del machines: Fully self-referential optimal universal self-improvers},
+  booktitle = {Artificial General Intelligence},
+  year      = {2006},
+  pages     = {119-226}
+}
+
+@incollection{ kramer-widmer01,
+  author = "Stefan Kramer and Gerhard Widmer",
+  editor = 	 {Sa\v{s}o D\v{z}eroski and Nada Lavra\v{c}},
+  booktitle = 	 {Relational Data Mining},
+  chapter = 	 {6},
+  title =        {Inducing Classification and Regression Trees in First 
+                  Order Logic},
+  publisher = 	 {Springer},
+  year = 	 {2001}
+}
+
+@article{ blockeel98topdown,
+    author = "Hendrik Blockeel and Luc {De Raedt}",
+    title = "Top-Down Induction of First-Order Logical Decision Trees",
+    journal = "Artificial Intelligence",
+    volume = "101",
+    number = "1-2",
+    pages = "285-297",
+    year = "1998",
+    url = "citeseer.nj.nec.com/blockeel98topdown.html" 
+}
+
+@Article{chipman98,
+  author = 	 {Hugh A. Chipman and Edward I. George and Robert E. Mc{C}ulloch},
+  title = 	 {Bayesian {CART} Model Search},
+  journal = 	 {Journal of the American Statistical Association},
+  year = 	 {1998},
+  volume = 	 {93},
+  pages = 	 {935-960}
+}
+
+@PhdThesis{buntine92thesis,
+  author = 	 {Wray L. Buntine},
+  title = 	 {A Theory of Learning Classification Rules},
+  school = 	 {University of Technology Sydney},
+  year = 	 {1992}
+}
+
+@Article{hoeting99bma,
+  author = 	 {Jennifer A. Hoeting and David Madigan and Adrian Raftery and Chris T. Volinsky},
+  title = 	 {Bayesian Model Averaging: A Tutorial},
+  journal = 	 {Statistical Science},
+  year = 	 {1999},
+  volume = 	 {14},
+  number = 	 {4},
+  pages = 	 {382-417}
+}
+
+@InProceedings{schmidhuber02,
+  author = 	 {J{\"u}rgen Schmidhuber},
+  title = 	 {The Speed prior: {A} new simplicity measure yielding
+                  near-optimal computable predictions},
+  booktitle = {Proc. 15th Annual Conf. on Computational Learning Theory },
+  pages = 	 {216-228},
+  year = 	 {2002}
+}
+
+@inproceedings{pankov08,
+  author    = {Sergey Pankov},
+  title     = {A computational approximation to the {AIXI} model},
+  booktitle = {AGI},
+  year      = {2008},
+  pages     = {256-267}
+}
+
+@InProceedings{ poland05,
+  author = 	 {Jan Poland and Marcus Hutter},
+  title = 	 {Defensive universal learning with experts},
+  booktitle = {Proc. 16th International Conf. on Algorithmic Learning
+                  Theory},
+  pages = 	 {356-370},
+  year = 	 {2005},
+  volume = 	 {LNAI 3734},
+  publisher = {Springer}
+}
+
+@TechReport{ poland06,
+  author = 	 {Jan Poland and Marcus Hutter},
+  title = 	 {Universal learning of repeated matrix games},
+  institution =  {IDSIA},
+  year = 	 {2006},
+  number = 	 {18-05}
+}
+
+@article{ schmidhuber97b,
+  author = "J. Schmidhuber and J. Zhao and M. A. Wiering",
+  title = "Shifting inductive bias with success-story algorithm, adaptive
+           {L}evin search, and incremental self-improvement",
+  journal = "Machine Learning",
+  volume = 28,
+  pages = "105-130",
+  year = 1997
+}
+
+@article{ schmidhuber97a,
+  author = "J{\" u}rgen Schmidhuber",
+  title = "Discovering neural nets with low {K}olmogorov complexity and 
+           high generalization capability",
+  journal = "Neural Networks",
+  volume = 10,
+  number = 5,
+  pages = "857-873",
+  year = 1997
+}
+
+@InProceedings{ schmidhuber03,
+  author = 	 {J{\" u}rgen Schmidhuber},
+  title = 	 {Bias-optimal incremental problem solving},
+  booktitle = {Advances in Neural Information Processing Systems 15},
+  pages = 	 {1571-1578},
+  year = 	 {2003},
+  publisher = {MIT Press},
+}
+
+@article{ schmidhuber04,
+  author = "J{\" u}rgen Schmidhuber",
+  title = "Optimal Ordered Problem Solver",
+  journal = "Machine Learning",
+  volume = 54,
+  pages = "211-254",
+  year = 2004
+}
+
+@article{ levin73,
+  author = "Leonid A. Levin",
+  title = "Universal sequential search problems",
+  journal = "Problems of Information Transmission",
+  volume = "9",
+  pages = "265-266",
+  year = 1973
+}
+
+@article{hutter02fastest,
+  author    = {Marcus Hutter},
+  title     = {The Fastest and Shortest Algorithm for all Well-Defined
+               Problems},
+  journal   = {International Journal of Foundations of Computer Science.},
+  volume    = {13},
+  number    = {3},
+  year      = {2002},
+  pages     = {431-443}
+}
+
+@inproceedings{RLshorttermmem98,
+ author = {Suematsu, Nobuo and Hayashi, Akira},
+ title = {A reinforcement learning algorithm in partially observable environments using short-term memory},
+ booktitle = {Proceedings of the 1998 conference on Advances in neural information processing systems II},
+ year = {1999},
+ isbn = {0-262-11245-0},
+ pages = {1059--1065},
+ publisher = {MIT Press},
+ address = {Cambridge, MA, USA},
+}
+
+@ARTICLE{Kaelbling95planningand,
+    author = {Leslie Pack Kaelbling and Michael L. Littman and Anthony R. Cassandra},
+    title = {Planning and Acting in Partially Observable Stochastic Domains},
+    journal = {Artificial Intelligence},
+    year = {1995},
+    volume = {101},
+    pages = {99--134}
+}
+
+@article{Ross:pomdp,
+	author = {Ross, St{\'e}phane and Pineau, Joelle and Paquet, S{\'e}bastien and Chaib-Draa, Brahim},
+	journal = {Journal of Artificial Intelligence Research},
+	pages = {663--704},
+	posted-at = {2009-02-11 20:51:20},
+	priority = {2},
+	title = {Online Planning Algorithms for {POMDP}s},
+	volume = {32},
+	year = {2008}
+}
+
+@inproceedings{ lloyd-ng-learnModal,
+  author = "John W. Lloyd and Kee Siong Ng",
+  title = "Learning Modal Theories",
+  booktitle = "Proceedings of the 16th International Conference on
+               Inductive Logic Programming",
+  series = "LNAI 4455",
+  pages = "320-334",
+  year = 2007
+}
+
+@InProceedings{Hutter:09phimdp,
+  author =       "Marcus Hutter",
+  title =        "Feature {M}arkov Decision Processes",
+  booktitle =    "AGI",
+  pages =        "61--66",
+  year =         "2009",
+   issn =         "1951-6851",
+  isbn =         "978-90-78677-24-6"
+}
+
+@InProceedings{Hutter:09phidbn,
+  author =       "Marcus Hutter",
+  title =        "Feature Dynamic {B}ayesian Networks",
+  booktitle =    "AGI",
+  pages =        "67--73",
+  year =         "2009",
+}
+
+@article{begleiter06,
+  author    = {Ron Begleiter and
+               Ran El-Yaniv},
+  title     = {Superior Guarantees for Sequential Prediction and Lossless
+               Compression via Alphabet Decomposition},
+  journal   = {Journal of Machine Learning Research},
+  volume    = {7},
+  year      = {2006},
+  pages     = {379-411}
+}
+
+@PhdThesis{mccallum96,
+  author = 	 {Andrew Kachites Mc{C}allum},
+  title = 	 {Reinforcement Learning with Selective Perception and Hidden State},
+  school = 	 {University of Rochester},
+  year = 	 {1996}
+}
+
+
+@ARTICLE{chaslot08d,
+  AUTHOR = {{G}.{M}.{J}-{B}. {C}haslot and {M}.{H}.{M}. {W}inands and {J}.{W}.{H}.{M}.
+	{U}iterwijk and van den {H}erik, {H}.{J}. and {B}. {B}ouzy},
+  TITLE = {Progressive Strategies for {Monte-Carlo Tree Search}},
+  JOURNAL = {New Mathematics and Natural Computation},
+  YEAR = {2008},
+  VOLUME = {4},
+  NUMBER = {3},
+ }
+
+@Article{ solomonoff64,
+  author = 	 {Ray J. Solomonoff},
+  title = 	 {A formal theory of inductive inference: Parts 1 and 2},
+  journal = 	 {Information and Control},
+  year = 	 {1964},
+  volume = 	 {7},
+  pages  =       {1-21}
+}
+
+@inproceedings{cadia2008,
+  author    = {Hilmar Finnsson and
+               Yngvi Bj{\"o}rnsson},
+  title     = {Simulation-Based Approach to General Game Playing},
+  booktitle = {AAAI},
+  year      = {2008},
+  pages     = {259-264}
+
+}
+
+@article{auer02,
+  author    = {Peter Auer},
+  title     = {Using Confidence Bounds for Exploitation-Exploration Trade-offs},
+  journal   = {JMLR},
+  volume    = {3},
+  year      = {2002},
+  pages     = {397--422},
+  ee        = {http://www.jmlr.org/papers/v3/auer02a.html},
+  bibsource = {DBLP, http://dblp.uni-trier.de}
+}
+
+@article{AuerCBF2002,
+  author = {P. Auer and N. Cesa-Bianchi and P. Fischer},
+  title = {Finite-time analysis of the multiarmed bandit problem},
+  journal = {Machine learning},
+  year = {2002},
+  volume = {47},
+  pages = {235--256},
+  number = {2},
+  publisher = {Springer}
+}
+
+@article{ begleiter04,
+   author = {Ron Begleiter and Ran El-Yaniv and Golan Yona},
+   title = {On Prediction using Variable Order Markov Models},
+   journal = {Journal of Artificial Intelligence Research},
+   volume = {22},
+   pages = {385-421},
+   year = {2004}
+}
+
+@inproceedings{ oliver-hand95,
+  author = {Jonathan J. Oliver and David J. Hand},
+  title = {On pruning and averaging decision trees},
+  booktitle = {ICML},
+  pages = {231--241},
+  year = {1995}
+}
+
+@Article{ ctw-tutorial,
+  author = 	 {Frans Willems and Yuri Shtarkov and Tjalling Tjalkens},
+  title = 	 {Reflections on ``{T}he {C}ontext {T}ree {W}eighting {M}ethod: Basic Properties''},
+  journal = 	 {Newsletter of the IEEE Information Theory Society},
+  volume  =      47,
+  number  =      1,
+  year = 	 {1997}
+}
+
+@Article{ ctw95,
+  author = 	 {Frans M.J. Willems and Yuri M. Shtarkov and
+                  Tjalling J. Tjalkens},
+  title = 	 {The {C}ontext {T}ree {W}eighting {M}ethod: {B}asic {P}roperties},
+  journal = 	 {IEEE Transactions on Information Theory},
+  year = 	 {1995},
+  volume = 	 {41},
+  pages = 	 {653-664}
+}
+
+@InProceedings{holmes06,
+  author = 	 {Michael P. Holmes and Charles Lee Isbell Jr},
+  title = 	 {Looping suffix tree-based inference of partially observable
+                  hidden state},
+  booktitle =    {ICML},
+  pages = 	 {409-416},
+  year = 	 {2006}
+}
+
+@Article{ ron96,
+  author = 	 {D. Ron and Y. Singer and N. Tishby},
+  title = 	 {The power of amnesia: Learning probabilistic automata with
+                  variable memory length},
+  journal = 	 {Machine Learning},
+  year = 	 {1996},
+  volume = 	 {25},
+  number = 	 {2},
+  pages = 	 {117-150}
+}
+
+@book{LogicforLearning,
+   author = "John W. Lloyd",
+   title = "Logic for Learning: Learning Comprehensible Theories from
+            Structured Data",
+   publisher = "Springer",
+   year = "2003"
+}
+
+@PhdThesis{ ng05thesis,
+  author = 	 {Kee Siong Ng},
+  title = 	 {Learning Comprehensible Theories from Structured Data},
+  school = 	 {The Australian National University},
+  year = 	 {2005}
+}
+
+@Book{Hutter:04uaibook,
+  author = 	 {Marcus Hutter},
+  title = 	 {Universal Artificial Intelligence: Sequential Decisions Based on Algorithmic Probability},
+  publisher = 	 {Springer},
+  year = 	 {2005}
+}
+
+@inproceedings(ginsberg,key="Ginsberg90",
+	Author="Ginsberg, M.L. and Harvey, W.D.",
+        Title="Iterative Broadening",
+	BookTitle="Proceedings of AAAI-91",
+        year=1990)
+
+@inproceedings(min-aaai, key="Minton90", author="Minton, S. and
+		Johnston, M. and Philips, A.B. and Laird, P.",
+	title="Solving Large Scale Constraint Satisfaction and Scheduling
+      Problems Using a Heuristic Repair Method",
+	BookTitle="Proceedings of AAAI-90",
+	year=1990)
+
+
+@article(papad, key="Johnson88", author="Johnson, D.S. and
+	Papadimitrou, C.H. and Yannakakis, M.",
+	title="How Easy is Local Search?",
+	journal="Journal of Computer and System Sciences",
+	volume="37", pages="79-100",
+	year=1988)
+
+@book(brassard, key="brassard88",author="Brassard, G. and Bratley, P.",
+	title="Algorithmics - Theory and Practice",
+        publisher="Englewood Cliffs, NJ: Prentice Hall", 
+	year=1988) 
+
+@article(stones, key="Stone87", author="Stone, H.S. and Stone, J.M.",
+	title="Efficient Search Techniques - An Empirical Study of the
+	N-Queens Problem",
+	journal="IBM Journal of Research and Development",
+	volume=31,
+        pages="464-474", publisher="International Business Machines.",
+	year=1987)
+
+@inproceedings(adorf, key="Adorf90", author="Adorf, H.M. and
+	Johnston, M.D.",
+	title="A Discrete Stochastic Neural Network Algorithm for 
+	Constraint Satisfaction Problems",
+	booktitle="Proceedings of the International Joint Conference on Neural
+	Networks",
+        year=1990)	
+
+@inproceedings(langley,key="Langley92",
+	Author="Langley, P.",
+        Title="Systematic and Nonsystematic Search Strategies",
+	BookTitle="Proceedings of AAAI-92",
+	year=1992)
+
+@inproceedings(johnston, key="Johnston89", 
+	author="Johnston, M.D. and Adorf, H.M.",
+	title="Learning in Stochastic Neural Networks for
+	Constraint Satisfaction Problems",
+	booktitle="Proceedings of NASA Conference on Space Telerobotics",
+	volume=37,
+	year=1989)
+
+
+@article(sam, key="Waldrop",
+        Author="Waldrop, M.",
+        Title="Will the {H}ubble Space Telescope Compute?",
+        Journal="Science", year=1989,
+	pages= "1437-1439",
+        volume=243)
+        
+@inproceedings(simmons-aaai88,key="Simmons88",
+	Author="Simmons, R.G.",
+        Title="A Theory of Debugging Plans and Interpretations",
+	BookTitle="Proceedings of AAAI-88",
+	year=1988)
+
+@book(hacker, key="sussman75",author="Sussman, G. J.",
+	title="A Computer Model of Skill Acquisition",
+	Publisher="New York: New American Elsevier",
+	year=1975) 
+
+@inproceedings(hopfield, key="Hopfield", author="Hopfield, J.J.",
+	title="Neural Networks and Physical Systems with Emergent Collective
+		Computational Abilities",
+	booktitle="Proceedings of the National Academy of Sciences",
+	publisher="Washington, DC: National Academy Press",
+	year=1982, 
+	volume=79)
+
+@inproceedings(mj-early, key="Johnston", author="Johnston, M.D.",
+	title="Automated Telescope Scheduling",
+	booktitle="Proceedings of the Symposium on Coordination
+		of Observational Projects",
+	year=1987)
+
+@inproceedings{Hauk04rediscovering,
+ author = {Hauk, T. and Buro, M. and Schaeffer, J.},
+ title = {Rediscovering *-MINIMAX search},
+ booktitle = {Proceedings of the 4th international conference on Computers and Games},
+ series = {CG'04},
+ year = {2006},
+ isbn = {3-540-32488-7, 978-3-540-32488-1},
+ location = {Ramat-Gan, Israel},
+ pages = {35--50},
+ numpages = {16},
+ url = {http://dx.doi.org/10.1007/11674399_3},
+ doi = {10.1007/11674399_3},
+ acmid = {2179920},
+ publisher = {Springer-Verlag},
+ address = {Berlin, Heidelberg},
+} 
+
+@inproceedings{Hauk04star,
+  author = {T. Hauk and M. Buro and J. Schaeffer},
+  title = {*-Minimax Performance in Backgammon},
+  pages = {51--66},
+  booktitle = {Proceedings of the 4th international conference on Computers and Games},
+  year = 2004,
+}
+
+@inproceedings{Winands09eval,
+ author = {Winands, M.H.M. and Bj\"{o}rnsson, Y.},
+ title = {Evaluation Function based {Monte-Carlo Lines of Action}},
+ booktitle = {Proceedings of the 12th International Conference on Advances in Computer Games},
+ series = {ACG'09},
+ year = {2010},
+ isbn = {3-642-12992-7, 978-3-642-12992-6},
+ location = {Pamplona, Spain},
+ pages = {33--44},
+ numpages = {12},
+ url = {http://dx.doi.org/10.1007/978-3-642-12993-3_4},
+ doi = {10.1007/978-3-642-12993-3_4},
+ acmid = {2166709},
+ publisher = {Springer-Verlag},
+ address = {Berlin, Heidelberg},
+} 
+
+
+
+@inproceedings{Lorentz11An,
+  author = {R.J. Lorentz},
+  title = {An {MCTS} Program to {Play EinStein W\"{u}rfelt Nicht!}},
+  booktitle = {Proceedings of the 12th International Conference on Advances in Computer Games},
+  year = {2011},
+  pages = {52--59}
+}
+
+@MastersThesis{ewnthesis,
+  author = {Sarmen Shahbazian},
+  title = {{Monte Carlo} Tree Search in {EinStein W\"{u}rfelt Nicht!}},
+  school = {California State University, Northridge},
+  year = {2012}
+}
+
+@MastersThesis{ng05thesis,
+  author = 	 {Kee Siong Ng},
+  title = 	 {Learning Comprehensible Theories from Structured Data},
+  school = 	 {The Australian National University},
+  year = 	 {2005}
+}
+
+%1966 Game-playing and game-learning automata. In Advances in Programming and Non-numerical Computation, (ed. L. Fox), Ch. 8, pp. 183-196.
+@article{Michie66Exp, 
+  author = {D. Michie},
+  title = {Game-playing and game-learning automata},
+  journal = {Advances in Programming and Non-numerical Computation},
+  editor = {Leslie Fox},
+  pages = {183--196},
+  year = 1966,
+}
+
+
+
