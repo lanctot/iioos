@@ -1,0 +1,44 @@
+%File: formatting-instruction.tex
+\documentclass[letterpaper]{article}
+\usepackage{aaai}
+\usepackage{times}
+\usepackage{helvet}
+\usepackage{courier}
+\frenchspacing
+\setlength{\pdfpagewidth}{8.5in}
+\setlength{\pdfpageheight}{11in}
+\pdfinfo{
+/Title (Searching Imperfect Information Games by Online Outcome Sampling)
+/Author (Authors)}
+\setcounter{secnumdepth}{0}  
+ \begin{document}
+% The file aaai.sty is the style file for AAAI Press 
+% proceedings, working notes, and technical reports.
+%
+\title{Monte Carlo Tree Search in Imperfect Information Games\\using Online Outcome Sampling}
+\author{Authors}
+%\author{Author info\\
+%Association for the Advancement of Artificial Intelligence\\
+%2275 East Bayshore Road, Suite 160\\
+%Palo Alto, California 94303\\
+
+
+\maketitle
+
+\begin{abstract}
+Online search in games has been a classic interest of artificial intelligence.
+Advances made in search for perfect information games (such as Chess, Checkers, Go, and Backgammon) have led to AI capable of defeating the world's top human experts. 
+The progress of search in imperfect information games (such as Poker, Bridge, and Skat) has comparatively lagged behind, due mainly to the complexities introduced by hiding information. 
+In this paper, we present Online Outcome Sampling (OOS), the first imperfect information search algorithm with formal guarantees of convergence to an equilibrium strategy.   
+In addition, we show that OOS avoids the common problems encountered by determinization.
+We evaluate the practical performance and convergence rate of OOS and two recent imperfect information search algorithms. OOS performs better than its competitors in randomly generated games as well as three complex domains: Phantom Tic-Tac-Toe, Bluff, and Scotland Yard.  
+\end{abstract}
+
+\section{Introduction}
+
+Blabla
+
+%\bibliographystyle\{aaai\}
+%\bibliography\{bibfile1,bibfile2,...\}
+
+\end{document}
