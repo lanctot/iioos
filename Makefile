@@ -9,3 +9,4 @@ view: iioos.pdf
 
 clean:
 	latexmk -c
+	rm -f iioos.pdf 
