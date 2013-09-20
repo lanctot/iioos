@@ -4,6 +4,7 @@
 \usepackage{times}
 \usepackage{helvet}
 \usepackage{courier}
+\usepackage{color}
 \frenchspacing
 \setlength{\pdfpagewidth}{8.5in}
 \setlength{\pdfpageheight}{11in}
@@ -22,6 +23,9 @@
 %2275 East Bayshore Road, Suite 160\\
 %Palo Alto, California 94303\\
 
+\newcounter{vlNoteCounter}
+\newcommand{\vlnote}[1]{{\scriptsize \color{blue} \refstepcounter{vlNoteCounter}\textsf{[VL]$_{\arabic{vlNoteCounter}}$:{#1}}}}
+%\renewcommand{\vlnote}[1]{}
 
 \maketitle
 
@@ -39,7 +43,8 @@ We evaluate the practical performance and convergence rate of OOS and two recent
 Main points: 
 \begin{itemize}
 \item motivate importance of convergence to NE. 
-\item existing methods may not converge over time (it would be great to have a motivating example that convinces the reader that any determinization-based II search algorithm cannot converge in general)
+\item why online search vs. offline equilibrium computation
+\item existing methods may not converge over time (it would be great to have a motivating example that convinces the reader that any determinization-based II search algorithm cannot converge in general - some kind of search game could be a good example)
 \item we intoduce the first one that does, and show that it can compete with the others in practice
 \end{itemize}
 
@@ -52,6 +57,7 @@ References to help:
 \begin{itemize}
 \item Original/first II search~\cite{Frank98Finding}
 \item Work on Bridge~\cite{Ginsberg01}
+\item Information Set Search~\cite{Parker06paranoia}\vlnote{\cite{Parker10iss} is a little more detailed, but I guess it is from a less reputable forum.} We have used ISS in MCTS setting in a visibility-based pursuit-evasion game~\cite{Lisy12peg}
 \item Work on Hearts / Spades~\cite{Sturtevant08An}
 \item PIMC~\cite{long2010understanding} and other work on Skat (Jeff's thesis)
 \item Counter-examples in simple games~\cite{Shafiei09,Ponsen11Computing} 
@@ -60,8 +66,9 @@ References to help:
 \item IS-MCTS~\cite{Cowling12ISMCTS} and other work by that group (on Dou di Zhu, MTG etc. \cite{Whitehouse11DDZ,Cowling12MTG})
 \item IIMC~\cite{Furtak13Recursive}
 \item Scotland Yard~\cite{Nijssen12SY}
-\item MCTS in Kriegspiel~\cite{Ciancarini09Kriegspiel}
+\item MCTS in Kriegspiel~\cite{Ciancarini09Kriegspiel}\vlnote{why not the AIJ 2010 paper?}
 \item Maybe quick mention of recent excitment in simultaneous move games (SMAB, double-oracle and serialized AB algorithm that doesn't have a name, SM-MCTS, and (hopefully!) NIPS paper)
+\item Mention that OOS has been applied in SM-MCTS setting.
 \end{itemize}
 
 \subsection{Extensive Games and Equilibrium Computation}
