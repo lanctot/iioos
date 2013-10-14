@@ -35,7 +35,8 @@ Advances made in search for perfect information games (such as Chess, Checkers, 
 The progress of search in imperfect information games (such as Poker, Bridge, and Skat) has comparatively lagged behind, due mainly to the complexities introduced by hiding information. 
 In this paper, we present Online Outcome Sampling (OOS), the first imperfect information search algorithm with formal guarantees of convergence to an equilibrium strategy.   
 In addition, we show that OOS avoids the common problems encountered by determinization.
-We evaluate the practical performance and convergence rate of OOS and two recent imperfect information search algorithms. OOS performs better than its competitors in randomly generated games as well as three complex domains: Phantom Tic-Tac-Toe, Bluff, and Scotland Yard.  
+We evaluate the practical performance and convergence rate of OOS and two recent imperfect information search algorithms. OOS performs better than its competitors in randomly generated game trees as well as several complex domains: 
+Phantom Tic-Tac-Toe, Bluff, and Scotland Yard.  
 \end{abstract}
 
 \section{Introduction}
@@ -45,7 +46,7 @@ Main points:
 \item motivate importance of convergence to NE. 
 \item why online search vs. offline equilibrium computation
 \item existing methods may not converge over time (it would be great to have a motivating example that convinces the reader that any determinization-based II search algorithm cannot converge in general - some kind of search game could be a good example)
-\item we intoduce the first one that does, and show that it can compete with the others in practice
+\item introduce the first one that does, and show that it can compete with the others in practice
 \end{itemize}
 
 \section{Background and Related Work}
@@ -57,7 +58,9 @@ References to help:
 \begin{itemize}
 \item Original/first II search~\cite{Frank98Finding}
 \item Work on Bridge~\cite{Ginsberg01}
-\item Information Set Search~\cite{Parker06paranoia}\vlnote{\cite{Parker10iss} is a little more detailed, but I guess it is from a less reputable forum.} We have used ISS in MCTS setting in a visibility-based pursuit-evasion game~\cite{Lisy12peg}
+\item Information Set Search~(ISS)~\cite{Parker10iss,Parker06paranoia}
+%\vlnote{\cite{Parker10iss} is a little more detailed, but I guess it is from a less reputable forum.} 
+We have used ISS in MCTS setting in a visibility-based pursuit-evasion game~\cite{Lisy12peg}
 \item Work on Hearts / Spades~\cite{Sturtevant08An}
 \item PIMC~\cite{long2010understanding} and other work on Skat (Jeff's thesis)
 \item Counter-examples in simple games~\cite{Shafiei09,Ponsen11Computing} 
@@ -66,8 +69,11 @@ References to help:
 \item IS-MCTS~\cite{Cowling12ISMCTS} and other work by that group (on Dou di Zhu, MTG etc. \cite{Whitehouse11DDZ,Cowling12MTG})
 \item IIMC~\cite{Furtak13Recursive}
 \item Scotland Yard~\cite{Nijssen12SY}
-\item MCTS in Kriegspiel~\cite{Ciancarini09Kriegspiel}\vlnote{why not the AIJ 2010 paper?}
-\item Maybe quick mention of recent excitment in simultaneous move games (SMAB, double-oracle and serialized AB algorithm that doesn't have a name, SM-MCTS, and (hopefully!) NIPS paper)
+\item MCTS in Kriegspiel~\cite{Ciancarini10Kriegspiel}
+%\item MCTS in Kriegspiel~\cite{Ciancarini09Kriegspiel}
+%\vlnote{why not the AIJ 2010 paper?} 
+% ML: I did not know about it.
+\item Maybe quick mention of recent excitment in simultaneous move games (SMAB, double-oracle and serialized AB algorithm that doesn't have a name, SM-MCTS, and NIPS paper
 \item Mention that OOS has been applied in SM-MCTS setting.
 \end{itemize}
 
