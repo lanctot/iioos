@@ -53,47 +53,64 @@ Dudo, Phantom Tic-Tac-Toe, and (a bigger one).
 Search in game-playing has been a classic interest of artificial intelligence. The field of has benefited 
 from decades of research focused on perfect information games, as evidenced by events such the as defeat of human chess champions, 
 solving of checkers, and the growing strength of computer Go programs~\cite{Campbell02deepblue,Schaeffer07gameover,Gelly12}.
-Search in imperfect information games has received comparitively much less attention. The reason is almost entirely due to the 
-the complexities introduced by hidden information. 
-Modern approaches use different forms of {\it determinization} to sample possible states, run 
-searches rooted from these states, and aggregate the information collected from these searches to form a recommendation. 
+Due to the the complexity and problems introduced by hidden information, search in imperfect information games has received 
+comparatively much less attention. This is unfortunate as many games that interest humans have some element of hidden information. 
 
-
+Modern approaches to imperfect information search use different forms of {\it determinization} to sample game states, run 
+searches rooted from these states, aggregating the values and estimated maintained by each search to form a final recommendation. 
+The most extreme form, Perfect Information Monte Carlo (PIMC)~\cite{Long10Understanding}, ``averages over clairvoyance''~\cite{AIBook}
+ignoring the game's information structure completely. The PIMC approach was shown to work well in practice in the trick-based card game Skat, 
+but did not work well in both simplified poker and Monte Carlo Tree Search (MCTS) applied to 
+Kriegspiel~\cite{Ciancarini10Kriegspiel}. 
+As was successful in Kriegspiel, most recent algorithms try fix the problems by accounting for the information structure during the 
+search in some way. These approaches seem to improve the imperfect information search in Kriegspiel, Skat~\cite{Furtak13Recursive}, 
+Scotland Yard~\cite{Nijssen12SY}, 
+Dou Di Zhu, Magic: The Gathering, and other card games~\cite{Cowling12MTG,Cowling12ISMCTS}.
 
 %For example, the notion of a subgame is required for backward induction, 
 %which most perfect information search algorithms are based on, is not well-defined in imperfect information games. 
 
+The main problem with the current techniques is that none have been shown to be {\it consistent}. 
+That is, it is not known whether any of the current algorithms provably compute a Nash equilibrium strategy, even if given 
+infinite time. In fact, there is practical evidence suggesting that some of these techniques will not converge to an 
+equilibrium at all, even in very small games like Biased Rock-Paper-Scissors and Kuhn poker~\cite{Shafiei09,Ponsen11Computing}.
+In perfect information search, consistency is a given since the algorithms are based on backward induction. 
 
-
+In this paper, we start by formalizing the problem of imperfect information search from the ground up. That is, we return to the game-theoretic 
+fundamentals upon which search is built to motivate the importance of consistency and to better explain the subtleties introduced by imperfect 
+information. 
+We introduce Online Outcome Sampling (OOS), and provide the first formal proof of consistency in imperfect information search.
+We show the empirical convergence rates and performance of OOS and compare them to two modern imperfect information search algorithms 
+IS-MCTS and MMCTS~\cite{Cowling12ISMCTS,Auger11Multiple}.
+We show empirical convergence and performance results in several complex domains: Dudo, Phantom Tic-Tac-Toe, and (a bigger one). 
 
 \section{Background and Related Work}
 
-Overview of past algorithms and the current state-of-the-art (we have to ``weave'' the related work below into a nice overview).
-Define determinization, strategy fusion, non-locality, disambiguation factor. 
-
-References to help:
-\begin{itemize}
-\item Original/first II search~\cite{Frank98Finding}
-\item Work on Bridge~\cite{Ginsberg01}
-\item Information Set Search~(ISS)~\cite{Parker10iss,Parker06paranoia}
-%\vlnote{\cite{Parker10iss} is a little more detailed, but I guess it is from a less reputable forum.} 
-We have used ISS in MCTS setting in a visibility-based pursuit-evasion game~\cite{Lisy12peg}
-\item Work on Hearts / Spades~\cite{Sturtevant08An}
-\item PIMC~\cite{long2010understanding} and other work on Skat (Jeff's thesis)
-\item Counter-examples in simple games~\cite{Shafiei09,Ponsen11Computing} 
-\item MMCTS (Phantom Tic-Tac-Toe)~\cite{Auger11Multiple}
-\item Work on Exp3 for Urban rivals~\cite{Teytaud11Upper,StPierre12Online}
-\item IS-MCTS~\cite{Cowling12ISMCTS} and other work by that group (on Dou di Zhu, MTG etc. \cite{Whitehouse11DDZ,Cowling12MTG})
-\item IIMC~\cite{Furtak13Recursive}
-\item Scotland Yard~\cite{Nijssen12SY}
-\item MCTS in Kriegspiel~\cite{Ciancarini10Kriegspiel}
-\item Kurt's past work on MCTS for Poker~\cite{vdbroek09MCTSPoker}?
-%\item MCTS in Kriegspiel~\cite{Ciancarini09Kriegspiel}
-%\vlnote{why not the AIJ 2010 paper?} 
-% ML: I did not know about it.
-\item Maybe quick mention of recent excitment in simultaneous move games (SMAB, double-oracle and serialized AB algorithm that doesn't have a name, SM-MCTS, and NIPS paper
-\item Mention that OOS has been applied in SM-MCTS setting.
-\end{itemize}
+%Overview of past algorithms and the current state-of-the-art (we have to ``weave'' the related work below into a nice overview).
+%Define determinization, strategy fusion, non-locality, disambiguation factor. 
+%References to help:
+%\begin{itemize}
+%\item Original/first II search~\cite{Frank98Finding}
+%\item Work on Bridge~\cite{Ginsberg01}
+%\item Information Set Search~(ISS)~\cite{Parker10iss,Parker06paranoia}
+%%\vlnote{\cite{Parker10iss} is a little more detailed, but I guess it is from a less reputable forum.} 
+%We have used ISS in MCTS setting in a visibility-based pursuit-evasion game~\cite{Lisy12peg}
+%\item Work on Hearts / Spades~\cite{Sturtevant08An}
+%\item PIMC~\cite{Long10Understanding} and other work on Skat (Jeff's thesis)
+%\item Counter-examples in simple games~\cite{Shafiei09,Ponsen11Computing} 
+%\item MMCTS (Phantom Tic-Tac-Toe)~\cite{Auger11Multiple}
+%\item Work on Exp3 for Urban rivals~\cite{Teytaud11Upper,StPierre12Online}
+%\item IS-MCTS~\cite{Cowling12ISMCTS} and other work by that group (on Dou di Zhu, MTG etc. \cite{Whitehouse11DDZ,Cowling12MTG})
+%\item IIMC~\cite{Furtak13Recursive}
+%\item Scotland Yard~\cite{Nijssen12SY}
+%\item MCTS in Kriegspiel~\cite{Ciancarini10Kriegspiel}
+%\item Kurt's past work on MCTS for Poker~\cite{vdbroek09MCTSPoker}?
+%%\item MCTS in Kriegspiel~\cite{Ciancarini09Kriegspiel}
+%%\vlnote{why not the AIJ 2010 paper?} 
+%% ML: I did not know about it.
+%\item Maybe quick mention of recent excitment in simultaneous move games (SMAB, double-oracle and serialized AB algorithm that doesn't have a name, SM-MCTS, and NIPS paper
+%\item Mention that OOS has been applied in SM-MCTS setting.
+%\end{itemize}
 
 \subsection{Extensive Games and Equilibrium Computation}
 
