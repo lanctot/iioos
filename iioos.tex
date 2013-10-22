@@ -32,22 +32,39 @@
 \begin{abstract}
 Online search in games has been a classic interest of artificial intelligence.
 Advances made in search for perfect information games (such as Chess, Checkers, Go, and Backgammon) have led to AI capable of defeating the world's top human experts. 
-The progress of search in imperfect information games (such as Poker, Bridge, and Skat) has comparatively lagged behind, due mainly to the complexities introduced by hiding information. 
+The progress of search in imperfect information games (such as Poker, Bridge, and Skat) has comparatively lagged behind, due mainly to the complexities introduced by hidden information. 
 In this paper, we present Online Outcome Sampling (OOS), the first imperfect information search algorithm with formal guarantees of convergence to an equilibrium strategy.   
 In addition, we show that OOS avoids the common problems encountered by determinization.
-We evaluate the practical performance and convergence rate of OOS and two recent imperfect information search algorithms. OOS performs better than its competitors in randomly generated game trees as well as several complex domains: 
-Phantom Tic-Tac-Toe, Bluff, and Scotland Yard (and/or Lost Cities?).  
+We evaluate the practical performance and convergence rate of OOS and compare to two modern imperfect information search algorithms.
+OOS is shown to outperform its competitors in randomly generated game trees as well as several complex domains: 
+Dudo, Phantom Tic-Tac-Toe, and (a bigger one). 
 \end{abstract}
 
 \section{Introduction}
 
-Main points: 
-\begin{itemize}
-\item motivate importance of convergence to NE. 
-\item why online search vs. offline equilibrium computation
-\item existing methods may not converge over time (it would be great to have a motivating example that convinces the reader that any determinization-based II search algorithm cannot converge in general - some kind of search game could be a good example)
-\item introduce the first one that does, and show that it can compete with the others in practice
-\end{itemize}
+%Main points: 
+%\begin{itemize}
+%\item motivate importance of convergence to NE. 
+%\item why online search vs. offline equilibrium computation
+%\item existing methods may not converge over time (it would be great to have a motivating example that convinces the reader that any determinization-based II search algorithm cannot converge in general - some kind of search game could be a good example)
+%\item introduce the first one that does, and show that it can compete with the others in practice
+%\end{itemize}
+
+Search in game-playing has been a classic interest of artificial intelligence. The field of has benefited 
+from decades of research focused on perfect information games, as evidenced by events such the as defeat of human chess champions, 
+solving of checkers, and the growing strength of computer Go programs~\cite{Campbell02deepblue,Schaeffer07gameover,Gelly12}.
+Search in imperfect information games has received comparitively much less attention. The reason is almost entirely due to the 
+the complexities introduced by hidden information. 
+Modern approaches use different forms of {\it determinization} to sample possible states, run 
+searches rooted from these states, and aggregate the information collected from these searches to form a recommendation. 
+
+
+
+%For example, the notion of a subgame is required for backward induction, 
+%which most perfect information search algorithms are based on, is not well-defined in imperfect information games. 
+
+
+
 
 \section{Background and Related Work}
 
