@@ -56,16 +56,14 @@ solving of checkers, and the growing strength of computer Go programs~\cite{Camp
 Due to the the complexity and problems introduced by hidden information, search in imperfect information games has received 
 comparatively much less attention. This is unfortunate as many games that interest humans have some element of hidden information. 
 
-Modern approaches to imperfect information search use different forms of {\it determinization} to sample game states, run 
-searches rooted from these states, aggregating the values and estimated maintained by each search to form a final recommendation. 
+Modern approaches to imperfect information search use different forms of {\it determinization} to sample game states, then run 
+searches rooted from these states, aggregating the values and estimated and maintained by each search to form a final recommendation. 
 The most extreme form, Perfect Information Monte Carlo (PIMC)~\cite{Long10Understanding}, ``averages over clairvoyance''~\cite{AIBook}
-ignoring the game's information structure completely. The PIMC approach was shown to work well in practice in the trick-based card game Skat, 
-but did not work well in both simplified poker and Monte Carlo Tree Search (MCTS) applied to 
-Kriegspiel~\cite{Ciancarini10Kriegspiel}. 
+ignoring the game's information structure completely. The PIMC approach but did not work well in both simplified (Kuhn) poker and 
+Monte Carlo Tree Search (MCTS) applied to Kriegspiel~\cite{Ciancarini10Kriegspiel}. 
 As was successful in Kriegspiel, most recent algorithms try fix the problems by accounting for the information structure during the 
-search in some way. These approaches seem to improve the imperfect information search in Kriegspiel, Skat~\cite{Furtak13Recursive}, 
-Scotland Yard~\cite{Nijssen12SY}, 
-Dou Di Zhu, Magic: The Gathering, and other card games~\cite{Cowling12MTG,Cowling12ISMCTS}.
+search in some way. These approaches seem to improve performance in Kriegspiel, Skat~\cite{Furtak13Recursive}, 
+Scotland Yard~\cite{Nijssen12SY}, Dou Di Zhu, Magic: The Gathering, and other card games~\cite{Cowling12MTG,Cowling12ISMCTS}.
 
 %For example, the notion of a subgame is required for backward induction, 
 %which most perfect information search algorithms are based on, is not well-defined in imperfect information games. 
@@ -74,13 +72,13 @@ The main problem with the current techniques is that none have been shown to be 
 That is, it is not known whether any of the current algorithms provably compute a Nash equilibrium strategy, even if given 
 infinite time. In fact, there is practical evidence suggesting that some of these techniques will not converge to an 
 equilibrium at all, even in very small games like Biased Rock-Paper-Scissors and Kuhn poker~\cite{Shafiei09,Ponsen11Computing}.
-In perfect information search, consistency is a given since the algorithms are based on backward induction. 
+In perfect information search, consistency is easier to ensire since the algorithms are based on backward induction. 
 
 In this paper, we start by formalizing the problem of imperfect information search from the ground up. That is, we return to the game-theoretic 
-fundamentals upon which search is built to motivate the importance of consistency and to better explain the subtleties introduced by imperfect 
+foundations upon which search is built to motivate the importance of consistency and to better explain the subtleties introduced by imperfect 
 information. 
 We introduce Online Outcome Sampling (OOS), and provide the first formal proof of consistency in imperfect information search.
-We show the empirical convergence rates and performance of OOS and compare them to two modern imperfect information search algorithms 
+We show the empirical convergence rates and performance of OOS, comparing them to two modern imperfect information search algorithms 
 IS-MCTS and MMCTS~\cite{Cowling12ISMCTS,Auger11Multiple}.
 We show empirical convergence and performance results in synthetic game trees as well as several complex domains: Dudo, Phantom Tic-Tac-Toe, 
 and (a bigger one). 
