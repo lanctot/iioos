@@ -5,6 +5,14 @@
 \usepackage{helvet}
 \usepackage{courier}
 \usepackage{color}
+\usepackage{textcomp}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{comment}
+
 \frenchspacing
 \setlength{\pdfpagewidth}{8.5in}
 \setlength{\pdfpageheight}{11in}
@@ -23,8 +31,17 @@
 %2275 East Bayshore Road, Suite 160\\
 %Palo Alto, California 94303\\
 
+% the note center!
+\definecolor{darkgreen}{RGB}{0,125,0}
 \newcounter{vlNoteCounter}
-\newcommand{\vlnote}[1]{{\scriptsize \color{blue} \refstepcounter{vlNoteCounter}\textsf{[VL]$_{\arabic{vlNoteCounter}}$:{#1}}}}
+\newcounter{mlNoteCounter}
+\newcounter{asNoteCounter}
+\newcommand{\vlnote}[1]{{\scriptsize \color{blue} $\blacksquare$ \refstepcounter{vlNoteCounter}\textsf{[VL]$_{\arabic{vlNoteCounter}}$:{#1}}}}
+\newcommand{\mlnote}[1]{{\scriptsize \color{darkgreen} $\blacksquare$ \refstepcounter{mlNoteCounter}\textsf{[ML]$_{\arabic{mlNoteCounter}}$:{#1}}}}
+\newcommand{\asnote}[1]{{\scriptsize \color{red} $\blacktriangle$ \refstepcounter{asNoteCounter}\textsf{[AS]$_{\arabic{asNoteCounter}}$:{#1}}}}
+
+%\newcounter{NoteCounter}
+%\newcommand{\vlnote}[1]{{\scriptsize \color{blue} \refstepcounter{vlNoteCounter}\textsf{[VL]$_{\arabic{vlNoteCounter}}$:{#1}}}}
 %\renewcommand{\vlnote}[1]{}
 
 \maketitle
@@ -72,7 +89,7 @@ The main problem with the current techniques is that none have been shown to be 
 That is, it is not known whether any of the current algorithms provably compute a Nash equilibrium strategy, even if given 
 infinite time. In fact, there is practical evidence suggesting that some of these techniques will not converge to an 
 equilibrium at all, even in very small games like Biased Rock-Paper-Scissors and Kuhn poker~\cite{Shafiei09,Ponsen11Computing}.
-In perfect information search, consistency is easier to ensire since the algorithms are based on backward induction. 
+In perfect information search, consistency is often easier to ensure since the algorithms are based on backward induction. 
 
 In this paper, we start by formalizing the problem of imperfect information search from the ground up. That is, we return to the game-theoretic 
 foundations upon which search is built to motivate the importance of consistency and to better explain the subtleties introduced by imperfect 
@@ -80,8 +97,10 @@ information.
 We introduce Online Outcome Sampling (OOS), and provide the first formal proof of consistency in imperfect information search.
 We show the empirical convergence rates and performance of OOS, comparing them to two modern imperfect information search algorithms 
 IS-MCTS and MMCTS~\cite{Cowling12ISMCTS,Auger11Multiple}.
-We show empirical convergence and performance results in synthetic game trees as well as several complex domains: Dudo, Phantom Tic-Tac-Toe, 
+We show results in synthetic game trees as well as several complex domains: Dudo, Phantom Tic-Tac-Toe, 
 and (a bigger one). 
+
+\vlnote{Current intro targets particularly the search community.}
 
 \section{Background and Related Work}
 
