@@ -94,9 +94,11 @@ In perfect information search, consistency is often easier to ensure since the a
 In this paper, we start by formalizing the problem of imperfect information search from the ground up. That is, we return to the game-theoretic 
 foundations upon which search is built to motivate the importance of consistency and to better explain the subtleties introduced by imperfect 
 information. 
-We introduce Online Outcome Sampling (OOS), and provide the first formal proof of consistency in imperfect information search.
-We show the empirical convergence rates and performance of OOS, comparing them to two modern imperfect information search algorithms 
-IS-MCTS and MMCTS~\cite{Cowling12ISMCTS,Auger11Multiple}.
+We introduce Online Outcome Sampling (OOS), a simulation-based MCTS-like algorithm that builds its search tree incrementally. 
+We formally prove that OOS converges to an equilibrium strategy as time increases, making it the first 
+known consistent imperfect information search algorithm.
+We show the empirical convergence rates and performance of OOS, comparing them to two modern imperfect information search algorithms: 
+IS-MCTS~\cite{Cowling12ISMCTS} and MMCTS~\cite{Auger11Multiple}.
 We show results in synthetic game trees as well as several complex domains: Dudo, Phantom Tic-Tac-Toe, 
 and (a bigger one). 
 
@@ -143,13 +145,10 @@ Convergence theorems. Algorithm description.
 \section{Empirical Evaluation}
 
 Try it in a few complex domains, but some smaller ones as well to compare to offline-computed approximate equilibrium strategies and compute exploitability, and in random games. 
-Hopefully it works well. {\tt :)} I think to convince people doing work in this area, we'll need 
+Hopefully it works well. I think to convince people doing work in this area, we'll need 
 to compare to one or two of the state-of-the-art algorithms. 
 
 \section{Conclusion}
-
-OOS rocks the body that rocks the party! {\tt :-p}  
-
 
 \bibliographystyle{aaai}
 \bibliography{iioos}
