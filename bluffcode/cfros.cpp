@@ -87,6 +87,7 @@ double cfros(GameState & gs, int player, int depth, unsigned long long bidseq,
   // get the info set from the info set store (iss)  
   // infoset key is the (bid sequence) (my roll) (0|1) 
   // note: regret-matching is applied as we pull this from the the store
+  // if the information set has never been visited, the current strategy is set to uniform
   infosetkey = bidseq;  
   infosetkey <<= iscWidth; 
   if (player == 1)
