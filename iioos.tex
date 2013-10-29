@@ -50,7 +50,7 @@
 Online search in games has been a classic interest of artificial intelligence.
 Advances made in search for perfect information games (such as Chess, Checkers, Go, and Backgammon) have led to AI capable of defeating the world's top human experts. 
 The progress of search in imperfect information games (such as Poker, Bridge, and Skat) has comparatively lagged behind, due mainly to the complexities introduced by hidden information. 
-In this paper, we present Online Outcome Sampling (OOS), the first imperfect information search algorithm with formal guarantees of convergence to an equilibrium strategy.   
+In this paper, we present Online Outcome Sampling (OOS), the first imperfect information search algorithm with formal guarantees of convergence to an equilibrium strategy in a zero-sum game.   
 In addition, we show that OOS avoids the common problems encountered by determinization.
 We evaluate the practical performance and convergence rate of OOS and compare to two modern imperfect information search algorithms.
 OOS is shown to outperform its competitors in randomly generated game trees as well as several complex domains: 
@@ -67,55 +67,37 @@ Dudo, Phantom Tic-Tac-Toe, and (a bigger one).
 %\item introduce the first one that does, and show that it can compete with the others in practice
 %\end{itemize}
 
-In a sequential decision-making problem, an agent chooses an action at each step and as a result the state changes, 
-leading to a sequence of states and actions describing an interation. There is some amount of initial time %$T_{prep}$, 
-that the agents use to prepare for this interaction before it happens, and time limits at each step that during the interaction.
-When the preparation time is abundant, it could be spent, for example, 
-computing an equilibrium strategy for a smaller abstract game to use during play. This {\it offline approach} has been remarkably 
-successful in Computer Poker.
-%where resulting strategies have competed at the human expert level and have been the basis of several successful computer poker competition 
-%agents. 
-However, there are problems where the agents may not be informed of the exact model of their environment far in advance, such as general 
-game-playing, security enforcement in dynamic settings, and general-purpose robotics. In these cases, agents mmay need to {\it decide online}, adapting to
-their current situation while the interaction is taking place.
+In many sequential multi-agent interactions, the agents first have some initial time to prepare for the interaction and then after each decision, they have an additional thinking time to decide about their next move. When the preparation time is abundant and the computational resources sufficient, an equilibrium strategy for a smaller abstract game can be pre-computed and then used during the game play. This {\it offline approach} has been remarkably successful in Computer Poker \cite{}.
+However, the preparation time is often very limited. The exact model of the game may become known only shortly before the play, such as in general game-playing, security enforcement in previously unknown environment, and general-purpose robotics. In a short time, only a very small abstract game could be solved in advance. Moreover, it might not even be possible to create a sufficiently small and still useful abstraction to be solved in time. In these cases, agents may need to {\it decide online}: make initial decisions quickly and then put additional effort to improving their strategy in the current situation while the interaction is taking place.
 
 %Search in game-playing has been a classic interest of artificial intelligence. 
 %focused on perfect information games, 
-When restricted to perfect information settings, the field of online search has benefited 
-from decades of research in game-playing. 
-%as evidenced by events such the as defeat of human chess champions, 
+When restricted to perfect information settings, the field of online search has benefited from decades of research in game-playing. 
+%as evidenced by events such as defeat of human chess champions, 
 %solving of checkers, and the growing strength of computer Go programs~\cite{Campbell02deepblue,Schaeffer07gameover,Gelly12}.
-Due to the the complexity and problems introduced by hidden information, search in imperfect information settings has received 
-comparatively much less attention. This is unfortunate as many sequential decision-making problems have some element of hidden information. 
-
+Due to the complexity and problems introduced by hidden information, search in imperfect information settings has received comparatively much less attention.
+%This is unfortunate as many sequential decision-making problems have some element of hidden information. 
 Modern approaches to imperfect information search use different forms of {\it determinization} to sample possible states, then run 
-searches rooted from these states, aggregating the values and estimated and maintained by each search to form a final recommendation. 
-The most extreme form, Perfect Information Monte Carlo (PIMC)~\cite{Long10Understanding}, ``averages over clairvoyance''~\cite{AIBook}
-ignoring the information structure completely. The PIMC approach but did not work well in both simplified (Kuhn) poker and 
+searches rooted from these states, aggregating their results choose an action to play. The most extreme forms, Perfect Information Monte Carlo (PIMC)~\cite{Long10Understanding} and ``averages over clairvoyance''~\cite{AIBook},
+ignore the information structure completely. While this is sufficient in some games, it does not work well in games like simplified (Kuhn) poker and 
 Monte Carlo Tree Search (MCTS) applied to Kriegspiel~\cite{Ciancarini10Kriegspiel}. 
-As was successful in Kriegspiel, most recent algorithms try fix the problem by accounting for the information structure during the 
+Following the success in Kriegspiel, most recent algorithms try to fix the problem by accounting for the information structure during the 
 search in some way. These approaches seem to improve performance in Kriegspiel, Skat~\cite{Furtak13Recursive}, 
 Scotland Yard~\cite{Nijssen12SY}, Dou Di Zhu, Magic: The Gathering, and other card games~\cite{Cowling12MTG,Cowling12ISMCTS}.
 
 %For example, the notion of a subgame is required for backward induction, 
 %which most perfect information search algorithms are based on, is not well-defined in imperfect information games. 
 
-The main problem with the current techniques is that none have been shown to be {\it consistent}. 
-That is, it is not known whether any of the current algorithms provably compute a Nash equilibrium strategy, even if given 
-infinite time. In fact, there is practical evidence suggesting that some of these techniques will not converge to an 
-equilibrium at all, even in very small games like Biased Rock-Paper-Scissors and Kuhn poker~\cite{Shafiei09,Ponsen11Computing}.
-In contrast, consistency is often easier to ensure in perfect information search since the algorithms are based on backward induction. 
+The main problem of the current techniques is a lack of theoretical foundations of the algorithms. There are no guarantees that the algorithms will always find a good strategy in a game, given a sufficient thinking time. In fact, there is practical evidence suggesting that some of these techniques will not converge to the optimum solution even in very small games like Biased Rock-Paper-Scissors and Kuhn poker~\cite{Shafiei09,Ponsen11Computing}.
 
 In this paper, we start by formalizing the problem of imperfect information search from the ground up. That is, we return to the game-theoretic 
-foundations upon which search is built to motivate the importance of consistency and to better explain the subtleties introduced by imperfect 
-information. 
-We introduce Online Outcome Sampling (OOS), a simulation-based MCTS-like algorithm that builds its search tree incrementally. 
+foundations upon which search in games is built to motivate the importance of Nash equilibrium as the optimum strategy in zero-sum games. We explain the subtleties introduced by imperfect information that cause the current approaches not to converge to the optimum strategy. We introduce Online Outcome Sampling (OOS), a simulation-based MCTS-like algorithm that builds its search tree incrementally. 
 We formally prove that OOS converges to an equilibrium strategy as time increases, making it the first 
-known consistent imperfect information search algorithm.
-We show the empirical convergence rates and performance of OOS, comparing them to two modern imperfect information search algorithms: 
+known imperfect information search algorithm satisfying this property, which we call {\it consistency}. Furthermore, we analyze methods for incorporating the information obtained by the players in the game to the search process, so that the consistency property is preserved. We show the empirical convergence rates and performance of OOS, comparing them to two modern imperfect information search algorithms: 
 ISMCTS~\cite{Cowling12ISMCTS} and MMCTS~\cite{Auger11Multiple}.
 We show results in synthetic game trees as well as several complex domains: Dudo, Phantom Tic-Tac-Toe, 
-and (a bigger one). 
+and (a bigger one).
+
 
 %\vlnote{Current intro targets particularly the search community.}
 
