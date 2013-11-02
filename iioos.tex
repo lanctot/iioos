@@ -13,6 +13,44 @@
 \usepackage{xcolor}
 \usepackage{comment}
 
+\newcommand{\argmin}{\operatornamewithlimits{argmin}}
+\newcommand{\argmax}{\operatornamewithlimits{argmax}}
+\newcommand{\bE}{\mathbb{E}}
+\newcommand{\bx}{\mathbf{x}}
+\newcommand{\bg}{\mathbf{g}}
+\newcommand{\bu}{\mathbf{u}}
+\newcommand{\bU}{\mathbf{U}}
+\newcommand{\cI}{\mathcal{I}}
+\newcommand{\cC}{\mathcal{C}}
+\newcommand{\PW}{\mbox{PW}}
+\newcommand{\BR}{\mbox{BR}}
+\newcommand{\defword}[1]{\textbf{\boldmath{#1}}}
+\newcommand{\ie}{{\it i.e.}}
+\newcommand{\eg}{{\it e.g.}}
+\newtheorem{definition}{Definition}
+\newtheorem{fact}{Fact}
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}{Corollary}
+\newtheorem{lemma}{Lemma}
+\newtheorem{proposition}{Proposition}
+\newcommand{\Proof}{{\noindent\bf Proof. }}
+\newcommand{\citejustyear}[1]{\cite{#1}}
+\newcommand{\Qed}{$\blacksquare$}
+\newcommand{\abs}[1]{\left|#1\right|}
+\newcommand{\todo}[1]{{\color{red}{\bf #1}}}
+
+% the note center!
+\definecolor{darkgreen}{RGB}{0,125,0}
+\newcounter{vlNoteCounter}
+\newcounter{mlNoteCounter}
+\newcounter{asNoteCounter}
+\newcommand{\vlnote}[1]{{\scriptsize \color{blue} $\blacksquare$ \refstepcounter{vlNoteCounter}\textsf{[VL]$_{\arabic{vlNoteCounter}}$:{#1}}}}
+\newcommand{\mlnote}[1]{{\scriptsize \color{darkgreen} $\blacksquare$ \refstepcounter{mlNoteCounter}\textsf{[ML]$_{\arabic{mlNoteCounter}}$:{#1}}}}
+\newcommand{\asnote}[1]{{\scriptsize \color{red} $\blacktriangle$ \refstepcounter{asNoteCounter}\textsf{[AS]$_{\arabic{asNoteCounter}}$:{#1}}}}
+%\newcounter{NoteCounter}
+%\newcommand{\vlnote}[1]{{\scriptsize \color{blue} \refstepcounter{vlNoteCounter}\textsf{[VL]$_{\arabic{vlNoteCounter}}$:{#1}}}}
+%\renewcommand{\vlnote}[1]{}
+
 \frenchspacing
 \setlength{\pdfpagewidth}{8.5in}
 \setlength{\pdfpageheight}{11in}
@@ -31,18 +69,6 @@
 %2275 East Bayshore Road, Suite 160\\
 %Palo Alto, California 94303\\
 
-% the note center!
-\definecolor{darkgreen}{RGB}{0,125,0}
-\newcounter{vlNoteCounter}
-\newcounter{mlNoteCounter}
-\newcounter{asNoteCounter}
-\newcommand{\vlnote}[1]{{\scriptsize \color{blue} $\blacksquare$ \refstepcounter{vlNoteCounter}\textsf{[VL]$_{\arabic{vlNoteCounter}}$:{#1}}}}
-\newcommand{\mlnote}[1]{{\scriptsize \color{darkgreen} $\blacksquare$ \refstepcounter{mlNoteCounter}\textsf{[ML]$_{\arabic{mlNoteCounter}}$:{#1}}}}
-\newcommand{\asnote}[1]{{\scriptsize \color{red} $\blacktriangle$ \refstepcounter{asNoteCounter}\textsf{[AS]$_{\arabic{asNoteCounter}}$:{#1}}}}
-
-%\newcounter{NoteCounter}
-%\newcommand{\vlnote}[1]{{\scriptsize \color{blue} \refstepcounter{vlNoteCounter}\textsf{[VL]$_{\arabic{vlNoteCounter}}$:{#1}}}}
-%\renewcommand{\vlnote}[1]{}
 
 \maketitle
 
@@ -78,7 +104,8 @@ When restricted to perfect information settings, the field of online search has 
 Due to the complexity and problems introduced by hidden information, search in imperfect information settings has received comparatively much less attention.
 %This is unfortunate as many sequential decision-making problems have some element of hidden information. 
 Modern approaches to imperfect information search use different forms of {\it determinization} to sample possible states, then run 
-searches rooted from these states, aggregating their results choose an action to play. The most extreme forms, Perfect Information Monte Carlo (PIMC)~\cite{Long10Understanding} and ``averages over clairvoyance''~\cite{AIBook},
+searches rooted from these states, aggregating their results choose an action to play. The most extreme forms, Perfect Information Monte Carlo (PIMC)~\cite{Long10Understanding} ``averages over clairvoyance''~\cite{AIBook},
+% ML-Note Nov2: @Viliam, PIMC *is* "averaging over clairvoyance"
 ignore the information structure completely. While this is sufficient in some games, it does not work well in games like simplified (Kuhn) poker and 
 Monte Carlo Tree Search (MCTS) applied to Kriegspiel~\cite{Ciancarini10Kriegspiel}. 
 Following the success in Kriegspiel, most recent algorithms try to fix the problem by accounting for the information structure during the 
@@ -88,13 +115,13 @@ Scotland Yard~\cite{Nijssen12SY}, Dou Di Zhu, Magic: The Gathering, and other ca
 %For example, the notion of a subgame is required for backward induction, 
 %which most perfect information search algorithms are based on, is not well-defined in imperfect information games. 
 
-The main problem of the current techniques is a lack of theoretical foundations of the algorithms. There are no guarantees that the algorithms will always find a good strategy in a game, given a sufficient thinking time. In fact, there is practical evidence suggesting that some of these techniques will not converge to the optimum solution even in very small games like Biased Rock-Paper-Scissors and Kuhn poker~\cite{Shafiei09,Ponsen11Computing}.
+The main problem of the current techniques is a lack of theoretical foundations of the algorithms. There are no guarantees that the algorithms will always find a good strategy in a game, given a sufficient thinking time. In fact, there is practical evidence suggesting that some of these techniques will not converge to the optimal solution even in very small games like Biased Rock-Paper-Scissors and Kuhn poker~\cite{Shafiei09,Ponsen11Computing}.
 
 In this paper, we start by formalizing the problem of imperfect information search from the ground up. That is, we return to the game-theoretic 
-foundations upon which search in games is built to motivate the importance of Nash equilibrium as the optimum strategy in zero-sum games. We explain the subtleties introduced by imperfect information that cause the current approaches not to converge to the optimum strategy. We introduce Online Outcome Sampling (OOS), a simulation-based MCTS-like algorithm that builds its search tree incrementally. 
+foundations upon which search in games is built to motivate the importance of Nash equilibrium as the optimal strategy in zero-sum games. We explain the subtleties introduced by imperfect information that cause the current approaches not to converge to the optimal strategy. We introduce Online Outcome Sampling (OOS), a simulation-based MCTS-like algorithm that builds its search tree incrementally. 
 We formally prove that OOS converges to an equilibrium strategy as time increases, making it the first 
-known imperfect information search algorithm satisfying this property, which we call {\it consistency}. Furthermore, we analyze methods for incorporating the information obtained by the players in the game to the search process, so that the consistency property is preserved. We show the empirical convergence rates and performance of OOS, comparing them to two modern imperfect information search algorithms: 
-ISMCTS~\cite{Cowling12ISMCTS} and MMCTS~\cite{Auger11Multiple}.
+known imperfect information search algorithm satisfying this property, which we call {\it consistency}. Furthermore, we analyze methods for incorporating the information obtained by the players in the game to the search process, so that the consistency property is preserved. We show the empirical convergence rates and performance of OOS, comparing them to three modern imperfect information search algorithms: 
+PIMC~\cite{Long10Understanding}, ISMCTS~\cite{Cowling12ISMCTS}, and MMCTS~\cite{Auger11Multiple}.
 We show results in synthetic game trees as well as several complex domains: Dudo, Phantom Tic-Tac-Toe, 
 and (a bigger one).
 
@@ -129,11 +156,111 @@ and (a bigger one).
 %\item Mention that OOS has been applied in SM-MCTS setting.
 %\end{itemize}
 
+A paragraphs or two on related work...?
 
-\subsection{Extensive Games and Equilibrium Computation}
+\subsection{Extensive-Form Games}
 
-Basic game theoretic definitions. Behavioral strategies. 
-CFR~\cite{CFR} and MCCFR~\cite{Lanctot09Sampling}. Success in Poker.
+%Basic game theoretic definitions. Behavioral strategies. 
+%CFR~\cite{CFR} and MCCFR~\cite{Lanctot09Sampling}. Success in Poker.
+
+Here, we define the relevant game-theoretic terminology that forms the basis
+of our analysis. The notation used here is based on~\cite{OsbRub94}. 
+
+%We then describe 
+%the fundamental concepts required to describe OOS.
+%For a comprehensive introduction and
+%survey of the fundamental topics, see~\cite{ShoLB08}.
+
+An extensive-form game models sequential decision making. There are $n$ decision-making agents called \defword{players} 
+$i \in N = \{ 1, \ldots, n \}$. In turn, players choose \defword{actions} leading to sequences called \defword{histories} $h \in H$. 
+A history $z \in Z$, where $Z \subseteq H$, is called a \defword{terminal history} represents a fully-played game from start to finish. 
+At each terminal history $z$ there is a payoff $u_i(z)$ in $[0,1]$ to each player $i$. At each nonterminal history $h$, there is a single 
+current player to act, determined by $P: H \backslash Z \rightarrow N \cup \{ c \}$ where $c$ is a special player called \defword{chance}
+(sometimes also called nature) that plays with a fixed stochastic strategy. For example, chance is used to represent rolls of dice
+and card draws. The game starts in the empty history, and 
+at each step, given the current history $h$, the current player chooses an action $a \in A(h)$ leading to successor history $h' = ha$;
+in this case we call $h$ a \defword{prefix} of $h'$ and denote this relationship by $h \sqsubset h'$. Also, for all $h,h',h'' \in H$, 
+if $h \sqsubset h'$ and $h' \sqsubset h''$ then $h \sqsubset h''$. Each set $N$, $H$, $Z$, and $A(h)$ are finite and every 
+history has finite length.
+
+Define $\cI = \{ \cI_i | i \in N \}$ the set of information partitions. 
+$\cI_i$ is a partition over $H_i = \{ h | P(h) = i \}$ where each part is call an \defword{information set}.
+Intuitively, an information set
+$I \in \cI_i$ that belongs to player $i$ represents a state of the game with respect to what player $i$ knows. 
+Formally, $I$ is a set of histories that a player cannot tell apart (due information hidden from that player). For all
+$h,h' \in I$, $A(h) = A(h')$ and $P(h) = P(h')$; hence, often we use $A(I)$ and $P(I)$. 
+
+% ML-Note Nov2:  I don't this we'll need this in this paper, but just in case...
+%We also define the \defword{choice set} of (information set, action) pairs for one player to be
+%$Q_i = \{ (I,a) \mid I \in \cI_i, a \in A(I) \} \cup \{ q_{\emptyset} \}$, where $q_{\emptyset}$ is
+%the empty(root) choice. 
+%For a history $h \in H$, define
+%$X_i(h) = (I,a), (I', a'), \cdots~$ to be the sequence of player $i$'s (information set,
+%action) pairs (choices) that were encountered and taken to reach $h$ in the same order as they are encountered
+%and taken along $h$. In this paper, every extensive-form game has \defword{perfect recall}, which means
+%$\forall i \in N, \forall I \in \cI_i : h, h' \in I \Rightarrow X_i(h) = X_i(h')$. Intuitively,
+%this means that player $i$ does not forget any information that they discovered during their play
+%up to $h$. 
+%Denote $succ_i(I,a)$ the set of successor choices of player $i$, that is 
+%all $(I',a')$ such that $X_i(h') = X_i(h),~(I',a')$ where $h \in I, h' \in I'$.
+
+%equilibrium definitions
+A \defword{behavioral strategy} for player $i$ is a function mapping each information set $I \in \cI_i$
+to a probability distribution over the actions $A(I)$, denoted by $\sigma_i(I)$. 
+If every distribution in the range of this mapping assigns all of its weight on a single action, 
+then the strategy is called \defword{pure}. 
+A \defword{mixed} strategy is a single explicit distribution over pure strategies. 
+Given a profile $\sigma$, we denote the probability of reaching a terminal history $z$ under $\sigma$ as 
+$\pi^\sigma(z) = \prod_{i \in N} \pi_i(z)$, where each $\pi_i(z)$ is a product of probabilities of the actions taken 
+by player $i$ in $X_i(z)$. We also refer to $\pi^{\sigma}_i(h,z)$ and $\pi^{\sigma}(h,z)$ to refer to the product 
+of only those probabilities along the sequence from $h$ to $z$, where $h \sqsubset z$.
+Define $\Sigma_i$ to be the set of behavioral strategies for player $i$. 
+As is convention, $\sigma_{-i}$ and $\pi_{-i}^\sigma$ refer to player $i's$ opponents' strategies and products (including chance's).
+An \defword{$\epsilon$-Nash equilibrium}, $\sigma$, is a set of $\sigma_i$ for $i \in N$ such that the benefit to switching to some 
+alternative $\sigma_i'$,
+\begin{equation}
+  \label{eq:ne}
+  \max_{\sigma_i' \in \Sigma_i} u_i(\sigma_i', \sigma_{-i}) - u_i(\sigma) \le \epsilon
+\end{equation}
+holds for each player $i \in N$. When $\epsilon = 0$, the profile is simply called a Nash equilibrium. 
+When $|N| = 2$ and $u_1(z) + u_2(z) = k$ for all $z \in Z$, then the game is a two-player $k$-sum game, where $k$ is a constant; these 
+games form an important subset of extensive-form games due to their worst-case guarantees: different equilibrium strategies result in 
+the same expected payoff against any arbitrary opponent equilibrium strategy. In this paper, we focus on two-player zero-sum games, 
+and define the \defword{exploitability} of a profile to be the sum of both distances from Eq.~\ref{eq:ne}, 
+$\epsilon_{\sigma} = \max_{\sigma_1' \in \Sigma_1} u_1(\sigma_1', \sigma_2) + \max_{\sigma_2' \in \Sigma_1} u_2(\sigma_1, \sigma_2')$.
+
+\subsection{Counterfactual Regret Minimization}
+
+Counterfactual Regret (CFR) is a notion of regret at the information set level for extensive-form games~\cite{CFR}. 
+The CFR algorithm is iterative, updating its strategies each time step in self-play, converging to an equilibrium. 
+The \defword{counterfactual value} of taking action 
+at information set $I$ is the expected payoff given that player $i$ played to reach $I$ and the opponents played 
+$\sigma_{-i}$, 
+\begin{equation}
+\label{eq:cfv}
+v_i(I,\sigma) = \sum_{(h,z) \in Z_I} \pi^{\sigma}_{-i}(z) \pi^{\sigma}_{i}(h,z) u_i(z),
+\end{equation}
+where $Z_I = \{ (h,z) | z \in Z, h \in I, h \sqsubset z\}$. 
+Suppose, at time $t$, player $i$ plays with strategy $\sigma^t_i$. 
+Define $\sigma^t_{I \rightarrow a}$ as identical to $\sigma^t$ except at $I$ action $a$ is taken with probability $1$. 
+The counterfactual regret of not taking $a \in A(I)$ at time $t$ is $r^t(I,a) = v_i(I,\sigma^t_{I \rightarrow a}) - v_i(I,\sigma)$. 
+For every iteration, and each $I \in \cI_i$, the algorithm updates the cumulative regret $R^T(I,a) = \sum_{t=1}^T r^t(I,a)$, for every
+action at every information set of every player. 
+Then, the distribution at each information set is obtained individually using regret-matching~\cite{Hart00}, which normalizes over the 
+positive regret, flushing probabilities to zero for those actions with negative regret:
+\begin{equation}
+\label{eq:rm}
+\sigma^{T+1}(I,a) = \left\{
+\begin{array}{ll}
+R^{T,+}(I,a) / R^{T,+}_{sum} & \mbox{if } R^{T,+}_{sum} > 0 \\ 
+1 / |A(I)|                   & \mbox{otherwise,}
+\end{array} \right.
+\end{equation}
+where $x^+ = \max(0,x), R^{T,+}_{sum} = \sum_{a' \in A(I)} R^{T,+}(I,a')$. 
+The combination of individual regret minimizers
+also minimizes overall average regret, and hence the average profile is a $2\epsilon$-equilibrium, with $\epsilon \rightarrow 0$
+as $T \rightarrow \infty$.
+
 
 \section{Online Outcome Sampling}
 
