@@ -22,6 +22,9 @@
 \newcommand{\bU}{\mathbf{U}}
 \newcommand{\cI}{\mathcal{I}}
 \newcommand{\cC}{\mathcal{C}}
+\newcommand{\cQ}{\mathcal{Q}}
+\newcommand{\tta}{\mathtt{a}}
+\newcommand{\tth}{\mathtt{h}}
 \newcommand{\PW}{\mbox{PW}}
 \newcommand{\BR}{\mbox{BR}}
 \newcommand{\defword}[1]{\textbf{\boldmath{#1}}}
@@ -238,9 +241,9 @@ at information set $I$ is the expected payoff given that player $i$ played to re
 $\sigma_{-i}$, 
 \begin{equation}
 \label{eq:cfv}
-v_i(I,\sigma) = \sum_{(h,z) \in Z_I} \pi^{\sigma}_{-i}(z) \pi^{\sigma}_{i}(h,z) u_i(z),
+v_i(I,\sigma) = \sum_{z \in Z_I} \pi^{\sigma}_{-i}(z[I]) \pi^{\sigma}_{i}(z[I],z) u_i(z),
 \end{equation}
-where $Z_I = \{ (h,z) | z \in Z, h \in I, h \sqsubset z\}$. 
+where $Z_I = \{ z | z \in Z, h \in I, h \sqsubset Z \}$. 
 Suppose, at time $t$, player $i$ plays with strategy $\sigma^t_i$. 
 Define $\sigma^t_{I \rightarrow a}$ as identical to $\sigma^t$ except at $I$ action $a$ is taken with probability $1$. 
 The counterfactual regret of not taking $a \in A(I)$ at time $t$ is $r^t(I,a) = v_i(I,\sigma^t_{I \rightarrow a}) - v_i(I,\sigma)$. 
@@ -261,11 +264,52 @@ The combination of individual regret minimizers
 also minimizes overall average regret, and hence the average profile is a $2\epsilon$-equilibrium, with $\epsilon \rightarrow 0$
 as $T \rightarrow \infty$.
 
+Monte Carlo Counterfactual Regret Minimization (MCCFR) applies CFR to sampled portions of the games~\cite{Lanctot09Sampling}. 
+Define a block set $\cQ$ is defined whose elements 
+$\cQ_j \subseteq Z$ define portions of the game. In MCCFR, a block is sampled with probability $q_j$ and the algorithm updates the 
+regret in information sets visited in $Q_j$ using the 
+\defword{sampled counterfactual value}, 
+\[ \tilde{v}_i(I,\sigma) = \sum_{Q_j \cap Z_I} \frac{1}{q(z)} \pi^{\sigma}_{-i}(z) \pi^{\sigma}_{i}(h,z) u_i(z), \]
+where $q(z)$ is the probability of sampling $z$. 
+As long every $z \in Z$ has non-zero probability of being sampled, $\tilde{v}_i(I,\sigma)$ is an unbiased estimate of $v(I,\sigma)$ 
+due to the importance-sampling correction. 
+In \defword{outcome sampling}, $\cQ$ is a partition and each block contains a single terminal history. In every iteration of outcome 
+sampling, a single $z \in Z$ is sampled and the information sets along the path to $z$ are modified. 
+
+\section{Subgames and Online Search}
+
+%Complexities of online search vs. offline equilibrium computation. Notions of subgame perfection (sequential equilibrium). 
+%Perfect infromation games. Subject perfection
+%Minimax and MCTS are online approximations of backward induction. 
+%Explain why this is not the case in imperfect information search. 
+%Show what can go wrong if you use a perfect information search method.
+
+In Poker, CFR has been used with remarkable success as an offline technique. Essentially, CFR spends 
+weeks computing approximate equilibria on abstract poker games, which are then used to look up actions when a decision needs to be made during play. 
+In an {\it online game} each player is allowed little (or no) preparation time. There is an \defword{match history}, $\tth$, initially set to 
+the empty history $\emptyset$. On each game turn, the agent controlling $P(\tth)$ is given $t$ seconds to decide on an action $\tta \in A(\tth)$ and 
+match history then changes using $\tth \leftarrow \tth \tta$. There is a single referee who knows $\tth$, chooses chance outcomes when required 
+by sampling from $\sigma_c(\tth)$, and who reveals $I(\tth)$ to $P(\tth)$ on their turn. The players play until the match is terminated, declaring one
+the winner. Often, many matches are played for results to be statistically significant.
+
+A perfect information game is one where every information set contains a single history. In this case, every game can be recursively broken down into 
+subgames (subtrees of the game tree.) An equilibrium is called subgame perfect if the portion used in every subgame is also an equilibrium in that 
+subgame. In every perfect information game, a pure subgame perfect equilibrium exists, which can be found using backward induction. 
+This greatly simplifies the problem, because it suffices to search for a single optimal action rather than compute a full strategy. 
+Search algorithms, such as minimax and MCTS, are online approximations of backward induction, given infinite time will compute the optimal action
+recommended by backward induction. 
+
+Imperfect information games cannot be easily broken down in this way; hence, the search problem is more complex. In the next section, 
+we present an a consistency online search algorithm for imperfect information games. 
 
 \section{Online Outcome Sampling}
 
-Complexities of online search vs. offline equilibrium computation. Notions of subgame perfection (sequential equilibrium). Information set targeted search. Epistemic depth.
-Convergence theorems. Algorithm description.
+%Information set targeted search. Epistemic depth.
+%Convergence theorems. Algorithm description.
+
+\subsection{Information Set Targeting}
+
+\subsection{Public Subgame Targeting}
 
 \section{Empirical Evaluation}
 
