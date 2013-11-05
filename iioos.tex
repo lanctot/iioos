@@ -12,6 +12,7 @@
 \usepackage{graphicx}
 \usepackage{xcolor}
 \usepackage{comment}
+\usepackage{xspace}
 
 \newcommand{\argmin}{\operatornamewithlimits{argmin}}
 \newcommand{\argmax}{\operatornamewithlimits{argmax}}
@@ -25,11 +26,12 @@
 \newcommand{\cQ}{\mathcal{Q}}
 \newcommand{\tta}{\mathtt{a}}
 \newcommand{\tth}{\mathtt{h}}
+\newcommand{\ttz}{\mathtt{z}}
 \newcommand{\PW}{\mbox{PW}}
 \newcommand{\BR}{\mbox{BR}}
 \newcommand{\defword}[1]{\textbf{\boldmath{#1}}}
-\newcommand{\ie}{{\it i.e.}}
-\newcommand{\eg}{{\it e.g.}}
+\newcommand{\ie}{{\it i.e.}\xspace}
+\newcommand{\eg}{{\it e.g.}\xspace}
 \newtheorem{definition}{Definition}
 \newtheorem{fact}{Fact}
 \newtheorem{theorem}{Theorem}
@@ -191,7 +193,8 @@ $\cI_i$ is a partition over $H_i = \{ h | P(h) = i \}$ where each part is call a
 Intuitively, an information set
 $I \in \cI_i$ that belongs to player $i$ represents a state of the game with respect to what player $i$ knows. 
 Formally, $I$ is a set of histories that a player cannot tell apart (due information hidden from that player). For all
-$h,h' \in I$, $A(h) = A(h')$ and $P(h) = P(h')$; hence, often we use $A(I)$ and $P(I)$. 
+$h,h' \in I$, $A(h) = A(h')$ and $P(h) = P(h')$; hence, often we use $A(I)$, $P(I)$, and denote $I(h)$ the information set
+containing $h$. 
 
 % ML-Note Nov2:  I don't this we'll need this in this paper, but just in case...
 %We also define the \defword{choice set} of (information set, action) pairs for one player to be
@@ -233,6 +236,7 @@ and define the \defword{exploitability} of a profile to be the sum of both dista
 $\epsilon_{\sigma} = \max_{\sigma_1' \in \Sigma_1} u_1(\sigma_1', \sigma_2) + \max_{\sigma_2' \in \Sigma_1} u_2(\sigma_1, \sigma_2')$.
 
 \subsection{Counterfactual Regret Minimization}
+\label{sec:cfr}
 
 Counterfactual Regret (CFR) is a notion of regret at the information set level for extensive-form games~\cite{CFR}. 
 The CFR algorithm is iterative, updating its strategies each time step in self-play, converging to an equilibrium. 
@@ -289,8 +293,8 @@ weeks computing approximate equilibria on abstract poker games, which are then u
 In an {\it online game} each player is allowed little (or no) preparation time. There is an \defword{match history}, $\tth$, initially set to 
 the empty history $\emptyset$. On each game turn, the agent controlling $P(\tth)$ is given $t$ seconds to decide on an action $\tta \in A(\tth)$ and 
 match history then changes using $\tth \leftarrow \tth \tta$. There is a single referee who knows $\tth$, chooses chance outcomes when required 
-by sampling from $\sigma_c(\tth)$, and who reveals $I(\tth)$ to $P(\tth)$ on their turn. The players play until the match is terminated, declaring one
-the winner. Often, many matches are played for results to be statistically significant.
+by sampling from $\sigma_c(\tth)$, and who reveals $I(\tth)$ to $P(\tth)$ on their turn. The players play until the match is terminated, giving each 
+agent a payoff of $u_i(\ttz)$. Often, many matches are played to ensure statistical significant.
 
 A perfect information game is one where every information set contains a single history. In this case, every game can be recursively broken down into 
 subgames (subtrees of the game tree.) An equilibrium is called subgame perfect if the portion used in every subgame is also an equilibrium in that 
@@ -300,16 +304,65 @@ Search algorithms, such as minimax and MCTS, are online approximations of backwa
 recommended by backward induction. 
 
 Imperfect information games cannot be easily broken down in this way; hence, the search problem is more complex. In the next section, 
-we present an a consistency online search algorithm for imperfect information games. 
+we present an a consistent online search algorithm for imperfect information games. 
 
 \section{Online Outcome Sampling}
 
 %Information set targeted search. Epistemic depth.
 %Convergence theorems. Algorithm description.
 
+Recall outcome sampling (OS) from Section~\ref{sec:cfr}. In CFR and MCCFR, all the information sets are preloaded and stored in main memory, and
+the strategies $\sigma^0(I)$ at all $I$ are assumed to be uniform random over $A(I)$. The information sets store regrets and average strategy 
+values, which are updated each time $I$ is visited. Before we describe how OS is adapted to the online setting, we first describe
+a modification.
+
+Imagine that OS is executed much like simulation-based MCTS. That is, an information set tree is built incrementally over 
+time, where a single information set (at most) is added to the information set tree (memory) each iteration, which is initially empty. In 
+particular, when an information set is reach is reached that is not in memory, it is added to memory and a default playout policy then takes 
+over for the remainder of the simulation. Along the playout portion (tail) of the simulation, actions are chosen uniformly at random and 
+information sets are not added to memory nor updated. Along the tree portion (head) of simulation, information sets are updated as normal. 
+We call this modification playout-based outcome sampling. Figure~\ref{fig:os-vs-pbos} seems to indicate that the convergence rate of 
+playout-based OS compared to OS. 
+
+\begin{figure}
+\hspace{-0.2cm}\includegraphics[scale=0.7]{figs/first-pbos/os-vs-pbos}
+\caption{Preliminary convergence rate analysis of OS vs. playout-based OS. The vertical axis represents exploitability $\epsilon_{\bar{\sigma}}$.
+\label{fig:os-vs-pbos}} 
+\end{figure}
+
+Playout-based OS seems to perform comparatively to OS in one domain. However, playout-based OS is not (yet) a search algorithm, since every 
+iteration starts with an empty history.
+The main difficulty will be deciding how to direct the search when it is invoked {\it during the match}, \ie when the match 
+history $\tth \not= \emptyset$. 
+
+Online Outcome Sampling builds on playout-based OS by proposing several different ways to direct the search when started from a particular
+match history, $\tth$, part of a match in progress.
+
 \subsection{Information Set Targeting}
 
+Suppose the match history is $\tth$. Information set targeting OOS is playout-based OS that samples terminal histories $z \in Z_{I(\tth)}$ 
+with higher bias than $z' \in Z - Z_{I(\tth)}$. The intuition is that these histories are particulary relevant since the searching player 
+{\it knows} that one of these $z$ will describe the match at its completion. Let $\delta_I$ be the probability that any $z \in Z_{I(\tth)}$. 
+Setting $\delta = 1$ is problematic, since convergence guarantees are lost. It is tempting to set $\delta$ high. The problem, however, is that 
+focusing too much on $Z_{I(\tth)}$ could have the effect of revealing private information to the opponent. To see this, imagine the subgame 
+defined by placing a single chance node over the histories $h \in I(\tth)$, whose distribution is obtained by previous chance event outcomes. 
+The equilibrium strategy for the opponent in this subgame plays as if the opponent knows the searching player's private information. Therefore,
+we expect that the optimal value of $\delta_I$ will depend on the importance of the hidden information.
+
 \subsection{Public Subgame Targeting}
+
+A \defword{public action}, $a \in A(I)$, to be where for all $h \in I$, $ha \in I'$. (Need to define this better, i.e. include chance) 
+Given a history $h$, let $p(h)$ be the sequence of public actions along $h$ in the same order that they were taken in $h$. 
+Define the \defword{public subgame induced by h} to be those terminal histories 
+$Z_{public,h} = \{ z | z \in Z, h' \in I, h \in H, p(h') = p(h), h \sqsubset z \}$. 
+(Note that this is not a true subgame in the game-theoretic sense.)
+Now, suppose the match history is $\tth$.
+Public subgame targeting samples $z \in Z_{public,\tth}$ with higher bias than terminal histories outside this set. 
+Suppose $\delta_{public,\tth}$ is the probability that any $z$ in this set is sampled. 
+Again, it is tempting to sample from this set with $\delta_{public,\tth} = 1$. 
+However, this is also problematic because the probabilities to reach $\tth$ play a critical role in the convergence in the full game. 
+Nonetheless, the intuition is to spend more time in parts of the tree that are relevant given the progression of the match. Unlike 
+information set targeting, public subgame targeting does not reveal anything about private information. 
 
 \section{Empirical Evaluation}
 
