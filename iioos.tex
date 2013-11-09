@@ -218,7 +218,7 @@ then the strategy is called \defword{pure}.
 A \defword{mixed} strategy is a single explicit distribution over pure strategies. 
 Given a profile $\sigma$, we denote the probability of reaching a terminal history $z$ under $\sigma$ as 
 $\pi^\sigma(z) = \prod_{i \in N} \pi_i(z)$, where each $\pi_i(z)$ is a product of probabilities of the actions taken 
-by player $i$ in $X_i(z)$. We also refer to $\pi^{\sigma}_i(h,z)$ and $\pi^{\sigma}(h,z)$ to refer to the product 
+by player $i$ along $z$. We also refer to $\pi^{\sigma}_i(h,z)$ and $\pi^{\sigma}(h,z)$ to refer to the product 
 of only those probabilities along the sequence from $h$ to $z$, where $h \sqsubset z$.
 Define $\Sigma_i$ to be the set of behavioral strategies for player $i$. 
 As is convention, $\sigma_{-i}$ and $\pi_{-i}^\sigma$ refer to player $i's$ opponents' strategies and products (including chance's).
@@ -353,9 +353,10 @@ we expect that the optimal value of $\delta_I$ will depend on the importance of 
 
 A \defword{public action}, $a \in A(I)$, to be one where for all $h \in I$, $ha \in I'$. (Need to define this better, i.e. include chance) 
 Given a history $h$, let $p(h)$ be the sequence of public actions along $h$ in the same order that they were taken in $h$. 
-Define the \defword{public subgame induced by h} to be the one whose terminal history set is
+Define the \defword{public subgame induced by I} to be the one whose terminal history set is
 \[Z_{p,I} = \{ z | z \in Z, h \in I, h' \in H, p(h') = p(h), h' \sqsubset z \}\]
-(Note that this is not a true subgame in the game-theoretic sense.)
+(Need to define this better too; also, note that this is not a true subgame in the usual game-theoretic sense.. so should we call it 
+something else?)
 Now, suppose the match history is $\tth$.
 Public subgame targeting samples $z \in Z_{p,I(\tth)}$ with higher probability than terminal histories outside this set. 
 Suppose $\delta_{p,\tth}$ is the probability that any $z$ in this set is sampled. 
@@ -376,7 +377,8 @@ Here are some ides for what we could look at empirically:
 \item Performance comparisons (win rates and exploitability) between sampling techniques and some state-of-the-art
 algorithms in imperfect information search (ISMCTS, PIMC, MMCTS), 
 possibly also show exploitation / exploitability tradeoffs as in RNash work
-\item (probably too much for this one paper) What if there are a sequence of multiple matches and we can reuse stuff from before?
+\item (probably too much for this one paper) What if there are a sequence of multiple matches and we can reuse computation from 
+previous matches? 
 \end{itemize}
 
 
