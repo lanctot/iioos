@@ -340,7 +340,7 @@ match history, $\tth$.
 \subsection{Information Set Targeting}
 
 Suppose the match history is $\tth$. Information set targeting OOS is playout-based OS that samples terminal histories $z \in Z_{I(\tth)}$ 
-with higher bias than $z' \in Z - Z_{I(\tth)}$. The intuition is that these histories are particulary relevant since the searching player 
+with higher probability than $z' \in Z - Z_{I(\tth)}$. The intuition is that these histories are particulary relevant since the searching player 
 {\it knows} that one of these $z$ will describe the match at its completion. Let $\delta_I$ be the probability that any $z \in Z_{I(\tth)}$. 
 Setting $\delta = 1$ is problematic, since convergence guarantees are lost. It is tempting to set $\delta_I$ high. 
 The problem, however, is that 
@@ -357,7 +357,7 @@ Define the \defword{public subgame induced by h} to be the one whose terminal hi
 \[Z_{p,I} = \{ z | z \in Z, h \in I, h' \in H, p(h') = p(h), h' \sqsubset z \}\]
 (Note that this is not a true subgame in the game-theoretic sense.)
 Now, suppose the match history is $\tth$.
-Public subgame targeting samples $z \in Z_{p,I(\tth)}$ with higher bias than terminal histories outside this set. 
+Public subgame targeting samples $z \in Z_{p,I(\tth)}$ with higher probability than terminal histories outside this set. 
 Suppose $\delta_{p,\tth}$ is the probability that any $z$ in this set is sampled. 
 Again, it is tempting to sample from this set with $\delta_{p,\tth} = 1$. 
 However, this is also problematic because the probabilities to reach $\tth$ play a critical role in the convergence in the full game. 
