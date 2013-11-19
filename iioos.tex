@@ -388,11 +388,13 @@ Setting $\delta = 1$ is problematic, since convergence guarantees are lost.
 
 Consider the game in Figure~\ref{fig:coordGame}. If the minimizing player knows it is in the information set $I$, it cannot start focussing all the search only to this information set. If he does, even though the maximizing player still computes its optimal strategy in this particular case, the minimizing player computes a suboptimal strategy in information set $I$. It would compute the uniform strategy, which is optimal in the coordination game. However, if the minimizing player plays uniformly, the maximizing player prefers to switch to always play the left action to increase its payoff in case of not playing the coordination game. Any fixed non-zero probability of sampling the left chance action will eventually solve the problem. The regrets are multiplied by one above the sampling probability; hence, they influence the strategy in the information set proportionally stronger if the samles are rare. 
 
-It is tempting to set $\delta_I$ high. The problem, however, is that 
-focusing too much on $Z_{I(\tth)}$ could have the effect of revealing private information to the opponent. \vlnote{I agree this holds for Exp3-based MMCTS-like approaches, but I do not think it is true for MCCFR. Can you create a simple counter-example as above?} To see this, imagine the subgame 
-defined by placing a single chance node over the histories $h \in I(\tth)$, whose distribution is obtained by previous chance event outcomes. 
-The equilibrium strategy for the opponent in this subgame plays as if the opponent knows the searching player's private information. Therefore,
-we expect that the optimal value of $\delta_I$ will depend on the importance of the hidden information.
+%It is tempting to set $\delta_I$ high. The problem, however, is that 
+%focusing too much on $Z_{I(\tth)}$ could 
+%have the effect of revealing private information to the opponent. 
+%\vlnote{I agree this holds for Exp3-based MMCTS-like approaches, but I do not think it is true for MCCFR. Can you create a simple counter-example as above?} To see this, imagine the subgame 
+%defined by placing a single chance node over the histories $h \in I(\tth)$, whose distribution is obtained by previous chance event outcomes. 
+%The equilibrium strategy for the opponent in this subgame plays as if the opponent knows the searching player's private information. Therefore,
+%we expect that the optimal value of $\delta_I$ will depend on the importance of the hidden information.
 
 \subsection{Public Subgame Targeting}
 
@@ -404,11 +406,12 @@ Define the \defword{public subgame induced by I} to be the one whose terminal hi
 something else?)
 Now, suppose the match history is $\tth$.
 Public subgame targeting samples $z \in Z_{p,I(\tth)}$ with higher probability than terminal histories outside this set. 
-Suppose $\delta_{p,\tth}$ is the probability that any $z$ in this set is sampled. 
-Again, it is tempting to sample from this set with $\delta_{p,\tth} = 1$. 
-However, this is also problematic because the probabilities to reach $\tth$ play a critical role in the convergence in the full game. 
-Nonetheless, the intuition is to spend more time in parts of the tree that are relevant given the progression of the match. Unlike 
-information set targeting, public subgame targeting should not reveal anything about private information. 
+
+%Suppose $\delta_{p,\tth}$ is the probability that any $z$ in this set is sampled. 
+%Again, it is tempting to sample from this set with $\delta_{p,\tth} = 1$. 
+%However, this is also problematic because the probabilities to reach $\tth$ play a critical role in the convergence in the full game. 
+%Nonetheless, the intuition is to spend more time in parts of the tree that are relevant given the progression of the match. Unlike 
+%information set targeting, public subgame targeting should not reveal anything about private information. 
 
 \section{Empirical Evaluation}
 
