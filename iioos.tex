@@ -13,6 +13,21 @@
 \usepackage{xcolor}
 \usepackage{comment}
 \usepackage{xspace}
+\usepackage{tikz}
+\usetikzlibrary{trees}
+\usetikzlibrary{shapes.geometric}
+
+\tikzset{
+  treenode/.style = {align=center, inner sep=0pt, font=\sffamily},
+  ma/.style = {draw,treenode, shape border rotate=90, isosceles triangle,isosceles triangle apex angle=60, black, minimum width=2mm},% arbre rouge noir, noeud noir
+  mi/.style = {ma, shape border rotate=-90},
+  ch/.style = {draw, treenode, circle, minimum width=2mm, black}
+}
+
+\tikzstyle{level 1}=[level distance=8mm, sibling distance=1.5cm]
+\tikzstyle{level 2}=[level distance=8mm, sibling distance=1cm]
+\tikzstyle{level 3}=[level distance=8mm, sibling distance=0.5cm]
+
 
 \newcommand{\argmin}{\operatornamewithlimits{argmin}}
 \newcommand{\argmax}{\operatornamewithlimits{argmax}}
@@ -80,7 +95,7 @@
 \begin{abstract}
 Online search in games has been a classic interest of artificial intelligence.
 Advances made in search for perfect information games (such as Chess, Checkers, Go, and Backgammon) have led to AI capable of defeating the world's top human experts. 
-The progress of search in imperfect information games (such as Poker, Bridge, and Skat) has comparatively lagged behind, due mainly to the complexities introduced by hidden information. 
+The progress of search in imperfect information games (such as Poker, Bridge, and Skat) has comparatively lagged behind, mainly due to the complexities introduced by hidden information. 
 In this paper, we present Online Outcome Sampling (OOS), the first imperfect information search algorithm with formal guarantees of convergence to an equilibrium strategy in a zero-sum game.   
 In addition, we show that OOS avoids the common problems encountered by determinization.
 We evaluate the practical performance and convergence rate of OOS and compare to two modern imperfect information search algorithms.
@@ -109,7 +124,7 @@ When restricted to perfect information settings, the field of online search has 
 Due to the complexity and problems introduced by hidden information, search in imperfect information settings has received comparatively much less attention.
 %This is unfortunate as many sequential decision-making problems have some element of hidden information. 
 Modern approaches to imperfect information search use different forms of {\it determinization} to sample possible states, then run 
-searches rooted from these states, aggregating their results choose an action to play. The most extreme forms, Perfect Information Monte Carlo (PIMC)~\cite{Long10Understanding} ``averages over clairvoyance''~\cite{AIBook},
+searches rooted from these states, aggregating their results to choose an action to play. The most extreme forms, Perfect Information Monte Carlo (PIMC)~\cite{Long10Understanding} ``averages over clairvoyance''~\cite{AIBook},
 % ML-Note Nov2: @Viliam, PIMC *is* "averaging over clairvoyance"
 ignore the information structure completely. While this is sufficient in some games, it does not work well in games like simplified (Kuhn) poker and 
 Monte Carlo Tree Search (MCTS) applied to Kriegspiel~\cite{Ciancarini10Kriegspiel}. 
@@ -296,13 +311,13 @@ by sampling from $\sigma_c(\tth)$, and who reveals $I(\tth)$ to $P(\tth)$ on the
 agent $i$ a payoff of $u_i(\ttz)$.
 
 A perfect information game is one where every information set contains a single history. In this case, every game can be recursively broken down into 
-subgames (subtrees of the game tree.) An equilibrium is called subgame perfect if the portion used in every subgame is also an equilibrium in that 
+subgames (subtrees of the game tree) and each of the subgames can be solved independently. An equilibrium is called subgame perfect if its portion used in every subgame is also an equilibrium in that 
 subgame. In every perfect information game, a pure subgame perfect equilibrium exists, which can be found using backward induction. 
 This greatly simplifies the problem, because it suffices to search for a single optimal action. 
 Search algorithms, such as minimax and MCTS, are online approximations of backward induction which, when given infinite time,
 will compute the optimal action recommended by backward induction. 
 
-Imperfect information games cannot be easily broken down in this way; hence, the search problem is more complex. In the next section, 
+Imperfect information games cannot be easily broken down into subgames. The optimal strategies in an inner information set of a game tree depend on the probabilities that individual nodes in the information set are reached. This probabilities depend on the strategies of the players in the tree above the informatin set. These strategies in turn depend on the rewards obtained in other parts of the tree. Hence, the ``subgames'' in general cannot be solved independently and the search problem is more complex. In the next section, 
 we present an a consistent online search algorithm for imperfect information games. 
 
 \section{Online Outcome Sampling}
@@ -317,7 +332,7 @@ values, which are updated each time $I$ is visited. Before we describe how OS is
 a modification.
 
 Imagine that OS is executed much like simulation-based MCTS. That is, an information set tree is built incrementally over 
-time, where a single information set (at most) is added to the information set tree (memory) each iteration, which is initially empty. In 
+time, where a single information set (at most) is added to the initially empty information set tree (memory) each iteration. In 
 particular, when an information set is reach is reached that is not in memory, it is added to memory and a default playout policy then takes 
 over for the remainder of the simulation. Along the playout portion (tail) of the simulation, actions are chosen uniformly at random and 
 information sets are not added to memory nor updated. Along the tree portion (head) of simulation, information sets are updated as normal. 
@@ -342,9 +357,39 @@ match history, $\tth$.
 Suppose the match history is $\tth$. Information set targeting OOS is playout-based OS that samples terminal histories $z \in Z_{I(\tth)}$ 
 with higher probability than $z' \in Z - Z_{I(\tth)}$. The intuition is that these histories are particulary relevant since the searching player 
 {\it knows} that one of these $z$ will describe the match at its completion. Let $\delta_I$ be the probability that any $z \in Z_{I(\tth)}$. 
-Setting $\delta = 1$ is problematic, since convergence guarantees are lost. It is tempting to set $\delta_I$ high. 
-The problem, however, is that 
-focusing too much on $Z_{I(\tth)}$ could have the effect of revealing private information to the opponent. To see this, imagine the subgame 
+Setting $\delta = 1$ is problematic, since convergence guarantees are lost.
+
+\begin{figure}
+\begin{center}
+\begin{tikzpicture}
+\node [ch] {}
+    child{ node [ma] (i1_1) {} 
+	    child{ node {1}}
+    	    child{ node {0}}
+    	    edge from parent node[left] {0.5}
+    }
+    child{ node [ma] (i1_2) {}
+	    child{ node [mi] (i2_1) {}
+			   child{ node {3}}
+	    		   child{ node {0}}
+			 }	    
+	    child{ node [mi] (i2_2) {}
+			   child{ node {0}}
+	    		   child{ node {3}}
+			 }
+		edge from parent node[right] {0.5}
+	};
+\draw [dashed] (i1_1) -- (i1_2);
+\draw [dashed] (i2_1) -- (i2_2) node[midway, above] {I};
+\end{tikzpicture}
+\end{center}
+\caption{Strict information set targeting counter-example with maximizing $\bigtriangleup$, minimizing $\bigtriangledown$ and chance $\bigcirc$ players.}\label{fig:coordGame}
+\end{figure}
+
+Consider the game in Figure~\ref{fig:coordGame}. If the minimizing player knows it is in the information set $I$, it cannot start focussing all the search only to this information set. If he does, even though the maximizing player still computes its optimal strategy in this particular case, the minimizing player computes a suboptimal strategy in information set $I$. It would compute the uniform strategy, which is optimal in the coordination game. However, if the minimizing player plays uniformly, the maximizing player prefers to switch to always play the left action to increase its payoff in case of not playing the coordination game. Any fixed non-zero probability of sampling the left chance action will eventually solve the problem. The regrets are multiplied by one above the sampling probability; hence, they influence the strategy in the information set proportionally stronger if the samles are rare. 
+
+It is tempting to set $\delta_I$ high. The problem, however, is that 
+focusing too much on $Z_{I(\tth)}$ could have the effect of revealing private information to the opponent. \vlnote{I agree this holds for Exp3-based MMCTS-like approaches, but I do not think it is true for MCCFR. Can you create a simple counter-example as above?} To see this, imagine the subgame 
 defined by placing a single chance node over the histories $h \in I(\tth)$, whose distribution is obtained by previous chance event outcomes. 
 The equilibrium strategy for the opponent in this subgame plays as if the opponent knows the searching player's private information. Therefore,
 we expect that the optimal value of $\delta_I$ will depend on the importance of the hidden information.
@@ -383,6 +428,8 @@ previous matches?
 
 
 \section{Conclusion}
+
+
 
 \bibliographystyle{aaai}
 \bibliography{iioos}
