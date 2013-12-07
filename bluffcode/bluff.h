@@ -105,7 +105,8 @@ bool replace(std::string& str, const std::string& from, const std::string& to);
 std::string getCurDateTime(); 
 
 // solver-specific function defs
-void newInfoset(Infoset & is, int actionshere); 
+void newInfoset(Infoset & is, int actionshere);
+void getInfoset(GameState & gs, int player, unsigned long long bidseq, Infoset & is, unsigned long long & infosetkey, int actionshere); 
 void initInfosets();
 void initSeqStore();
 void allocSeqStore(); 

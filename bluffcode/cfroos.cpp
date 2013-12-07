@@ -11,6 +11,9 @@ static string runname = "";
 
 static int expansions = 0; 
 
+void getInfoset(unsigned long long & infosetkey, Infoset & is, GameState & gs, unsigned long long bidseq, int actionshere) {
+}
+
 double cfroos(GameState & gs, int player, int depth, unsigned long long bidseq, 
               double reach1, double reach2, double sprob1, double sprob2, int updatePlayer, 
               double & suffixreach, double & rtlSampleProb, bool treePhase)
@@ -59,27 +62,10 @@ double cfroos(GameState & gs, int player, int depth, unsigned long long bidseq,
   int actionshere = maxBid - gs.curbid; 
   assert(actionshere > 0);
 
-  // get the info set from the info set store (iss) 
-  // infoset key is the (bid sequence) (my roll) (0|1) 
-  infosetkey = bidseq;  
-  infosetkey <<= iscWidth; 
-  if (player == 1)
-  {
-    infosetkey |= gs.p1roll; 
-    infosetkey <<= 1; 
-    bool ret = iss.get(infosetkey, is, actionshere, 0); 
-    assert(ret);
-  }
-  else if (player == 2)
-  {
-    infosetkey |= gs.p2roll; 
-    infosetkey <<= 1; 
-    infosetkey |= 1; 
-    bool ret = iss.get(infosetkey, is, actionshere, 0); 
-    assert(ret);
-  }
+  // get the info set
+  getInfoset(gs, player, bidseq, is, infosetkey, actionshere);
 
-  // oos
+  // this is the incremental tree-building part
   
   bool newTreePhase = treePhase;
   

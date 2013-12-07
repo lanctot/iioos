@@ -306,6 +306,14 @@ void getInfosetKey(GameState & gs, unsigned long long & infosetkey, int player, 
   }
 }
 
+void getInfoset(GameState & gs, int player, unsigned long long bidseq, Infoset & is, unsigned long long & infosetkey, int actionshere)
+{
+  getInfosetKey(gs, infosetkey, player, bidseq);
+  bool ret = iss.get(infosetkey, is, actionshere, 0);
+  assert(ret);
+}
+
+
 int ceiling_log2(int val)
 {
   int exp = 1, num = 2; 
@@ -773,6 +781,8 @@ void loadMetaData(std::string filename)
 
   inf.close();
 }
+
+
 
 void initInfosets(GameState & gs, int player, int depth, unsigned long long bidseq)
 {

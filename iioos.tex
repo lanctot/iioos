@@ -28,6 +28,13 @@
 \tikzstyle{level 2}=[level distance=8mm, sibling distance=1cm]
 \tikzstyle{level 3}=[level distance=8mm, sibling distance=0.5cm]
 
+\usepackage[algo2e, noend, noline, linesnumbered]{algorithm2e}
+\DontPrintSemicolon
+\makeatletter
+\newcommand{\pushline}{\Indp}% Indent
+\newcommand{\popline}{\Indm}
+\makeatother
+
 
 \newcommand{\argmin}{\operatornamewithlimits{argmin}}
 \newcommand{\argmax}{\operatornamewithlimits{argmax}}
@@ -38,6 +45,7 @@
 \newcommand{\bU}{\mathbf{U}}
 \newcommand{\cI}{\mathcal{I}}
 \newcommand{\cC}{\mathcal{C}}
+\newcommand{\cP}{\mathcal{P}}
 \newcommand{\cQ}{\mathcal{Q}}
 \newcommand{\tta}{\mathtt{a}}
 \newcommand{\tth}{\mathtt{h}}
@@ -58,6 +66,7 @@
 \newcommand{\Qed}{$\blacksquare$}
 \newcommand{\abs}[1]{\left|#1\right|}
 \newcommand{\todo}[1]{{\color{red}{\bf #1}}}
+\newcommand{\breturn}{{\bf return}\xspace}
 
 % the note center!
 \definecolor{darkgreen}{RGB}{0,125,0}
@@ -114,7 +123,7 @@ Dudo, Phantom Tic-Tac-Toe, and (a bigger one).
 %\end{itemize}
 
 In many sequential multi-agent interactions, the agents first have some initial time to prepare for the interaction and then after each decision, they have an additional thinking time to decide about their next move. When the preparation time is abundant and the computational resources sufficient, an equilibrium strategy for a smaller abstract game can be pre-computed and then used during the game play. This {\it offline approach} has been remarkably successful in Computer Poker \cite{}.
-However, the preparation time is often very limited. The exact model of the game may become known only shortly before the play, such as in general game-playing, security enforcement in previously unknown environment, and general-purpose robotics. In a short time, only a very small abstract game could be solved in advance. Moreover, it might not even be possible to create a sufficiently small and still useful abstraction to be solved in time. In these cases, agents may need to {\it decide online}: make initial decisions quickly and then put additional effort to improving their strategy in the current situation while the interaction is taking place.
+However, the preparation time is often very limited. The exact model of the game may become known only shortly before acting is necessary, such as in general game-playing, security enforcement in previously unknown environment, and general-purpose robotics. In a short time, only a very small abstract game could be solved in advance. Moreover, it might not even be possible to create a sufficiently small and still useful abstraction to be solved in time. In these cases, agents may need to {\it decide online}: make initial decisions quickly and then put additional effort to improving their strategy in the current situation while the interaction is taking place.
 
 %Search in game-playing has been a classic interest of artificial intelligence. 
 %focused on perfect information games, 
@@ -124,9 +133,9 @@ When restricted to perfect information settings, the field of online search has 
 Due to the complexity and problems introduced by hidden information, search in imperfect information settings has received comparatively much less attention.
 %This is unfortunate as many sequential decision-making problems have some element of hidden information. 
 Modern approaches to imperfect information search use different forms of {\it determinization} to sample possible states, then run 
-searches rooted from these states, aggregating their results to choose an action to play. The most extreme forms, Perfect Information Monte Carlo (PIMC)~\cite{Long10Understanding} ``averages over clairvoyance''~\cite{AIBook},
+searches rooted from these states, aggregating their results to choose an action to play. The most extreme forms, \eg Perfect Information Monte Carlo (PIMC)~\cite{Long10Understanding} ``average over clairvoyance''~\cite{AIBook},
 % ML-Note Nov2: @Viliam, PIMC *is* "averaging over clairvoyance"
-ignore the information structure completely. While this is sufficient in some games, it does not work well in games like simplified (Kuhn) poker and 
+ignoring the information structure completely. While this is sufficient in some games, it does not work well in games like simplified (Kuhn) poker and 
 Monte Carlo Tree Search (MCTS) applied to Kriegspiel~\cite{Ciancarini10Kriegspiel}. 
 Following the success in Kriegspiel, most recent algorithms try to fix the problem by accounting for the information structure during the 
 search in some way. These approaches seem to improve performance in Kriegspiel, Skat~\cite{Furtak13Recursive}, 
@@ -135,10 +144,10 @@ Scotland Yard~\cite{Nijssen12SY}, Dou Di Zhu, Magic: The Gathering, and other ca
 %For example, the notion of a subgame is required for backward induction, 
 %which most perfect information search algorithms are based on, is not well-defined in imperfect information games. 
 
-The main problem of the current techniques is a lack of theoretical foundations of the algorithms. There are no guarantees that the algorithms will always find a good strategy in a game, given a sufficient thinking time. In fact, there is practical evidence suggesting that some of these techniques will not converge to the optimal solution even in very small games like Biased Rock-Paper-Scissors and Kuhn poker~\cite{Shafiei09,Ponsen11Computing}.
+The main problem with current techniques is a lack of theoretical foundations of the algorithms. There are no guarantees that the algorithms will always find a good strategy in a game, given a sufficient thinking time. In fact, there is practical evidence suggesting that some of these techniques will not converge to the optimal solution even in very small games like Biased Rock-Paper-Scissors and Kuhn poker~\cite{Shafiei09,Ponsen11Computing}.
 
 In this paper, we start by formalizing the problem of imperfect information search from the ground up. That is, we return to the game-theoretic 
-foundations upon which search in games is built to motivate the importance of Nash equilibrium as the optimal strategy in zero-sum games. We explain the subtleties introduced by imperfect information that cause the current approaches not to converge to the optimal strategy. We introduce Online Outcome Sampling (OOS), a simulation-based MCTS-like algorithm that builds its search tree incrementally. 
+foundations upon which search in games is built to motivate the importance of Nash equilibrium as the optimal strategy in zero-sum games. We explain the subtleties introduced by imperfect information that cause the current approaches not to converge to the optimal strategy. We introduce Online Outcome Sampling (OOS), a simulation-based algorithm that builds its search tree incrementally, like MCTS.  
 We formally prove that OOS converges to an equilibrium strategy as time increases, making it the first 
 known imperfect information search algorithm satisfying this property, which we call {\it consistency}. Furthermore, we analyze methods for incorporating the information obtained by the players in the game to the search process, so that the consistency property is preserved. We show the empirical convergence rates and performance of OOS, comparing them to three modern imperfect information search algorithms: 
 PIMC~\cite{Long10Understanding}, ISMCTS~\cite{Cowling12ISMCTS}, and MMCTS~\cite{Auger11Multiple}.
@@ -302,22 +311,28 @@ sampling, a single $z \in Z$ is sampled and the information sets along the path 
 %Explain why this is not the case in imperfect information search. 
 %Show what can go wrong if you use a perfect information search method.
 
-In Poker, CFR has been used with remarkable success as an offline technique. Essentially, CFR time offline (weeks?) computing approximate equilibria on abstract poker games, which are then used to look up actions when a decision needs to be made during play. 
+In Poker, CFR has been used with remarkable success as an offline technique. Essentially, CFR takes time (weeks?) {\it pre-computing} 
+approximate equilibria on abstract poker games, which are then used to look up actions when a decision needs to be made during play. 
 In a \defword{match} (online game), each player is allowed little (or no) preparation time before the match begins. 
 During the match, there is a current \defword{match history}, $\tth$, initially set to 
-the empty history $\emptyset$ (representing the start of the match). On each turn, the agent controlling $P(\tth)$ is given $t$ seconds to decide on an action $\tta \in A(\tth)$ and 
+the empty history $\emptyset$ (representing the start of the match). On each turn, the agent controlling $P(\tth)$ is given $t$ seconds 
+to decide on an action $\tta \in A(\tth)$ and the 
 match history then changes using $\tth \leftarrow \tth \tta$. There is a single referee who knows $\tth$, chooses chance outcomes when required 
 by sampling from $\sigma_c(\tth)$, and who reveals $I(\tth)$ to $P(\tth)$ on their turn. The players play until the match is terminated, giving each 
 agent $i$ a payoff of $u_i(\ttz)$.
 
 A perfect information game is one where every information set contains a single history. In this case, every game can be recursively broken down into 
-subgames (subtrees of the game tree) and each of the subgames can be solved independently. An equilibrium is called subgame perfect if its portion used in every subgame is also an equilibrium in that 
+subgames (subtrees of the game tree) and each of the subgames can be solved independently. An equilibrium is called subgame perfect if its portion 
+used in every subgame is also an equilibrium in that 
 subgame. In every perfect information game, a pure subgame perfect equilibrium exists, which can be found using backward induction. 
 This greatly simplifies the problem, because it suffices to search for a single optimal action. 
 Search algorithms, such as minimax and MCTS, are online approximations of backward induction which, when given infinite time,
 will compute the optimal action recommended by backward induction. 
 
-Imperfect information games cannot be easily broken down into subgames. The optimal strategies in an inner information set of a game tree depend on the probabilities that individual nodes in the information set are reached. This probabilities depend on the strategies of the players in the tree above the informatin set. These strategies in turn depend on the rewards obtained in other parts of the tree. Hence, the ``subgames'' in general cannot be solved independently and the search problem is more complex. In the next section, 
+Imperfect information games cannot be easily broken down into subgames. The optimal strategies in an inner information set depend on the 
+probabilities that individual nodes in the information set are reached. These probabilities depend on the strategies of the players in
+the tree above the information set. These strategies in turn depend on the rewards obtained in other parts of the tree. Hence, the 
+``subgames'' in general cannot be solved independently and the search problem is more complex. In the next section, 
 we present an a consistent online search algorithm for imperfect information games. 
 
 \section{Online Outcome Sampling}
@@ -336,7 +351,7 @@ time, where a single information set (at most) is added to the initially empty i
 particular, when an information set is reach is reached that is not in memory, it is added to memory and a default playout policy then takes 
 over for the remainder of the simulation. Along the playout portion (tail) of the simulation, actions are chosen uniformly at random and 
 information sets are not added to memory nor updated. Along the tree portion (head) of simulation, information sets are updated as normal. 
-We call this modification playout-based outcome sampling. Preliminary results shown in Figure~\ref{fig:os-vs-pbos} seem to indicate that the convergence rate of playout-based OS compares to OS (in Bluff(1,1)).
+We call this modification \defword{playout-based outcome sampling}. Preliminary results shown in Figure~\ref{fig:os-vs-pbos} seem to indicate that the convergence rate of playout-based OS compares to OS (in Bluff(1,1)) when the match history $\tth = \emptyset$. 
 
 \begin{figure}
 \hspace{-0.2cm}\includegraphics[scale=0.7]{figs/first-pbos/os-vs-pbos}
@@ -355,7 +370,7 @@ match history, $\tth$.
 \subsection{Information Set Targeting}
 
 Suppose the match history is $\tth$. Information set targeting OOS is playout-based OS that samples terminal histories $z \in Z_{I(\tth)}$ 
-with higher probability than $z' \in Z - Z_{I(\tth)}$. The intuition is that these histories are particulary relevant since the searching player 
+with higher probability than $z' \in Z - Z_{I(\tth)}$. The intuition is that these histories are particularly relevant since the searching player 
 {\it knows} that one of these $z$ will describe the match at its completion. Let $\delta_I$ be the probability that any $z \in Z_{I(\tth)}$. 
 Setting $\delta = 1$ is problematic, since convergence guarantees are lost.
 
@@ -386,7 +401,7 @@ Setting $\delta = 1$ is problematic, since convergence guarantees are lost.
 \caption{Strict information set targeting counter-example with maximizing $\bigtriangleup$, minimizing $\bigtriangledown$ and chance $\bigcirc$ players.}\label{fig:coordGame}
 \end{figure}
 
-Consider the game in Figure~\ref{fig:coordGame}. If the minimizing player knows it is in the information set $I$, it cannot start focussing all the search only to this information set. If he does, even though the maximizing player still computes its optimal strategy in this particular case, the minimizing player computes a suboptimal strategy in information set $I$. It would compute the uniform strategy, which is optimal in the coordination game. However, if the minimizing player plays uniformly, the maximizing player prefers to switch to always play the left action to increase its payoff in case of not playing the coordination game. Any fixed non-zero probability of sampling the left chance action will eventually solve the problem. The regrets are multiplied by one above the sampling probability; hence, they influence the strategy in the information set proportionally stronger if the samles are rare. 
+Consider the game in Figure~\ref{fig:coordGame}. If the minimizing player knows it is in the information set $I$, it cannot start focus sing all the search only to this information set. If he does, even though the maximizing player still computes its optimal strategy in this particular case, the minimizing player computes a suboptimal strategy in information set $I$. It would compute the uniform strategy, which is optimal in the coordination game. However, if the minimizing player plays uniformly, the maximizing player prefers to switch to always play the left action to increase its payoff in case of not playing the coordination game. Any fixed non-zero probability of sampling the left chance action will eventually solve the problem. The regrets are multiplied by the reciprocal of the sampling probability; hence, they influence the strategy in the information set proportionally stronger if the samples are rare. 
 
 %It is tempting to set $\delta_I$ high. The problem, however, is that 
 %focusing too much on $Z_{I(\tth)}$ could 
@@ -401,7 +416,7 @@ Consider the game in Figure~\ref{fig:coordGame}. If the minimizing player knows 
 A \defword{public action}, $a \in A(I)$, to be one where for all $h \in I$, $ha \in I'$. (Need to define this better, i.e. include chance) 
 Given a history $h$, let $p(h)$ be the sequence of public actions along $h$ in the same order that they were taken in $h$. 
 Define the \defword{public subgame induced by I} to be the one whose terminal history set is
-\[Z_{p,I} = \{ z | z \in Z, h \in I, h' \in H, p(h') = p(h), h' \sqsubset z \}\]
+\[Z_{p,I(h)} = \{ z | z \in Z, h \in I, h' \in H, p(h') = p(h), h' \sqsubset z \}\]
 (Need to define this better too; also, note that this is not a true subgame in the usual game-theoretic sense.. so should we call it 
 something else?)
 Now, suppose the match history is $\tth$.
@@ -412,6 +427,79 @@ Public subgame targeting samples $z \in Z_{p,I(\tth)}$ with higher probability t
 %However, this is also problematic because the probabilities to reach $\tth$ play a critical role in the convergence in the full game. 
 %Nonetheless, the intuition is to spend more time in parts of the tree that are relevant given the progression of the match. Unlike 
 %information set targeting, public subgame targeting should not reveal anything about private information. 
+
+\subsection{Algorithm}
+
+\begin{algorithm2e}[t]
+  OOS$(h, \pi_i, \pi_{-i}, s, i)$: \;
+  \pushline
+  \lIf{$h \in Z$}{\breturn $(1, s, u_i(z))$}
+  $I \gets $ getInfoset$(h, P(h))$ \;
+  Sample action $a$ with pr. $\rho$ from $\cP_{sub}(h, I, i, \gamma, \epsilon)$ \; \label{alg:sample}
+  \If{$P(h) = c$}{
+    \breturn OOS$(ha, \pi_i, \sigma_c(h,a) \pi_{-i}, \rho s, i)$ \;
+  }
+  \If{$I$ is not in memory}{ 
+    Add $I$ to memory \;
+    $\sigma(I) \leftarrow \mbox{Unif}(A(I))$ \;
+    $(x, l, u) \gets $ Playout$(ha, s)$ \;         \label{alg:playout}
+  }
+  \Else{
+    $\sigma(I) \gets $ RegretMatching$(r_I)$ \;
+    $(\pi_i', \pi_{-i}') \leftarrow$ NewReachProbs$(h, \pi_i, \pi_{-i}, i)$ \;  \label{alg:newreaches}
+    $(x, l, u) \gets$ OOS$(ha, \pi_i', \pi_{-i}', \rho s, i)$ \;  
+  }
+  $c \gets x$ \;                   \label{alg:suffix1} 
+  $x \gets x \sigma(I,a)$ \;     \label{alg:suffix2}
+  \For{$a' \in A(I)$}{
+    \If{$P(h) = i$}{
+      $W \gets \frac{u \pi_{-i}}{l}$ \;
+      \lIf{$a' = a$}{$r_I[a'] \gets r_I[a'] + (c - x)W$}
+      \lElse{$r_I[a'] \gets r_I[a'] - xW$}
+    }
+    \Else{
+      $s_I[a] \gets s_I[a] + \frac{1}{s \pi_{-i} \sigma(I,a)}$ \;  \label{alg:avgstrat}
+    }
+  }
+  \breturn $(x, l, u)$ \;     \label{alg:return}
+  \popline
+  \vspace{0.1cm}
+  \caption{Online Outcome Sampling. \label{alg}}
+\end{algorithm2e}
+
+Much like MCTS, the algorithm is iterative and samples a single trajectory from the root $\emptyset$ to some 
+terminal history. At each information set in memory, $I$, there are two tables maintained: $r_I$ stores cumulative 
+regret for each action $a \in A(I)$, and $s_I$ stores the cumulative average strategy probability of each 
+action. 
+
+The pseudo-code is presented as Algorithm~\ref{alg}. The first parameter is the current history. 
+The next two are reach probabilities for the update player $i$ and the opponent. The third parameter 
+is the sample probability. The last is the update player. Initial calls have the form 
+OOS$(\emptyset, 1, 1, 1, i)$ where $i \in \{1,2\}$ is alternated. For the return values, $x$ is
+a suffix/tail reach probability for both players, $l$ is the root-to-leaf sample probability, and $u$ is the
+payoff of the trajectory in view of the update player. 
+
+A critical part of the algorithm is the action sampling that occurs on line~\ref{alg:sample}. 
+Define $\cP_{sub}(h, I, i, \gamma, \epsilon)$ as a distribution over actions $a \in A(I)$. 
+Depending on the method being used, 
+define $Z_{sub}$ as $Z_{I(\tth)}$ or $Z_{p,I(\tth)}$. 
+However, in practice it will not sample $z \in Z_{sub}$ directly, but on a per-action basis. 
+There are two stages, the prefix stage ($h \sqsubset \tth$), and the suffix stage ($\tth \sqsubseteq h$). 
+In the prefix stage, $\cP_{sub}$ is a distribution 
+that assigns some high probability $\gamma$ to sampling an action that is consistent with $\tth$. In the suffix case, the 
+sampling distribution is $\epsilon$-on-policy, so action $a \in A(I)$ is sample with probability 
+$\epsilon/|A(I)| + (1-\epsilon)\sigma(I,a)$. Also, no exploration is done on opponent histories, so $\epsilon = 0$ when 
+$P(h) = -i$.
+
+The playout on line~\ref{alg:playout} samples to the end of the game with some playout policy at each step; we use uniform random, 
+but in general one could use an informed (fully-mixed) policy as well. 
+Unlike MCTS, the playout policy in OOS must compute $l$ when reaching a terminal and update the tail probability $x$ when returning
+as done on line~\ref{alg:suffix2}. The function NewReachProbs on line~\ref{alg:newreaches} simply modifies the $P(h)$'s reach 
+probability by multiplying it by $\sigma(I,a)$, keeping the value of the other one the same.
+
+Lines~\ref{alg:suffix1} to \ref{alg:return} contain the usual outcome sampling updates. Note that regrets are updated at the 
+update player histories, while average strategy tables at opponent histories. \mlnote{Still need to add some more detail to 
+earlier sections so that this last part is not too confusing.}
 
 \section{Empirical Evaluation}
 
