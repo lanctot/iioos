@@ -451,7 +451,7 @@ Public subgame targeting samples $z \in Z_{p,I(\tth)}$ with higher probability t
   }
   $c \gets x$ \;                   \label{alg:suffix1} 
   $x \gets x \sigma(I,a)$ \;     \label{alg:suffix2}
-  \For{$a' \in A(I)$}{
+  \For{$a' \in A(I)$}{   
     \If{$P(h) = i$}{
       $W \gets \frac{u \pi_{-i}}{l}$ \;
       \lIf{$a' = a$}{$r_I[a'] \gets r_I[a'] + (c - x)W$}
@@ -460,8 +460,8 @@ Public subgame targeting samples $z \in Z_{p,I(\tth)}$ with higher probability t
     \Else{
       $s_I[a] \gets s_I[a] + \frac{1}{s \pi_{-i} \sigma(I,a)}$ \;  \label{alg:avgstrat}
     }
-  }
-  \breturn $(x, l, u)$ \;     \label{alg:return}
+  } 
+  \breturn $(x, l, u)$ \;   \label{alg:returnend} 
   \popline
   \vspace{0.1cm}
   \caption{Online Outcome Sampling. \label{alg}}
@@ -483,10 +483,11 @@ A critical part of the algorithm is the action sampling that occurs on line~\ref
 Define $\cP_{sub}(h, I, i, \gamma, \epsilon)$ as a distribution over actions $a \in A(I)$. 
 Depending on the method being used, 
 define $Z_{sub}$ as $Z_{I(\tth)}$ or $Z_{p,I(\tth)}$. 
-However, in practice it will not sample $z \in Z_{sub}$ directly, but on a per-action basis. 
-There are two stages, the prefix stage ($h \sqsubset \tth$), and the suffix stage ($\tth \sqsubseteq h$). 
+In practice, the algorithm does not sample $z \in Z_{sub}$ directly, but rather on a per-action basis. 
+There are two stages, the prefix stage ($h \sqsubset \tth$), and the tail stage (either $\tth \sqsubseteq h$ or $h$ is 
+off the match path). 
 In the prefix stage, $\cP_{sub}$ is a distribution 
-that assigns some high probability $\gamma$ to sampling an action that is consistent with $\tth$. In the suffix case, the 
+that assigns some high probability $\gamma$ to sampling an action that is consistent with $\tth$. In the tail case, the 
 sampling distribution is $\epsilon$-on-policy, so action $a \in A(I)$ is sample with probability 
 $\epsilon/|A(I)| + (1-\epsilon)\sigma(I,a)$. Also, no exploration is done on opponent histories, so $\epsilon = 0$ when 
 $P(h) = -i$.
@@ -497,7 +498,9 @@ Unlike MCTS, the playout policy in OOS must compute $l$ when reaching a terminal
 as done on line~\ref{alg:suffix2}. The function NewReachProbs on line~\ref{alg:newreaches} simply modifies the $P(h)$'s reach 
 probability by multiplying it by $\sigma(I,a)$, keeping the value of the other one the same.
 
-Lines~\ref{alg:suffix1} to \ref{alg:return} contain the usual outcome sampling updates. Note that regrets are updated at the 
+%Lines~\ref{alg:suffix1} to \ref{alg:returnend} % second ref does not seem to work
+Lines~\ref{alg:suffix1} to 24
+contain the usual outcome sampling updates. Note that regrets are updated at the 
 update player histories, while average strategy tables at opponent histories. \mlnote{Still need to add some more detail to 
 earlier sections so that this last part is not too confusing.}
 

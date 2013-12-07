@@ -11,124 +11,9 @@ static string runname = "";
 
 static int expansions = 0; 
 
-static double oos_gamma = 0.95; 
-static double oos_epsilon = 0.6;
+// "playout-based outcome sampling"
 
-// 1 = IST
-// 2 = PST
-static int oos_variant = 1; 
-
-
-void biasedChanceSample(GameState & match_gs, int player, int updatePlayer, GameState & gs, 
-                        double & sampleProb, double & chanceProb) { 
-
-  if (oos_variant == 1) { 
-    // information set targeting applies the bias only at "our" chance event
-    
-    // if at an "opponent" chance event, choose the usual way
-
-    if (updatePlayer != player) {
-      if (player == 1) { 
-        sampleChanceEvent(1, gs.p1roll, sampleProb);
-        chanceProb = sampleProb;
-      }
-      else if (player == 2) { 
-        sampleChanceEvent(2, gs.p2roll, sampleProb);
-        chanceProb = sampleProb;
-      }
-
-      return; 
-    }
-
-    // ok, we're at "our" chance event here.. time for some good, old-fashioned bias :) 
-
-    double roll = drand48(); 
-
-    if (roll < oos_gamma) { 
-      // we're hitting the bias case; set to be consistent with match game
-      //int outcomes = (player == 1 ? numChanceOutcomes(1) : numChanceOutcomes(2));  
-      
-      int outcome = (player == 1 ? match_gs.p1roll : match_gs.p2roll);       
-      chanceProb = getChanceProb(player, outcome);
-     
-      if (player == 1) {
-        gs.p1roll = outcome; 
-        sampleProb = oos_gamma;
-      }
-      else if (player == 2) { 
-        gs.p2roll = outcome;
-        sampleProb = oos_gamma;
-      }
-    }
-    else { 
-      int outcome = (player == 1 ? match_gs.p1roll : match_gs.p2roll);       
-      double outcomeProb = getChanceProb(player, outcome);
-
-      // sample something else
-      bool done = false; 
-      while (!done) { 
-        // resample until get one that is not the same as the match
-        //
-        if (player == 1) { 
-          sampleChanceEvent(1, gs.p1roll, sampleProb);
-          chanceProb = sampleProb;
-          if (gs.p1roll != outcome) done = true;
-        }
-        else if (player == 2) { 
-          sampleChanceEvent(2, gs.p2roll, sampleProb);
-          chanceProb = sampleProb;
-          if (gs.p2roll != outcome) done = true;
-        }
-      }
-
-      // renormalize over all actions that are not the biased one. then mult by 1/gamma
-      sampleProb *= (chanceProb / (1.0 - outcomeProb))*(1.0-oos_gamma); 
-    }
-
-  }
-  else { 
-    // unimplemented
-    assert(false); 
-  }
-}
-
-/* 
-  if (player == updatePlayer)
-    takeAction = sampleAction(player, is, actionshere, sampleprob, 0.6, false); 
-  else
-    takeAction = sampleAction(player, is, actionshere, sampleprob, 0.0, false); 
-*/ 
-//int takeAction = oosSampleAction(match_gs, match_bidseq, bidseq, player, updatePlayer, is, actionshere, sampleprob, 0.6);
-int oosSampleAction(GameState & match_gs, unsigned long long match_bidseq, GameState & gs, unsigned long long bidseq,
-                    int player, int updatePlayer, Infoset & is, int actionshere, double & sampleProb) {
-
-  // decide: are we in the prefix stage or the tail stage?
-  int stage = 0; 
-
-  if (oos_variant == 1) { 
-    // for IST, we are in the prefix stage if: 
-    // - our chance outcome is the same, 
-    // - all the bids are the same up to here
-    // else, we're in the tail stage
- 
-    int maxBid = (gs.curbid == 0 ? BLUFFBID-1 : BLUFFBID);
-    int match_curbid = match_gs.curbid; 
-
-    int lastMatch = 0; 
-    int matchLastOne = 0;
-
-
-  }
-  else { 
-    assert(false);
-  }
-
-  return 0;
-}
-
-
-double cfroos(GameState & match_gs, unsigned long long match_bidseq,  
-              GameState & gs, int player, int depth, unsigned long long bidseq, 
+double pbos(GameState & gs, int player, int depth, unsigned long long bidseq, 
               double reach1, double reach2, double sprob1, double sprob2, int updatePlayer, 
               double & suffixreach, double & rtlSampleProb, bool treePhase)
 {
@@ -146,54 +31,24 @@ double cfroos(GameState & match_gs, unsigned long long match_bidseq,
   
   nodesTouched++;
 
-  // chance nodes. 
-
+  // chance nodes
   if (gs.p1roll == 0) 
   {
     GameState ngs = gs; 
-    double sampleProb = 0, chanceProb = 0;
-    biasedChanceSample(match_gs, 1, updatePlayer, ngs, sampleProb, chanceProb);
+    double sampleProb;
+    sampleChanceEvent(1, ngs.p1roll, sampleProb);
 
-    CHKPROBNZ(sampleProb);
-    CHKPROBNZ(chanceProb);
-    assert(ngs.p1roll > 0);
-
-    // need to modify the reaches and sprobs, unlike other sampling variants
-    if (updatePlayer == 1) { 
-      sprob2 *= sampleProb;
-      reach2 *= chanceProb; 
-    }
-    else if (updatePlayer == 2) { 
-      sprob1 *= sampleProb;
-      reach1 *= chanceProb; 
-    }
-
-    return cfroos(match_gs, match_bidseq, ngs, player, depth+1, bidseq, reach1, reach2, 
-                  sprob1, sprob2, updatePlayer, suffixreach, rtlSampleProb, treePhase); 
+    // don't need to worry about keeping track of sampled chance probs for outcome sampling
+    return pbos(ngs, player, depth+1, bidseq, reach1, reach2, sprob1, sprob2, updatePlayer, suffixreach, rtlSampleProb, treePhase); 
   }
   else if (gs.p2roll == 0)
   {
     GameState ngs = gs; 
-    double sampleProb = 0, chanceProb = 0;
-    biasedChanceSample(match_gs, 2, updatePlayer, ngs, sampleProb, chanceProb);
-    
-    CHKPROBNZ(sampleProb);
-    CHKPROBNZ(chanceProb);
-    assert(ngs.p2roll > 0);
-    
-    // need to modify the reaches and sprobs, unlike other sampling variants
-    if (updatePlayer == 1) { 
-      sprob2 *= sampleProb;
-      reach2 *= chanceProb; 
-    }
-    else if (updatePlayer == 2) { 
-      sprob1 *= sampleProb;
-      reach1 *= chanceProb; 
-    }
+    double sampleProb;
+    sampleChanceEvent(2, ngs.p2roll, sampleProb);
     
     // don't need to worry about keeping track of sampled chance probs for outcome sampling
-    return cfroos(match_gs, match_bidseq, ngs, player, depth+1, bidseq, reach1, reach2, 
-                  sprob1, sprob2, updatePlayer, suffixreach, rtlSampleProb, treePhase); 
+    return pbos(ngs, player, depth+1, bidseq, reach1, reach2, sprob1, sprob2, updatePlayer, suffixreach, rtlSampleProb, treePhase); 
   }
 
   // declare the variables
@@ -226,8 +81,10 @@ double cfroos(GameState & match_gs, unsigned long long match_bidseq,
   int takeAction = 0; 
   double newsuffixreach = 1.0; 
 
-  // sample the action!
-  takeAction = oosSampleAction(match_gs, match_bidseq, gs, bidseq, player, updatePlayer, is, actionshere, sampleprob);
+  if (player == updatePlayer)
+    takeAction = sampleAction(player, is, actionshere, sampleprob, 0.6, false); 
+  else
+    takeAction = sampleAction(player, is, actionshere, sampleprob, 0.0, false); 
 
   CHKPROBNZ(sampleprob); 
   double newsprob1 = (player == 1 ? sampleprob*sprob1 : sprob1); 
@@ -263,8 +120,8 @@ double cfroos(GameState & match_gs, unsigned long long match_bidseq,
   double newreach1 = (player == 1 ? moveProb*reach1 : reach1); 
   double newreach2 = (player == 2 ? moveProb*reach2 : reach2); 
 
-  updatePlayerPayoff = cfroos(match_gs, match_bidseq, ngs, 3-player, depth+1, newbidseq, newreach1, newreach2, 
-                              newsprob1, newsprob2, updatePlayer, newsuffixreach, rtlSampleProb, newTreePhase);
+  updatePlayerPayoff = pbos(ngs, 3-player, depth+1, newbidseq, newreach1, newreach2, newsprob1, newsprob2, 
+                             updatePlayer, newsuffixreach, rtlSampleProb, newTreePhase);
 
   ctlReach = newsuffixreach; 
   itlReach = newsuffixreach*is.curMoveProbs[action]; 
@@ -311,12 +168,6 @@ double cfroos(GameState & match_gs, unsigned long long match_bidseq,
   return updatePlayerPayoff;
 }
 
-// Called from sim.cpp
-int getMoveOOS(int player, GameState gs, unsigned long long match_bidseq) { 
-  return 0;
-}
-
-#if 0
 int main(int argc, char ** argv)
 {
   unsigned long long maxIters = 0; 
@@ -374,12 +225,12 @@ int main(int argc, char ** argv)
     GameState gs1; bidseq = 0;
     double suffixreach = 1.0; 
     double rtlSampleProb = 1.0; 
-    cfroos(gs1, 1, 0, bidseq, 1.0, 1.0, 1.0, 1.0, 1, suffixreach, rtlSampleProb, true);
+    pbos(gs1, 1, 0, bidseq, 1.0, 1.0, 1.0, 1.0, 1, suffixreach, rtlSampleProb, true);
     
     GameState gs2; bidseq = 0;
     suffixreach = 1.0; 
     rtlSampleProb = 1.0; 
-    cfroos(gs1, 1, 0, bidseq, 1.0, 1.0, 1.0, 1.0, 2, suffixreach, rtlSampleProb, true);
+    pbos(gs1, 1, 0, bidseq, 1.0, 1.0, 1.0, 1.0, 2, suffixreach, rtlSampleProb, true);
 
     if (   (maxNodesTouched > 0 && nodesTouched >= maxNodesTouched)
         || (maxNodesTouched == 0 && nodesTouched >= ntNextReport))
@@ -405,7 +256,7 @@ int main(int argc, char ** argv)
       
       cout << "**alglne: iter = " << iter << " nodes = " << nodesTouched << " conv = " << conv << " time = " << totaltime << endl; 
 
-      string str = "cfroos." + runname + ".report.txt"; 
+      string str = "pbos." + runname + ".report.txt"; 
       report(str, totaltime, 2.0*MAX(b1,b2), 0, 0, conv);
       //dumpInfosets("iss-" + runname); 
       //dumpMetaData("metainfo-" + runname, totaltime); 
@@ -425,6 +276,4 @@ int main(int argc, char ** argv)
   
   return 0;
 }
-#endif
-
 

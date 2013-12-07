@@ -5,7 +5,7 @@ set(CMAKE_CXX_COMPILER "g++")
 # find a way to make this OS-dependent
 #set(CMAKE_CXX_FLAGS "-g -pg -O0 -Wall -I/sw/include")
 #set(CMAKE_CXX_FLAGS "-g -pg -O2 -Wall -I/sw/include")
-set(CMAKE_CXX_FLAGS "-g -O2 -Wall -I/sw/include")
+set(CMAKE_CXX_FLAGS "-g -O2 -Wall -Wno-unused-variable -I/sw/include")
 #set(CMAKE_CXX_FLAGS "-O3 -Wall -DNDEBUG -I/sw/include")
 
 # find a way to make this OS-dependent
@@ -13,17 +13,17 @@ set(CMAKE_CXX_FLAGS "-g -O2 -Wall -I/sw/include")
 # (must be the full path.. e.g. no env. variables as above)
 #set(CMAKE_EXE_LINKER_FLAGS "-g -pg -O0 -L/sw/lib")
 #set(CMAKE_EXE_LINKER_FLAGS "-g -pg -O2 -L/sw/lib")
-set(CMAKE_EXE_LINKER_FLAGS "-g -O2 -L/sw/lib")
+set(CMAKE_EXE_LINKER_FLAGS "-g -O2 -Wno-unused-variable -L/sw/lib")
 #set(CMAKE_EXE_LINKER_FLAGS "-O3 -DNDEBUG -L/sw/lib")
 
 #set (LIBFILES infosetstore.cpp bluff.cpp util.cpp br.cpp)
-set (LIBFILES infosetstore.cpp bluff.cpp util.cpp br.cpp abstraction.cpp eval.cpp sampling.cpp fsicommon.cpp seqstore.cpp)
+set (LIBFILES infosetstore.cpp bluff.cpp util.cpp br.cpp abstraction.cpp eval.cpp sampling.cpp fsicommon.cpp seqstore.cpp ismcts.cpp cfroos.cpp)
 
 #add_executable (cfroos cfroos.cpp ${LIBFILES})
 #target_link_libraries(cfroos m)
 
-add_executable (cfroos cfroos.cpp ${LIBFILES})
-target_link_libraries(cfroos m)
+add_executable (pbos pbos.cpp ${LIBFILES})
+target_link_libraries(pbos m)
 
 add_executable (cfros cfros.cpp ${LIBFILES})
 target_link_libraries(cfros m)
@@ -52,8 +52,8 @@ target_link_libraries(cfros m)
 #add_executable (br brmain.cpp ${LIBFILES})
 #target_link_libraries(br m)
 
-#add_executable (sim sim.cpp ${LIBFILES})
-#target_link_libraries(sim m)
+add_executable (sim sim.cpp ${LIBFILES})
+target_link_libraries(sim m)
 
 
 #add_executable (cfros-orig cfros-orig.cpp ${LIBFILES})

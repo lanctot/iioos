@@ -176,6 +176,16 @@ extern unsigned long long nodesTouched;
 extern double sumEV1;
 extern double sumEV2;
 
+// for search-based players
+extern bool simgame;
+extern double timeLimit; 
+extern InfosetStore sgiss1;
+extern InfosetStore sgiss2;
+int getMoveKeyboard(int player, GameState gs, unsigned long long bidseq);
+int getMoveStrat(int player, GameState gs, unsigned long long bidseq);
+int getMoveMCTS(int player, GameState gs, unsigned long long bidseq); 
+int getMoveOOS(int player, GameState gs, unsigned long long bidseq);
+int getMoveRandom(int player, GameState gs, unsigned long long bidseq);
 
 
 class StopWatch

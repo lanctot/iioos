@@ -115,6 +115,12 @@ unsigned long long ntMultiplier = 2;  // nodes touched base timing
 double sumEV1 = 0.0;
 double sumEV2 = 0.0;
 
+// used in simulated games (see sim.cpp)
+bool simgame = false;
+double timeLimit = 1.0;
+InfosetStore sgiss1;
+InfosetStore sgiss2;
+
 // key is roll, value is # of time it shows up. Used only when determining chance outcomes
 map<int,int> outcomes; 
 
