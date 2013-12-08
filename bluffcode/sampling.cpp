@@ -92,3 +92,31 @@ int sampleAction(int player, Infoset & is, int actionshere, double & sampleprob,
   assert(false);
   return -1; 
 }
+
+int sampleActionBiased(int player, Infoset & is, int actionshere, double & sampleprob, double epsilon, 
+                       double oos_gamma, int action) { 
+  
+  // build the distribution to sample from
+  double dist[actionshere];
+  for (int a = 0; a < actionshere; a++) {
+    dist[a] =         oos_gamma*(a == action ? 1.0 : 0.0)
+              + (1.0-oos_gamma)*( epsilon*(1.0 / actionshere) + (1.0-epsilon)*is.curMoveProbs[a] ); 
+  } 
+  
+  double roll = drand48(); 
+  double sum = 0.0; 
+  for (int a = 0; a < actionshere; a++) 
+  {
+    if (roll >= sum && roll < sum+dist[a])
+    {
+      sampleprob = dist[a]; 
+      return a; 
+    }
+
+    sum += dist[a];
+  }
+
+  assert(false);
+  return -1; 
+}
+

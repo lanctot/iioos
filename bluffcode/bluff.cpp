@@ -118,6 +118,7 @@ double sumEV2 = 0.0;
 // used in simulated games (see sim.cpp)
 bool simgame = false;
 double timeLimit = 1.0;
+int sg_curPlayer = 0;
 InfosetStore sgiss1;
 InfosetStore sgiss2;
 
@@ -314,9 +315,23 @@ void getInfosetKey(GameState & gs, unsigned long long & infosetkey, int player, 
 
 void getInfoset(GameState & gs, int player, unsigned long long bidseq, Infoset & is, unsigned long long & infosetkey, int actionshere)
 {
-  getInfosetKey(gs, infosetkey, player, bidseq);
-  bool ret = iss.get(infosetkey, is, actionshere, 0);
-  assert(ret);
+  // when simultatig a game, get it from a diff place
+  if (sg_curPlayer == 1) { 
+    getInfosetKey(gs, infosetkey, player, bidseq);
+    bool ret = sgiss1.get(infosetkey, is, actionshere, 0);
+    assert(ret);
+  }
+  else if (sg_curPlayer == 2) { 
+    getInfosetKey(gs, infosetkey, player, bidseq);
+    bool ret = sgiss2.get(infosetkey, is, actionshere, 0);
+    assert(ret);
+  }
+  else { 
+    // normal case when using most algorithms, i.e. solving    
+    getInfosetKey(gs, infosetkey, player, bidseq);
+    bool ret = iss.get(infosetkey, is, actionshere, 0);
+    assert(ret);
+  }
 }
 
 

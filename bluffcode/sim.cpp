@@ -147,12 +147,22 @@ double simloop()
   sampleChanceEvent(1, gs.p1roll, p1prob);
   sampleChanceEvent(2, gs.p2roll, p2prob);
 
+  sg_curPlayer = 1; 
+
   do 
   {
     int move = getMove(player, gs, bidseq);
-    assert(move >= 1 && move <= 13); // 1,1
+    assert(move >= gs.curbid+1 && move <= BLUFFBID); 
 
-    cout << "Player chooses move " << move << endl;
+    if (move < BLUFFBID) {
+      int quantity = 0;
+      int face = 0;
+      convertbid(quantity, face, move); 
+      cout << "Player chooses move " << move << " (" << quantity << "-" << face << ")" << endl;
+    }
+    else { 
+      cout << "Player calls bluff!" << endl;
+    }
     
     GameState ngs = gs; 
     ngs.prevbid = gs.curbid;
@@ -160,6 +170,7 @@ double simloop()
     ngs.callingPlayer = player;
     bidseq |= (1ULL << (BLUFFBID-move)); 
     player = 3-player;
+    sg_curPlayer = player; 
 
     gs = ngs;
   }  

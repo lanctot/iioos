@@ -144,6 +144,8 @@ void sampleMoveAvg(Infoset & is, int actionshere, int & index, double & prob);
 void sampleChanceEvent(int player, int & outcome, double & prob);
 void sampleMoveAvg(Infoset & is, int actionshere, int & index, double & prob);
 int sampleAction(int player, Infoset & is, int actionshere, double & sampleprob, double epsilon, bool firstTimeUniform);
+int sampleActionBiased(int player, Infoset & is, int actionshere, double & sampleprob, double epsilon, 
+                       double oos_gamma, int action);
 
 // FSI functions
 void fsiInit();
@@ -178,6 +180,7 @@ extern double sumEV2;
 
 // for search-based players
 extern bool simgame;
+extern int sg_curPlayer; 
 extern double timeLimit; 
 extern InfosetStore sgiss1;
 extern InfosetStore sgiss2;
