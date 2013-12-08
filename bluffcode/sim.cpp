@@ -178,7 +178,7 @@ double simloop()
 
   //int winner = whowon(gs);
   //cout << "Winner: " << winner << endl;
-  cout << "Game over. Rolls were " << gs.p1roll << " " << gs.p2roll << endl;
+  cout << "Game done. Rolls were " << gs.p1roll << " " << gs.p2roll << endl;
   
   return payoff(gs, 1);
 }
@@ -217,10 +217,10 @@ int main(int argc, char ** argv)
   double payoff = simloop();
 
   if (payoff > 0) 
-    cout << "P1 wins!" << endl; 
+    cout << "Game over. P1 wins!" << endl; 
   else if (payoff == 0) 
-    cout << "draw" << endl;
+    cout << "game over. draw" << endl;
   else if (payoff < 0) 
-    cout << "P2 wins!" << endl;
+    cout << "Game over. P2 wins!" << endl;
 }
   
