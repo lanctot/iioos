@@ -11,87 +11,100 @@ static double C = 2.0;
 
 static InfosetStore iss2; 
 
-double getMoveMCTS_rec(int player, GameState & gs, unsigned long long bidseq, int topPlayer, int & takeAction)
+double getMoveMCTS_rec(int player, GameState & gs, unsigned long long bidseq, int topPlayer, bool treeMode)
 {
   //cout << "bidseq = " << bidseq << endl;
 
   if (terminal(gs))
   {
     //cout << "terminal!" << endl;
-    return payoff(gs, topPlayer);
+    double util = payoff(gs, topPlayer);
+    //cout << "util = " << util << ", topPlayer = " << topPlayer << endl;
+    return util;
   }
+  else if (!treeMode) { 
+    // playout
+    int maxBid = (gs.curbid == 0 ? BLUFFBID-1 : BLUFFBID);
+    int actionshere = maxBid - gs.curbid; 
 
+    // take a random move 
+    int takeAction = static_cast<int>(drand48() * actionshere); 
+
+    int bid = gs.curbid + 1 + takeAction;
+    gs.prevbid = gs.curbid;
+    gs.curbid = bid; 
+    gs.callingPlayer = player;
+    bidseq |= (1ULL << (BLUFFBID-bid)); 
+
+    return getMoveMCTS_rec(3-player, gs, bidseq, topPlayer, treeMode); 
+  }
+  
   unsigned long long infosetkey = 0; 
   Infoset is; 
   int maxBid = (gs.curbid == 0 ? BLUFFBID-1 : BLUFFBID);
   int actionshere = maxBid - gs.curbid; 
 
-  // first get the parent infoset
-  infosetkey = bidseq;  
-  infosetkey <<= iscWidth; 
-  
-  if (player == 1)
-  {
-    infosetkey |= gs.p1roll; 
-    infosetkey <<= 1; 
-    bool ret = iss.get(infosetkey, is, actionshere, 0); 
-    assert(ret);
-  }
-  else if (player == 2)
-  {
-    infosetkey |= gs.p2roll; 
-    infosetkey <<= 1; 
-    infosetkey |= 1; 
-    bool ret = iss.get(infosetkey, is, actionshere, 0); 
-    assert(ret);
+  getInfoset(gs, player, bidseq, is, infosetkey, actionshere);
+
+  if (treeMode && is.lastUpdate == 0) { 
+    // expansion case 
+    treeMode = false; 
+    //is.lastUpdate = iter;  // stores parent visits
   }
 
-  takeAction = -1; 
+  int takeAction = -1; 
 
   // check if there are any with 0 visits
-  int unvisited[actionshere]; 
+  int candidates[actionshere]; 
   int ua = 0; 
 
   for (int i = 0; i < actionshere; i++)
   {
     if (is.totalMoveProbs[i] == 0.0) 
     {
-      unvisited[ua] = i;
+      candidates[ua] = i;
       ua++; 
     }
   }
 
+  
   if (ua > 0) 
   {
-    // this still happens fairly often even at high sims
-    //cout << "*"; cout.flush();
-    int index = static_cast<int>(drand48() * ua); 
-    takeAction = unvisited[index];
-    assert(takeAction >= 0 && takeAction < actionshere); 
+    // there were some actions that have never been chosen
+    // choose among those first
   }
   else
   {
     double maxval = -1000.0;
-    int maxact = -1; 
+    double tolerance = 0.0000001; 
     assert(is.lastUpdate >= static_cast<unsigned int>(actionshere));
     
     for (int i = 0; i < actionshere; i++) 
     {
       assert(is.totalMoveProbs[i] > 0.0); 
       double val =   (is.cfr[i] / is.totalMoveProbs[i]) 
-                   + C * sqrt( log(static_cast<double>(is.lastUpdate)) / is.totalMoveProbs[i] ); 
+                   + C * sqrt( log(static_cast<double>(is.lastUpdate)+1) / is.totalMoveProbs[i] ); 
 
-      if (val > maxval) {
+      if (val >= (maxval+tolerance)) {
+        // clear better choice
         maxval = val; 
-        maxact = i;
+        candidates[0] = i;
+        ua = 1; 
+      }
+      else if (val >= (maxval-tolerance) && val < (maxval+tolerance)) { 
+        // tie, add this as a candidate
+        candidates[ua] = i; 
+        ua++; 
       }
     }
 
-    assert(maxact >= 0); 
-    takeAction = maxact;
+    assert(ua > 0); 
   }
 
-  //cout << "takeAction = " << takeAction << endl;
+  // choose among the candidates
+  int index = static_cast<int>(drand48() * ua); 
+  takeAction = candidates[index];
+  assert(takeAction >= 0 && takeAction < actionshere); 
 
   // take the action, modify the state
   
@@ -101,9 +114,10 @@ double getMoveMCTS_rec(int player, GameState & gs, unsigned long long bidseq, in
   gs.callingPlayer = player;
   bidseq |= (1ULL << (BLUFFBID-bid)); 
 
-  int dummy = 0;
-  double tppayoff = getMoveMCTS_rec(3-player, gs, bidseq, topPlayer, dummy);
+  double tppayoff = getMoveMCTS_rec(3-player, gs, bidseq, topPlayer, treeMode);
   double mypayoff = (player == topPlayer ? tppayoff : -tppayoff); 
+
+  //cout << "player " << player << ", tpp = " << tppayoff << ", myp = " << mypayoff << endl;
 
   assert(takeAction >= 0 && takeAction < actionshere); 
 
@@ -111,40 +125,31 @@ double getMoveMCTS_rec(int player, GameState & gs, unsigned long long bidseq, in
   is.totalMoveProbs[takeAction] += 1.0; 
   is.lastUpdate++; 
 
-  iss.put(infosetkey, is, actionshere, 0); 
+  //cout << "is.lastUpdate = " << is.lastUpdate << endl;
+
+  if (sg_curPlayer == 1)  
+    sgiss1.put(infosetkey, is, actionshere, 0); 
+  else 
+    sgiss2.put(infosetkey, is, actionshere, 0); 
 
   return tppayoff;
 }
 
-int getMoveMCTS(int player, GameState gs, unsigned long long bidseq)
+int getMoveMCTS(int player, GameState match_gs, unsigned long long match_bidseq)
 {
-  int roll = (player == 1 ? gs.p1roll : gs.p2roll); 
-  cout << "Player: " << player << ", Roll: " << roll << endl << "Running MCTS simulations: ";
+  int myroll = (player == 1 ? match_gs.p1roll : match_gs.p2roll); 
+  cout << "Player: " << player << ", My Roll is: " << myroll << endl << "Running MCTS simulations: ";
 
-  unsigned long long pisk = 0; 
-  Infoset pis; 
-  int maxBid = (gs.curbid == 0 ? BLUFFBID-1 : BLUFFBID);
-  int actionshere = maxBid - gs.curbid; 
+  // determine which information set store to use based on the match player 
+  //InfosetStore & myiss = (sg_curPlayer == 1 ? sgiss1 : sgiss2); 
 
-  // first get the parent infoset
-  pisk = bidseq;  
-  pisk <<= iscWidth; 
-  
-  if (player == 1)
-  {
-    pisk |= gs.p1roll; 
-    pisk <<= 1; 
-    bool ret = iss.get(pisk, pis, actionshere, 0); 
-    assert(ret);
-  }
-  else if (player == 2)
-  {
-    pisk |= gs.p2roll; 
-    pisk <<= 1; 
-    pisk |= 1; 
-    bool ret = iss.get(pisk, pis, actionshere, 0); 
-    assert(ret);
-  }
+  //unsigned long long infosetkey = 0; 
+  //Infoset pis; 
+  //int maxBid = (gs.curbid == 0 ? BLUFFBID-1 : BLUFFBID);
+  //int actionshere = maxBid - gs.curbid; 
+
+  // root infoset
+  //getInfoset(match_gs, player, match_bidseq, is, infosetkey, actionshere);
 
   // start the simulations
   int takeAction;
@@ -152,78 +157,124 @@ int getMoveMCTS(int player, GameState gs, unsigned long long bidseq)
   double totaltime = 0.0;
   StopWatch stopwatch;
 
+  iter = 0; 
+
   //for (unsigned long long i = 0; i < simulations; i++)
-  for (unsigned long long i = 0; true; i++)
+  for (unsigned long long i = 1; true; i++)
   {
-    if (i % 10000 == 0) 
-    { 
-      totaltime += stopwatch.stop();
-      stopwatch.reset(); 
-      cout << "."; cout.flush(); 
-    }
+    //cout << "Simulation " << i << endl; 
 
-    if (totaltime > nextCheckpoint)
-    {
-      cout << endl << "total time: " << totaltime << " seconds. ";
-      //iter = i;
-      //return 0;
+    totaltime = stopwatch.stop();
+    if (totaltime >= timeLimit) break; 
+    
 
-      InfosetStore iss_save;
-      iss.copy(iss_save);
-  
-      //iss.mctsToCFR_mixed();
-      iss.mctsToCFR_pure();
+    // Old code! ~circa 2010
+    //
+    //InfosetStore iss_save;
+    //iss.copy(iss_save);
+    //iss.mctsToCFR_mixed();
+    //iss.mctsToCFR_pure();
 
-      //double conv = computeBestResponses(false, false); FIXME
-      //report("mctspreport.txt", totaltime, conv, 0, 0); FIXME
+    //double conv = computeBestResponses(false, false); FIXME
+    //report("mctspreport.txt", totaltime, conv, 0, 0); FIXME
+    //iss_save.copy(iss);
+    
+    iter = i;
 
-      iss_save.copy(iss);
-      
-      iter = i;
-      dumpInfosets("issmcts");
+    //dumpInfosets("issmcts");
 
-      cout << endl;
-      nextCheckpoint += cpWidth;
+    //cout << endl;
+    //nextCheckpoint += cpWidth;
 
-      stopwatch.reset(); 
-    }
-
-
-    GameState gscopy = gs; 
-
+    //stopwatch.reset(); 
+    
     // ONLY when solving!
-    int myoc = 0; double myprob = 0.0;
-    sampleChanceEvent(player, myoc, myprob);
+    //int myoc = 0; double myprob = 0.0;
+    //sampleChanceEvent(player, myoc, myprob);
 
-    // sample the opponent's chance outcome
+    GameState gscopy = match_gs; 
+
+    // determinize! sample the opponent's chance outcome
     int outcome = 0;
     double prob = 0;
     sampleChanceEvent(3-player, outcome, prob);
 
     if (player == 1)
-    {
-      gscopy.p1roll = myoc;
       gscopy.p2roll = outcome;
-    }
     else if (player == 2)
-    {
       gscopy.p1roll = outcome;
-      gscopy.p2roll = myoc;
-    }
+
+    //cout << "determinized outcome for opponent = " << outcome << endl;
 
     takeAction = -1;
-    getMoveMCTS_rec(player, gscopy, bidseq, player, takeAction);
-
-    //if (i % (simulations / 100) == 0) { cout << "."; cout.flush(); }
-
+    getMoveMCTS_rec(player, gscopy, match_bidseq, player, true);
   }
 
-  cout << endl;
+  cout << "Total simulations: " << iter << endl;
 
   // use the last takeAction
+  //assert(takeAction >= 0 && takeAction < actionshere); 
+  
+  // final move selection; highest value
+  unsigned long long infosetkey = 0; 
+  Infoset is; 
+  int maxBid = (match_gs.curbid == 0 ? BLUFFBID-1 : BLUFFBID);
+  int actionshere = maxBid - match_gs.curbid; 
+
+  getInfoset(match_gs, player, match_bidseq, is, infosetkey, actionshere);
+  
+  int candidates[actionshere]; 
+  int ua = 0; 
+
+  for (int i = 0; i < actionshere; i++)
+  {
+    if (is.totalMoveProbs[i] == 0.0) 
+    {
+      candidates[ua] = i;
+      ua++; 
+    }
+  }
+
+  assert(ua == 0); 
+  
+  double maxval = -1000.0;
+  double tolerance = 0.0000001; 
+    
+  for (int i = 0; i < actionshere; i++) 
+  {
+    double val = (is.cfr[i] / is.totalMoveProbs[i]); 
+
+    cout << "move " << i; 
+    if (match_gs.curbid + 1 + i == BLUFFBID) cout << " (bluff)"; 
+    else { 
+      int quantity = 0;
+      int face = 0;
+      convertbid(quantity, face, match_gs.curbid + 1 + i);
+      cout << " (" << quantity << "-" << face << ")"; 
+    }
+    cout << " = " << is.cfr[i] << " " << is.totalMoveProbs[i] << " " << val << endl;
+
+    if (val >= (maxval+tolerance)) {
+      // clear better choice
+      maxval = val; 
+      candidates[0] = i;
+      ua = 1; 
+    }
+    else if (val >= (maxval-tolerance) && val < (maxval+tolerance)) { 
+      // tie, add this as a candidate
+      candidates[ua] = i; 
+      ua++; 
+    }
+  }
+
+  assert(ua > 0);
+
+  // choose among the candidates
+  int index = static_cast<int>(drand48() * ua); 
+  takeAction = candidates[index];
   assert(takeAction >= 0 && takeAction < actionshere); 
   
-  return (gs.curbid + 1 + takeAction);
+  return (match_gs.curbid + 1 + takeAction);
 }
 
 

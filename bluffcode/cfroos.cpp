@@ -11,7 +11,7 @@ static string runname = "";
 
 static int expansions = 0; 
 
-static double oos_gamma = 0.95; 
+static double oos_gamma = 0.97; 
 static double oos_epsilon = 0.6;
 
 // 1 = IST
@@ -451,7 +451,7 @@ int getMoveOOS(int player, GameState match_gs, unsigned long long match_bidseq) 
       break;
   }
 
-  cout << "OOS, searched " << iter << " iterations " << endl; 
+  cout << "OOS, searched " << iter << " iterations, in " << sw.stop() << " seconds " << endl; 
 
   // now get the information set and sample from the avg. strategy
 
