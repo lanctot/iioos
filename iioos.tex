@@ -29,6 +29,9 @@
 \tikzstyle{level 3}=[level distance=8mm, sibling distance=0.5cm]
 
 \usepackage[algo2e, noend, noline, linesnumbered]{algorithm2e}
+% need these next two lines for old versions of alg2e
+\providecommand{\SetAlgoLined}{\SetLine}  
+\providecommand{\DontPrintSemicolon}{\dontprintsemicolon}
 \DontPrintSemicolon
 \makeatletter
 \newcommand{\pushline}{\Indp}% Indent
