@@ -523,6 +523,50 @@ possibly also show exploitation / exploitability tradeoffs as in RNash work
 previous matches? 
 \end{itemize}
 
+\subsection{Preliminary Results in Bluff(1,1)}
+
+Here are some first results for performance and/or exploitability analysis of the algorithms. 
+Note that unless otherwise stated, memory is retained and not cleared between successive searches
+(which has no effect in ISMCTS).
+\mlnote{I have played against the ISMCTS strategy and I believe it's converging to a particular 
+pure (and bad) strategy.}
+
+So far, the only variant of OOS implemented is IST with $(\epsilon, \gamma) = (0.6, 0.97)$. Manual tuning shows
+that $\gamma > 0.9$ is a good region. ISMCTS uses $C = 2$ and manual tuning shows that the value of $C$ does not 
+affect the performance much. Both ISMCTS and OOS win against random 75-85\% of the time.
+
+\begin{center}
+\begin{table}[h!]
+\begin{tabular}{|c|c|}
+\hline
+Search time & Performance \\
+\hline
+    1s      & OOS wins 59.10 $\pm$ 3.05\% of games \\
+    5s      & OOS wins 54.70 $\pm$ 3.05\% of games \\
+    25s     & OOS wins 54.80 $\pm$ 3.05\% of games \\
+\hline
+\end{tabular}
+\caption{OOS vs. ISMCTS head-to-head performance on full games.}
+\end{table}
+\end{center}
+
+There are several ways that the expoitability of the strategies produced by these search algorithms can be evaluated 
+(in each case $X \in \{$ OOS, ISMCTS $\}$ and $B$ is some fixed benchmark strategy):
+\begin{itemize}
+\item The {\bf single-match method}. Runs algorithm $X$ vs $B$ for a single match.
+      Then compute the exploitability of the strategy computed by $X$. 
+\item The {\bf multi-match method}. Run the single-match method for $M$ matches and save each full strategy. Then, compute the 
+      average strategy $\bar{\sigma}^m$ over all matches. Compute the exploitability of $\bar{\sigma}^m$.
+\item The {\bf partial-stitching method}. For all $I \in \cI_1$: run the search algorithm $X$ starting at $I$ and starting with 
+      empty strategy (nothing saved from previous match decisions). After each search, save the distribution $\bar{\sigma}(I)$ 
+      computed by $X$ to a global ``stitched'' strategy $\bar{\sigma}'$. Compute the exploitability of $\bar{\sigma}'$.      
+\item The {\bf full-stitching method}. For all $I \in \cI_1$: run a search at each $I'$ which is a predecessor of $I$ retaining
+      memory. Then, run a search from $I$, starting with a strategy computed from these previous searches. 
+      As in partial stitching, save the distribution computed at $I$ to a 
+      globally stitched strategy $\bar{\sigma}'$ and compute the exploitability of the stitched strategy.
+\end{itemize}
+
+
 
 \section{Conclusion}
 
