@@ -1,12 +1,22 @@
-all: iioos.pdf
+prefix=iioos
+#dbdir=~/Dropbox/sm-tron
 
-iioos.pdf: iioos.tex iioos.bib
-	latexmk -pdf iioos.tex
+pdf: $(prefix).tex
+	latexmk -pdf $(prefix).tex
 
-# marc likes having this one:
-view: iioos.pdf
-	evince iioos.pdf
+view: pdf
+	evince $(prefix).pdf
+
+#putdb:
+#	cp *.bib *.tex *.pdf *.sty $(dbdir)
+#	cp images/* $(dbdir)/images
+
+#getdb:  
+#	cp $(dbdir)/*.tex $(dbdir)/*.bib $(dbdir)/*.sty .
+#	cp $(dbdir)/images/* images
 
 clean:
 	latexmk -c
-	rm -f iioos.pdf 
+	rm -f *~ *.bbl
+	rm -f $(prefix).pdf
+
