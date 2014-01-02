@@ -188,7 +188,7 @@ int main(int argc, char ** argv)
   init();
   
   simgame = true; 
-  timeLimit = 1.0;
+  timeLimit = 5.0;
 
   if (argc < 2)
   {
@@ -222,5 +222,12 @@ int main(int argc, char ** argv)
     cout << "game over. draw" << endl;
   else if (payoff < 0) 
     cout << "Game over. P2 wins!" << endl;
+
+  cout << "Single-match exploitability." << endl; 
+
+  double v1 = searchComputeHalfBR(2, &sgiss2, true);
+  double v2 = searchComputeHalfBR(1, &sgiss1, false);
+
+  cout << "v1 = " << v1 << ", v2 = " << v2 << endl;
 }
   

@@ -138,7 +138,7 @@ double getMoveMCTS_rec(int player, GameState & gs, unsigned long long bidseq, in
 int getMoveMCTS(int player, GameState match_gs, unsigned long long match_bidseq)
 {
   int myroll = (player == 1 ? match_gs.p1roll : match_gs.p2roll); 
-  cout << "Player: " << player << ", My Roll is: " << myroll << endl << "Running MCTS simulations: ";
+  cout << "Player: " << player << ", My Roll is: " << myroll << endl << "Running MCTS simulations ..." << endl;
 
   // determine which information set store to use based on the match player 
   //InfosetStore & myiss = (sg_curPlayer == 1 ? sgiss1 : sgiss2); 
@@ -225,6 +225,8 @@ int getMoveMCTS(int player, GameState match_gs, unsigned long long match_bidseq)
   
   int candidates[actionshere]; 
   int ua = 0; 
+
+  // sanity check: make sure ever action was taken at least once 
 
   for (int i = 0; i < actionshere; i++)
   {

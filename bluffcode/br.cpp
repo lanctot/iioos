@@ -13,6 +13,8 @@
 static bool mccfrAvgFix = false;
 static bool cfrbr = false;
 static bool twofiles = false;
+static bool ismcts = false;
+static InfosetStore * issPtr = &iss;
 
 bool uctbr = false;
 #if FSICFR
@@ -136,8 +138,9 @@ void getInfoset(unsigned long long & infosetkey, Infoset & is, GameState gs, uns
     getAbsInfosetKey(ngs, isk, player, bidseq);
     ret = iss.get(isk, is, actionshere, 0); 
   }
-  else 
-    ret = iss.get(infosetkey, is, actionshere, 0); 
+  else { 
+    ret = issPtr->get(infosetkey, is, actionshere, 0); 
+  }
 
   /*
   unsigned long long sskey = 0;
@@ -149,6 +152,62 @@ void getInfoset(unsigned long long & infosetkey, Infoset & is, GameState gs, uns
   if (!ret) cerr << "infoset get failed, infosetkey = " << infosetkey << endl;
   assert(ret);  
 }
+  
+double getMoveProbISMCTS(Infoset & is, int action, int actionshere) { 
+  
+  int candidates[actionshere]; 
+  int ua = 0; 
+  double totalVisits = 0;
+
+  for (int i = 0; i < actionshere; i++)
+  {
+    if (is.totalMoveProbs[i] == 0.0) 
+    {
+      candidates[ua] = i;
+      ua++; 
+    }
+    else { 
+      totalVisits += is.totalMoveProbs[i];
+    }
+  }
+
+  if (ua == 0) { 
+    // MCTS has not searched this node yet, return default
+    return (1.0 / static_cast<double>(actionshere)); 
+  }
+  
+  double maxval = -1000.0;
+  double tolerance = 0.0000001; 
+    
+  for (int i = 0; i < actionshere; i++) 
+  {
+    double val = (is.cfr[i] / is.totalMoveProbs[i]); 
+
+    if (val >= (maxval+tolerance)) {
+      // clear better choice
+      maxval = val; 
+      candidates[0] = i;
+      ua = 1; 
+    }
+    else if (val >= (maxval-tolerance) && val < (maxval+tolerance)) { 
+      // tie, add this as a candidate
+      candidates[ua] = i; 
+      ua++; 
+    }
+  }
+
+  assert(ua > 0);
+
+  // now, if the action is among the candidates, return 1/#candidates
+  // else return 0
+
+  for (int i = 0; i < ua; i++) { 
+    if (candidates[i] == action) 
+      return (1.0 / static_cast<double>(ua)); 
+  }
+
+  return 0.0;
+}
 
 double getMoveProb(Infoset & is, int action, int actionshere)
 { 
@@ -157,6 +216,8 @@ double getMoveProb(Infoset & is, int action, int actionshere)
     CHKPROB(is.curMoveProbs[action]);
     return is.curMoveProbs[action];
   }
+  else if (ismcts) 
+    return getMoveProbISMCTS(is, action, actionshere); 
 
   double den = 0.0; 
   
@@ -784,6 +845,30 @@ double computeBestResponses(bool abs, bool avgFix, double & p1value, double & p2
   return conv;
 }
 
+double searchComputeHalfBR(int fixed_player, InfosetStore * _issPtr, bool _ismcts)
+{
+  ismcts = _ismcts;
+  issPtr = _issPtr;
+
+  int CO = (fixed_player == 1 ? numChanceOutcomes(1) : numChanceOutcomes(2)); 
+
+  // fill chance outcomes for opponent
+  oppChanceOutcomes.clear();
+  for (int i = 1; i <= CO; i++)
+    oppChanceOutcomes.push_back(i); 
+
+  GameState gs; 
+  unsigned long long bidseq = 0; 
+  FVector<double> oppreach(CO, 1.0); 
+
+  //double expectimaxbr(GameState gs, unsigned long long bidseq, int player, int fixed_player, int depth, FVector<double> & oppReach)
+  double value = expectimaxbr(gs, bidseq, 1, fixed_player, 0, oppreach);
+
+  return value;
+}
+
+
+
 #if FSICFR
 double absComputeBestResponses(bool abs, bool avgFix)
 {
@@ -1103,6 +1188,7 @@ void UCTBR(int fixed_player)
     }
   }
 }
+
 
 #endif
 

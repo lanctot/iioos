@@ -566,6 +566,19 @@ There are several ways that the expoitability of the strategies produced by thes
       globally stitched strategy $\bar{\sigma}'$ and compute the exploitability of the stitched strategy.
 \end{itemize}
 
+I have run the single-match method for a small number of games, and averaged the results 
+
+\begin{center}
+\begin{tabular}{ccccc}
+alg & time & avg. exp(1) & avg. exp(2) & total avg. exploitability\\
+\hline
+ISMCTS & 1s & 0.795 & 0.767 & 1.562 \\
+OOS    & 1s & 0.703 & 0.444 & 1.147 \\
+\hline
+ISMCTS & 5s & 0.796 & 0.768 & 1.564 \\
+OOS    & 5s & 0.518 & 0.283 & 0.801 \\
+\end{tabular}
+\end{center}
 
 
 \section{Conclusion}

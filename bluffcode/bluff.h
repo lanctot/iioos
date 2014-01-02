@@ -75,6 +75,9 @@ struct Infoset
 
 };
 
+// global forward declarations
+class InfosetStore;
+
 // game-specific function defs
 bool terminal(GameState & gs); 
 double payoff(GameState & gs, int player);
@@ -130,6 +133,7 @@ void UCTBR(int fixed_player);
 void fsiBR(int fixed_player);
 double absComputeBestResponses(bool abs, bool avgFix, double & p1value, double & p2value);
 double absComputeBestResponses(bool abs, bool avgFix);
+double searchComputeHalfBR(int fixed_player, InfosetStore * _issPtr, bool _ismcts);
 
 // abstract versions of stuff
 void absInitInfosets();
@@ -161,7 +165,6 @@ void fsiTestAddSub();
 double fsiAvgStratEV(bool player1, unsigned int * sequence, int p1roll, int p2roll);
 
 // global variables
-class InfosetStore;
 extern InfosetStore iss; 
 extern InfosetStore briss2;
 extern InfosetStore evaliss2;
