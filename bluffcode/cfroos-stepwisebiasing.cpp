@@ -11,15 +11,168 @@ static string runname = "";
 
 static int expansions = 0; 
 
-static double oos_delta = 0.9; 
+static double oos_gamma = 0.97; 
 static double oos_epsilon = 0.6;
 
 // 1 = IST
 // 2 = PST
 static int oos_variant = 1; 
 
-bool isMatchPrefix(GameState & match_gs, unsigned long long match_bidseq, GameState & gs, unsigned long long bidseq, 
-                   int player, int updatePlayer) { 
+/**
+ * Biased sampling at chance nodes. This is new... no CFR variants have ever done this. 
+ * You have to bias the sampling at chance nodes so that sampling Z_{sub} is more likely. 
+ * This means having to pass down the sampling prob and the opponent reach, unlike other 
+ * CFR variants where these always cancel out. 
+ */ 
+void biasedChanceSample(GameState & match_gs, int player, int updatePlayer, GameState & gs, 
+                        double & sampleProb, double & chanceProb) { 
+
+  if (oos_variant == 1) { 
+    // information set targeting applies the bias only at "our" chance event
+    
+    // if at an "opponent" chance event, choose the usual way
+
+    if (updatePlayer != player) {
+      if (player == 1) { 
+        sampleChanceEvent(1, gs.p1roll, sampleProb);
+        chanceProb = sampleProb;
+      }
+      else if (player == 2) { 
+        sampleChanceEvent(2, gs.p2roll, sampleProb);
+        chanceProb = sampleProb;
+      }
+
+      return; 
+    }
+
+    // ok, we're at "our" chance event here.. time for some good, old-fashioned bias :) 
+
+    double roll = drand48(); 
+
+    if (roll < oos_gamma) { 
+      // we're hitting the bias case; set to be consistent with match game
+      //int outcomes = (player == 1 ? numChanceOutcomes(1) : numChanceOutcomes(2));  
+      
+      int outcome = (player == 1 ? match_gs.p1roll : match_gs.p2roll);       
+      chanceProb = getChanceProb(player, outcome);
+     
+      if (player == 1) {
+        gs.p1roll = outcome; 
+        sampleProb = oos_gamma;
+      }
+      else if (player == 2) { 
+        gs.p2roll = outcome;
+        sampleProb = oos_gamma;
+      }
+    }
+    else { 
+      int outcome = (player == 1 ? match_gs.p1roll : match_gs.p2roll);       
+      double outcomeProb = getChanceProb(player, outcome);
+
+      // sample something else
+      bool done = false; 
+      while (!done) { 
+        // resample until get one that is not the same as the match
+        //
+        if (player == 1) { 
+          sampleChanceEvent(1, gs.p1roll, sampleProb);
+          chanceProb = sampleProb;
+          if (gs.p1roll != outcome) done = true;
+        }
+        else if (player == 2) { 
+          sampleChanceEvent(2, gs.p2roll, sampleProb);
+          chanceProb = sampleProb;
+          if (gs.p2roll != outcome) done = true;
+        }
+      }
+
+      // renormalize over all actions that are not the biased one. then mult by 1/gamma
+      sampleProb *= (chanceProb / (1.0 - outcomeProb))*(1.0-oos_gamma); 
+    }
+
+  }
+  else { 
+    // unimplemented
+    assert(false); 
+  }
+}
+
+/**
+ * Stage 1: Prefix stage
+ *
+ * Assume a single action is "consistent with the history" (in the case of Bluff, this is true, 
+ * can be generalized w.l.o.g.) there is a pure dist P assigns 1 to only that action and 0 to
+ * all other actions.
+ *
+ * What we constuct here then is a distribution D, 
+ *
+ *   Let expl = epsilon if P(h) = i, 0 othewise
+ *
+ *   D =  \gamma P + (1 - \gamma) ( expl Unif(A(I)) + (1 - expl) \sigma(I) )
+ *
+ * And we sample an action according to D. 
+ * 
+ */
+int oosSampleAction_stage1(GameState & match_gs, unsigned long long match_bidseq, GameState & gs, 
+  unsigned long long bidseq, int player, int updatePlayer, Infoset & is, int actionshere, 
+  double & sampleProb) {
+
+  // get the consistent action (bid)
+  int action = -1; 
+
+  int maxBid = (gs.curbid == 0 ? BLUFFBID-1 : BLUFFBID);
+      
+  unsigned long long singleBitMask = (1ULL << (BLUFFBID-(gs.curbid+1)));
+
+  for (int bid = gs.curbid+1; bid <= maxBid; bid++) {
+    action++; 
+
+    if ((match_bidseq & singleBitMask) > 0) { 
+      // this is the next bid
+      break;
+    }
+
+    singleBitMask >>= 1; 
+  }
+
+  assert(action >= 0 && action < actionshere); 
+
+  int takeAction = -1;
+
+  if (player == updatePlayer)
+    takeAction = sampleActionBiased(player, is, actionshere, sampleProb, oos_epsilon, oos_gamma, action); 
+  else
+    takeAction = sampleActionBiased(player, is, actionshere, sampleProb, 0.0, oos_gamma, action); 
+
+  return takeAction;
+}
+
+/**
+ * Stage 2: Sampling is done exactly as in OS
+ */
+int oosSampleAction_stage2(GameState & match_gs, unsigned long long match_bidseq, GameState & gs, 
+  unsigned long long bidseq, int player, int updatePlayer, Infoset & is, int actionshere, 
+  double & sampleProb) {
+
+  int takeAction = -1;
+
+  if (player == updatePlayer)
+    takeAction = sampleAction(player, is, actionshere, sampleProb, oos_epsilon, false); 
+  else
+    takeAction = sampleAction(player, is, actionshere, sampleProb, 0.0, false); 
+
+  return takeAction;
+}
+
+//int takeAction = oosSampleAction(match_gs, match_bidseq, bidseq, player, updatePlayer, is, actionshere, sampleprob, 0.6);
+int oosSampleAction(GameState & match_gs, unsigned long long match_bidseq, GameState & gs, unsigned long long bidseq,
+                    int player, int updatePlayer, Infoset & is, int actionshere, double & sampleProb) {
+
+  // decide: are we in the prefix stage or the tail stage?
+  // 1 = prefix stage
+  // 2 = tail stage
+  int stage = 0; 
+
   if (oos_variant == 1) { 
     // for IST, we are in the prefix stage if: 
     // - update player's chance outcome is the same, 
@@ -30,10 +183,10 @@ bool isMatchPrefix(GameState & match_gs, unsigned long long match_bidseq, GameSt
     int match_curbid = match_gs.curbid; 
 
     if (updatePlayer == 1 && match_gs.p1roll != gs.p1roll) { 
-      return false; 
+      stage = 2; 
     }
     else if (updatePlayer == 2 && match_gs.p2roll != gs.p2roll) { 
-      return false; 
+      stage = 2;
     }
     else { 
       // matching outcome, now much check: is my history a prefix of the match history?
@@ -59,54 +212,31 @@ bool isMatchPrefix(GameState & match_gs, unsigned long long match_bidseq, GameSt
       // - my history's current bid has to be < the match history's current bid
       if (lastMatchingBid == gs.curbid && gs.curbid < match_gs.curbid)  { 
         // proper prefix
-        return true;
+        stage = 1; 
       }
       else {
-        return false;
+        stage = 2; 
       }
     }
     
   }
+
+  if (stage == 1)
+    return oosSampleAction_stage1(match_gs, match_bidseq, gs, bidseq, player, updatePlayer, 
+      is, actionshere, sampleProb);
+  else if (stage == 2) 
+    return oosSampleAction_stage2(match_gs, match_bidseq, gs, bidseq, player, updatePlayer, 
+      is, actionshere, sampleProb);
   else { 
-    cerr << "isMatchPrefix unimplemented for this oos variant." << endl;
-    exit(-1); 
+    assert(false);
+    return 0;
   }
-
-  return false;
 }
 
-int getMatchAction(GameState & match_gs, unsigned long long match_bidseq, GameState & gs, int player, int updatePlayer) { 
-  // get the consistent action (bid)
-  int action = -1; 
 
-  int maxBid = (gs.curbid == 0 ? BLUFFBID-1 : BLUFFBID);
-  int actionshere = maxBid - gs.curbid; 
-      
-  unsigned long long singleBitMask = (1ULL << (BLUFFBID-(gs.curbid+1)));
-
-  for (int bid = gs.curbid+1; bid <= maxBid; bid++) {
-    action++; 
-
-    if ((match_bidseq & singleBitMask) > 0) { 
-      // this is the next bid
-      break;
-    }
-
-    singleBitMask >>= 1; 
-  }
-
-  assert(action >= 0 && action < actionshere);
-
-  return action;
-}
-
-// mode = 1 -> along the match
-// mode = 2 -> post match
-// mode = 3 -> off match
-
-double cfroos(GameState & match_gs, unsigned long long match_bidseq, int match_player,  
+double cfroos(GameState & match_gs, unsigned long long match_bidseq,  
               GameState & gs, int player, int depth, unsigned long long bidseq, 
-              double reach1, double reach2, double sprob_bs, double sprob_us, bool biasedSample, int mode, int updatePlayer, 
+              double reach1, double reach2, double sprob1, double sprob2, int updatePlayer, 
               double & suffixreach, double & rtlSampleProb, bool treePhase)
 {
   CHKPROB(reach1); 
@@ -116,7 +246,7 @@ double cfroos(GameState & match_gs, unsigned long long match_bidseq, int match_p
   if (terminal(gs))
   {
     suffixreach = 1.0; 
-    rtlSampleProb = oos_delta*sprob_bs + (1.0-oos_delta)*sprob_us;
+    rtlSampleProb = sprob1*sprob2;
     
     return payoff(gs, updatePlayer); 
   }
@@ -128,65 +258,49 @@ double cfroos(GameState & match_gs, unsigned long long match_bidseq, int match_p
   if (gs.p1roll == 0) 
   {
     GameState ngs = gs; 
-    double new_bs = sprob_bs;
-    double new_us = sprob_us;
+    double sampleProb = 0, chanceProb = 0;
+    biasedChanceSample(match_gs, 1, updatePlayer, ngs, sampleProb, chanceProb);
 
-    if (biasedSample && match_player == 1) {
-      // biased. force roll
-      ngs.p1roll = match_gs.p1roll; 
-      new_us *= getChanceProb(1, match_gs.p1roll); 
-    }
-    else { 
-      // regular os
-      double sampleProb = 0;
-      sampleChanceEvent(1, ngs.p1roll, sampleProb);
-      CHKPROBNZ(sampleProb);
-      
-      // need to keep track when we go off the match path
-      if (match_player == 1 && ngs.p1roll != match_gs.p1roll) {
-        new_bs = 0; // off path
-        mode = 3;
-      }
-      
-      new_us *= sampleProb;
-    }
-
+    CHKPROBNZ(sampleProb);
+    CHKPROBNZ(chanceProb);
     assert(ngs.p1roll > 0);
 
-    return cfroos(match_gs, match_bidseq, match_player, ngs, player, depth+1, bidseq, reach1, reach2, 
-                  new_bs, new_us, biasedSample, mode, updatePlayer, suffixreach, rtlSampleProb, treePhase); 
+    // need to modify the reaches and sprobs, unlike other sampling variants
+    if (updatePlayer == 1) { 
+      sprob2 *= sampleProb;
+      reach2 *= chanceProb; 
+    }
+    else if (updatePlayer == 2) { 
+      sprob1 *= sampleProb;
+      reach1 *= chanceProb; 
+    }
+
+    return cfroos(match_gs, match_bidseq, ngs, player, depth+1, bidseq, reach1, reach2, 
+                  sprob1, sprob2, updatePlayer, suffixreach, rtlSampleProb, treePhase); 
   }
   else if (gs.p2roll == 0)
   {
     GameState ngs = gs; 
-    double new_bs = sprob_bs;
-    double new_us = sprob_us;
-
-    if (biasedSample && match_player == 2) {
-      // biased. force roll
-      ngs.p2roll = match_gs.p2roll; 
-      new_us *= getChanceProb(2, match_gs.p2roll); 
-    }
-    else { 
-      // regular os
-      double sampleProb = 0;
-      sampleChanceEvent(2, ngs.p2roll, sampleProb);
-      CHKPROBNZ(sampleProb);
-     
-      // need to keep track when we go off the match path
-      if (match_player == 2 && ngs.p2roll != match_gs.p2roll) {        
-        new_bs = 0; // off path
-        mode = 3;
-      }
-      
-      new_us *= sampleProb;
-    }
-
+    double sampleProb = 0, chanceProb = 0;
+    biasedChanceSample(match_gs, 2, updatePlayer, ngs, sampleProb, chanceProb);
+    
+    CHKPROBNZ(sampleProb);
+    CHKPROBNZ(chanceProb);
     assert(ngs.p2roll > 0);
     
+    // need to modify the reaches and sprobs, unlike other sampling variants
+    if (updatePlayer == 1) { 
+      sprob2 *= sampleProb;
+      reach2 *= chanceProb; 
+    }
+    else if (updatePlayer == 2) { 
+      sprob1 *= sampleProb;
+      reach1 *= chanceProb; 
+    }
+    
     // don't need to worry about keeping track of sampled chance probs for outcome sampling
-    return cfroos(match_gs, match_bidseq, match_player, ngs, player, depth+1, bidseq, reach1, reach2, 
-                  new_bs, new_us, biasedSample, mode, updatePlayer, suffixreach, rtlSampleProb, treePhase); 
+    return cfroos(match_gs, match_bidseq, ngs, player, depth+1, bidseq, reach1, reach2, 
+                  sprob1, sprob2, updatePlayer, suffixreach, rtlSampleProb, treePhase); 
   }
 
   // declare the variables
@@ -219,37 +333,12 @@ double cfroos(GameState & match_gs, unsigned long long match_bidseq, int match_p
   int takeAction = 0; 
   double newsuffixreach = 1.0; 
 
-  // check if we're still along the match
-  if (mode == 1) { 
-    bool prefix = isMatchPrefix(match_gs, match_bidseq, gs, bidseq, player, updatePlayer); 
-    if (!prefix) 
-      mode = 2; 
-  }
-  
-  CHKPROB(sprob_bs);
-  CHKPROBNZ(sprob_us); 
+  // sample the action!
+  takeAction = oosSampleAction(match_gs, match_bidseq, gs, bidseq, player, updatePlayer, is, actionshere, sampleprob);
 
-  double new_bs = sprob_bs; 
-  double new_us = sprob_us; 
-
-  // sample the action! .. and adjust sample probabilities
-  //takeAction = oosSampleAction(match_gs, match_bidseq, gs, bidseq, player, updatePlayer, is, actionshere, sampleprob);
-
-  if (biasedSample && mode == 1) { 
-    // still along the match. force the match action
-    int matchAction = getMatchAction(match_gs, match_bidseq, gs, player, updatePlayer); 
-
-    // compute what would have been the sample prob for this action
-  }
-  else { 
-    // choose like os chooses
-
-    if (player == updatePlayer)
-      takeAction = sampleAction(player, is, actionshere, sampleprob, 0.6, false); 
-    else
-      takeAction = sampleAction(player, is, actionshere, sampleprob, 0.0, false); 
-  }
-
+  CHKPROBNZ(sampleprob); 
+  double newsprob1 = (player == 1 ? sampleprob*sprob1 : sprob1); 
+  double newsprob2 = (player == 2 ? sampleprob*sprob2 : sprob2); 
 
   double ctlReach = 0;
   double itlReach = 0; 
@@ -281,13 +370,8 @@ double cfroos(GameState & match_gs, unsigned long long match_bidseq, int match_p
   double newreach1 = (player == 1 ? moveProb*reach1 : reach1); 
   double newreach2 = (player == 2 ? moveProb*reach2 : reach2); 
 
-//double cfroos(GameState & match_gs, unsigned long long match_bidseq, int match_player,  
-//              GameState & gs, int player, int depth, unsigned long long bidseq, 
-//              double reach1, double reach2, double sprob_bs, double sprob_us, bool biasedSample, int mode, int updatePlayer, 
-//              double & suffixreach, double & rtlSampleProb, bool treePhase)
-
-  updatePlayerPayoff = cfroos(match_gs, match_bidseq, match_player, ngs, 3-player, depth+1, newbidseq, newreach1, newreach2, 
-                              new_bs, new_us, biasedSample, mode, updatePlayer, newsuffixreach, rtlSampleProb, newTreePhase);
+  updatePlayerPayoff = cfroos(match_gs, match_bidseq, ngs, 3-player, depth+1, newbidseq, newreach1, newreach2, 
+                              newsprob1, newsprob2, updatePlayer, newsuffixreach, rtlSampleProb, newTreePhase);
 
   ctlReach = newsuffixreach; 
   itlReach = newsuffixreach*is.curMoveProbs[action]; 
@@ -296,8 +380,6 @@ double cfroos(GameState & match_gs, unsigned long long match_bidseq, int match_p
   // payoff always in view of update player
   double myreach = (player == 1 ? reach1 : reach2); 
   double oppreach = (player == 1 ? reach2 : reach1); 
-
-  double samplereach = oos_delta*sprob_bs + (1.0-oos_delta)*sprob_us;
 
   // only perform updates if in tree or expanding
   if (treePhase) { 
@@ -325,7 +407,7 @@ double cfroos(GameState & match_gs, unsigned long long match_bidseq, int match_p
       for (int a = 0; a < actionshere; a++)
       {
         // stochastically-weighted averaging
-        double inc = (1.0 / samplereach)*myreach*is.curMoveProbs[a];
+        double inc = (1.0 / (sprob1*sprob2))*myreach*is.curMoveProbs[a];
         is.totalMoveProbs[a] += inc; 
       }
     }
@@ -340,7 +422,7 @@ double cfroos(GameState & match_gs, unsigned long long match_bidseq, int match_p
 }
 
 // Called from sim.cpp
-int getMoveOOS(int match_player, GameState match_gs, unsigned long long match_bidseq) { 
+int getMoveOOS(int player, GameState match_gs, unsigned long long match_bidseq) { 
   
   unsigned long long bidseq = 0; 
     
@@ -354,21 +436,16 @@ int getMoveOOS(int match_player, GameState match_gs, unsigned long long match_bi
   for (; true; iter++)
   {
     //cout << "OOS iter = " << iter << endl; 
-//double cfroos(GameState & match_gs, unsigned long long match_bidseq, int match_player,  
-//              GameState & gs, int player, int depth, unsigned long long bidseq, 
-//              double reach1, double reach2, double sprob_bs, double sprob_us, bool biasedSample, int mode, int updatePlayer, 
-//              double & suffixreach, double & rtlSampleProb, bool treePhase)
-    bool biasedSample = drand48() < oos_delta; 
 
     GameState gs1; bidseq = 0;
     double suffixreach = 1.0; 
     double rtlSampleProb = 1.0; 
-    cfroos(match_gs, match_bidseq, match_player, gs1, 1, 0, bidseq, 1.0, 1.0, 1.0, 1.0, biasedSample, 1, 1, suffixreach, rtlSampleProb, true);
+    cfroos(match_gs, match_bidseq, gs1, 1, 0, bidseq, 1.0, 1.0, 1.0, 1.0, 1, suffixreach, rtlSampleProb, true);
     
     GameState gs2; bidseq = 0;
     suffixreach = 1.0; 
     rtlSampleProb = 1.0; 
-    cfroos(match_gs, match_bidseq, match_player, gs1, 1, 0, bidseq, 1.0, 1.0, 1.0, 1.0, biasedSample, 2, 2, suffixreach, rtlSampleProb, true);
+    cfroos(match_gs, match_bidseq, gs1, 1, 0, bidseq, 1.0, 1.0, 1.0, 1.0, 2, suffixreach, rtlSampleProb, true);
 
     if (sw.stop() > timeLimit) 
       break;
@@ -388,7 +465,7 @@ int getMoveOOS(int match_player, GameState match_gs, unsigned long long match_bi
   assert(actionshere > 0);
 
   Infoset is; 
-  getInfoset(match_gs, match_player, match_bidseq, is, infosetkey, actionshere);
+  getInfoset(match_gs, player, match_bidseq, is, infosetkey, actionshere);
 
   sampleMoveAvg(is, actionshere, action, sampleProb); 
 
