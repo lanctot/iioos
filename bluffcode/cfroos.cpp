@@ -238,8 +238,10 @@ double cfroos(GameState & match_gs, unsigned long long match_bidseq, int match_p
   if (biasedSample && mode == 1) { 
     // still along the match. force the match action
     int matchAction = getMatchAction(match_gs, match_bidseq, gs, player, updatePlayer); 
+    takeAction = matchAction;
 
     // compute what would have been the sample prob for this action
+    // FIXME: modify sample probs
   }
   else { 
     // choose like os chooses
@@ -248,8 +250,11 @@ double cfroos(GameState & match_gs, unsigned long long match_bidseq, int match_p
       takeAction = sampleAction(player, is, actionshere, sampleprob, 0.6, false); 
     else
       takeAction = sampleAction(player, is, actionshere, sampleprob, 0.0, false); 
+
+    // FIXME: modify sample probs
   }
 
+  // FIXME: might not have it all correct below here
 
   double ctlReach = 0;
   double itlReach = 0; 
