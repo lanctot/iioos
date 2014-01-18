@@ -372,6 +372,8 @@ match history, $\tth$.
 
 \subsection{Information Set Targeting}
 
+\mlnote{Need to reformulate as new version.}
+
 Suppose the match history is $\tth$. Information set targeting OOS is playout-based OS that samples terminal histories $z \in Z_{I(\tth)}$ 
 with higher probability than $z' \in Z - Z_{I(\tth)}$. The intuition is that these histories are particularly relevant since the searching player 
 {\it knows} that one of these $z$ will describe the match at its completion. Let $\delta_I$ be the probability that any $z \in Z_{I(\tth)}$. 
@@ -532,8 +534,8 @@ Note that unless otherwise stated, memory is retained and not cleared between su
 \mlnote{I have played against the ISMCTS strategy and I believe it's converging to a particular 
 pure (and bad) strategy.}
 
-So far, the only variant of OOS implemented is IST with $(\epsilon, \gamma) = (0.6, 0.97)$. Manual tuning shows
-that $\gamma > 0.9$ is a good region. ISMCTS uses $C = 2$ and manual tuning shows that the value of $C$ does not 
+So far, the only variant of OOS implemented is IST with $(\epsilon, \delta) = (0.6, 0.9)$. 
+ISMCTS uses $C = 2$ and manual tuning shows that the value of $C$ does not 
 affect the performance much. Both ISMCTS and OOS win against random 75-85\% of the time.
 
 \begin{center}
@@ -567,17 +569,21 @@ There are several ways that the expoitability of the strategies produced by thes
       globally stitched strategy $\bar{\sigma}'$ and compute the exploitability of the stitched strategy.
 \end{itemize}
 
-I have run the single-match method for a small number of games, and averaged the results 
+I have run the single-match method for a small number of matches (5 per data point), and averaged the results 
 
 \begin{center}
 \begin{tabular}{ccccc}
 alg & time & avg. exp(1) & avg. exp(2) & total avg. exploitability\\
 \hline
 ISMCTS & 1s & 0.795 & 0.767 & 1.562 \\
-OOS    & 1s & 0.703 & 0.444 & 1.147 \\
+% Before the algorithm change:
+% OOS    & 1s & 0.703 & 0.444 & 1.147 \\
+OOS    & 1s & 0.629 & 0.453 & 1.082 \\
 \hline
 ISMCTS & 5s & 0.796 & 0.768 & 1.564 \\
-OOS    & 5s & 0.518 & 0.283 & 0.801 \\
+% Before the algorithm change:
+%OOS    & 5s & 0.518 & 0.283 & 0.801 \\
+OOS    & 5s & 0.401 & 0.273 & 0.674 \\
 \end{tabular}
 \end{center}
 
