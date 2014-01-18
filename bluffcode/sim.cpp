@@ -188,7 +188,7 @@ int main(int argc, char ** argv)
   init();
   
   simgame = true; 
-  timeLimit = 5.0;
+  timeLimit = 1.0;
 
   if (argc < 2)
   {
@@ -224,10 +224,19 @@ int main(int argc, char ** argv)
     cout << "Game over. P2 wins!" << endl;
 
   cout << "Single-match exploitability." << endl; 
+  double v1 = 0;
+  double v2 = 0;
 
-  double v1 = searchComputeHalfBR(2, &sgiss2, true);
-  double v2 = searchComputeHalfBR(1, &sgiss1, false);
+  if (p2type == TYPE_MCTS) { 
+    v1 = searchComputeHalfBR(2, &sgiss2, true);
+    v2 = searchComputeHalfBR(1, &sgiss1, false);
+  }
+  else if (p1type == TYPE_MCTS) { 
+    v1 = searchComputeHalfBR(2, &sgiss2, false);
+    v2 = searchComputeHalfBR(1, &sgiss1, true);
+  }
 
-  cout << "v1 = " << v1 << ", v2 = " << v2 << endl;
+  cout << "v1 (expl of P2 strategy) = " << v1 << endl; 
+  cout << "v2 (expl of P1 strategy) = " << v2 << endl;
 }
   

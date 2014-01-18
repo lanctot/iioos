@@ -262,7 +262,7 @@ bool InfosetStore::get_priv(unsigned long long infoset_key, Infoset & infoset, i
   // now do the usual regret matching to get the curMoveProbs
   double totPosReg = 0.0;
   bool all_negative = true;
-
+  
   for (int i = 0, m = firstmove; i < moves; i++, m++) 
   {
     int movenum = m;
@@ -293,7 +293,6 @@ bool InfosetStore::get_priv(unsigned long long infoset_key, Infoset & infoset, i
         assert(totPosReg >= 0.0);
         if (totPosReg > 0.0)  // regret-matching
           infoset.curMoveProbs[movenum] = infoset.cfr[movenum] / totPosReg;
-
       }
     }
     else
@@ -308,7 +307,29 @@ bool InfosetStore::get_priv(unsigned long long infoset_key, Infoset & infoset, i
   #if !USERAT
   if (! (ABS(1-probSum) < 0.00000001))
   {
-    cout << "infoset store get probSum = " << probSum << endl;
+    cout << "infoset store 1, get probSum = " << probSum << endl;
+    exit(-1);
+  }
+  #endif
+
+  // Added for OOS
+  // This is a fix for the 'irrationality problem'.
+  probSum = 0; 
+  double uniform = 1.0 / moves; 
+
+  for (int i = 0, m = firstmove; i < moves; i++, m++) 
+  {
+    int movenum = m;
+    
+    infoset.curMoveProbs[movenum] = 0.01*uniform + 0.99*infoset.curMoveProbs[movenum]; 
+     
+    probSum += infoset.curMoveProbs[movenum];
+  }
+
+  #if !USERAT
+  if (! (ABS(1-probSum) < 0.00000001))
+  {
+    cout << "infoset store 2, get probSum = " << probSum << endl;
     exit(-1);
   }
   #endif

@@ -25,11 +25,14 @@ set (LIBFILES infosetstore.cpp bluff.cpp util.cpp br.cpp abstraction.cpp eval.cp
 add_executable (pbos pbos.cpp ${LIBFILES})
 target_link_libraries(pbos m)
 
-add_executable (cfros cfros.cpp ${LIBFILES})
-target_link_libraries(cfros m)
+#add_executable (cfros cfros.cpp ${LIBFILES})
+#target_link_libraries(cfros m)
 
 #add_executable (cfr cfr.cpp ${LIBFILES})
 #target_link_libraries(cfr m)
+
+#add_executable (cfres cfres.cpp ${LIBFILES})
+#target_link_libraries(cfres m)
 
 #add_executable (cfrbr cfrbr.cpp ${LIBFILES})
 #target_link_libraries(cfrbr m)
@@ -55,12 +58,8 @@ target_link_libraries(cfros m)
 add_executable (sim sim.cpp ${LIBFILES})
 target_link_libraries(sim m)
 
-
 #add_executable (cfros-orig cfros-orig.cpp ${LIBFILES})
 #target_link_libraries(cfros-orig m)
-
-#add_executable (cfres cfres.cpp ${LIBFILES})
-#target_link_libraries(cfres m)
 
 #add_executable (eval evalmain.cpp ${LIBFILES})
 #target_link_libraries(eval m)

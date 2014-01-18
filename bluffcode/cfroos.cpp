@@ -241,7 +241,16 @@ double cfroos(GameState & match_gs, unsigned long long match_bidseq, int match_p
     takeAction = matchAction;
 
     // compute what would have been the sample prob for this action
-    // FIXME: modify sample probs
+    
+    // new_bs stays 1
+
+    // new_us
+    if (player == updatePlayer)
+      new_us *= (0.6*(1.0 / actionshere) + 0.4*is.curMoveProbs[takeAction]);   
+    else
+      new_us *= is.curMoveProbs[takeAction]; // this will never be zero due to epsilon regret-matching
+
+    CHKPROBNZ(new_us);
   }
   else { 
     // choose like os chooses
@@ -251,10 +260,34 @@ double cfroos(GameState & match_gs, unsigned long long match_bidseq, int match_p
     else
       takeAction = sampleAction(player, is, actionshere, sampleprob, 0.0, false); 
 
-    // FIXME: modify sample probs
-  }
+    // this is always the case
+    new_us *= sampleprob;
+    
+    CHKPROBNZ(new_us); // never 0 due to epsilon regret-matching
+    
+    if (mode == 1) { 
+      int matchAction = getMatchAction(match_gs, match_bidseq, gs, player, updatePlayer); 
 
-  // FIXME: might not have it all correct below here
+      if (matchAction == takeAction) {
+        // on path. nothing happens.
+        // new_bs is already properly set
+      }
+      else { 
+        // gone off the path
+        new_bs = 0; 
+        mode = 3; 
+      }
+    }
+    else if (mode == 2) { 
+      // tail part
+      new_bs *= sampleprob;
+    }
+    else if (mode == 3) { 
+      // new_bs is already 0
+    }
+
+        
+  }
 
   double ctlReach = 0;
   double itlReach = 0; 
@@ -286,10 +319,10 @@ double cfroos(GameState & match_gs, unsigned long long match_bidseq, int match_p
   double newreach1 = (player == 1 ? moveProb*reach1 : reach1); 
   double newreach2 = (player == 2 ? moveProb*reach2 : reach2); 
 
-//double cfroos(GameState & match_gs, unsigned long long match_bidseq, int match_player,  
-//              GameState & gs, int player, int depth, unsigned long long bidseq, 
-//              double reach1, double reach2, double sprob_bs, double sprob_us, bool biasedSample, int mode, int updatePlayer, 
-//              double & suffixreach, double & rtlSampleProb, bool treePhase)
+  //double cfroos(GameState & match_gs, unsigned long long match_bidseq, int match_player,  
+  //              GameState & gs, int player, int depth, unsigned long long bidseq, 
+  //              double reach1, double reach2, double sprob_bs, double sprob_us, bool biasedSample, int mode, int updatePlayer, 
+  //              double & suffixreach, double & rtlSampleProb, bool treePhase)
 
   updatePlayerPayoff = cfroos(match_gs, match_bidseq, match_player, ngs, 3-player, depth+1, newbidseq, newreach1, newreach2, 
                               new_bs, new_us, biasedSample, mode, updatePlayer, newsuffixreach, rtlSampleProb, newTreePhase);
@@ -354,15 +387,16 @@ int getMoveOOS(int match_player, GameState match_gs, unsigned long long match_bi
 
   iter = 0; 
 
+  cout << "Player " << match_player << ", my roll is: " << match_gs.p1roll << endl;
   cout << "Starting OOS iterations..." << endl;
 
   for (; true; iter++)
   {
     //cout << "OOS iter = " << iter << endl; 
-//double cfroos(GameState & match_gs, unsigned long long match_bidseq, int match_player,  
-//              GameState & gs, int player, int depth, unsigned long long bidseq, 
-//              double reach1, double reach2, double sprob_bs, double sprob_us, bool biasedSample, int mode, int updatePlayer, 
-//              double & suffixreach, double & rtlSampleProb, bool treePhase)
+    //double cfroos(GameState & match_gs, unsigned long long match_bidseq, int match_player,  
+    //              GameState & gs, int player, int depth, unsigned long long bidseq, 
+    //              double reach1, double reach2, double sprob_bs, double sprob_us, bool biasedSample, int mode, int updatePlayer, 
+    //              double & suffixreach, double & rtlSampleProb, bool treePhase)
     bool biasedSample = drand48() < oos_delta; 
 
     GameState gs1; bidseq = 0;
@@ -373,7 +407,7 @@ int getMoveOOS(int match_player, GameState match_gs, unsigned long long match_bi
     GameState gs2; bidseq = 0;
     suffixreach = 1.0; 
     rtlSampleProb = 1.0; 
-    cfroos(match_gs, match_bidseq, match_player, gs1, 1, 0, bidseq, 1.0, 1.0, 1.0, 1.0, biasedSample, 2, 2, suffixreach, rtlSampleProb, true);
+    cfroos(match_gs, match_bidseq, match_player, gs2, 1, 0, bidseq, 1.0, 1.0, 1.0, 1.0, biasedSample, 1, 2, suffixreach, rtlSampleProb, true);
 
     if (sw.stop() > timeLimit) 
       break;
@@ -396,6 +430,26 @@ int getMoveOOS(int match_player, GameState match_gs, unsigned long long match_bi
   getInfoset(match_gs, match_player, match_bidseq, is, infosetkey, actionshere);
 
   sampleMoveAvg(is, actionshere, action, sampleProb); 
+
+  double den = 0;
+
+  for (int i = 0; i < actionshere; i++)
+    den += is.totalMoveProbs[i];
+
+  for (int i = 0; i < actionshere; i++) 
+  {
+    double val = (is.totalMoveProbs[i] / den); 
+
+    cout << "move " << i; 
+    if (match_gs.curbid + 1 + i == BLUFFBID) cout << " (bluff)"; 
+    else { 
+      int quantity = 0;
+      int face = 0;
+      convertbid(quantity, face, match_gs.curbid + 1 + i);
+      cout << " (" << quantity << "-" << face << ")"; 
+    }
+    cout << " = " << val << endl;
+  }
 
   assert(action >= 0 && action < actionshere);
   CHKPROBNZ(sampleProb);
