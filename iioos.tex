@@ -222,7 +222,7 @@ We show that ISMCTS also suffers from this problem as well.
 
 % other missing related works
 
-One particularly related work is the mulitple tree (MMCTS) algorithm~\cite{Auger11Multiple} that has been 
+One particularly related work is the MMCTS algorithm~\cite{Auger11Multiple} that has been 
 applied to Phantom Tic-Tac-Toe. 
 MMCTS uses Exp3 at each information set in its Monte Carlo tree search, and scales the payoff received by the 
 depth of each playout. While we have not implemented MMCTS, we have been able to test our algorithm 
@@ -235,7 +235,7 @@ Game-tree search techniques have also been applied to Poker~\cite{Billings04Game
 the most common approach to producing strong Poker AI has been to use advances in equilibrium approximation 
 algorithms to compute a near-optimal equilibrium of an abstract game, and then use the abstract strategies 
 when playing the full game~\cite{Sandholm10The}. This {\it offline} approach requires designing 
-abstractions and pre-computing Poker equlibria, which is often not possible. Also, due to the size of 
+abstractions and pre-computing Poker equilibria, which is often not possible. Also, due to the size of 
 abstractions~\cite{Johanson13Evaluating}, the memory resource may not be available or known in advance. 
 
 \subsection{Extensive-Form Games}
@@ -571,7 +571,7 @@ Here are some ides for what we could look at empirically:
 \item Importance of ``retaining the tree'' from previous searches along the same match $z$ (suspected to be high)
 \item Performance comparisons (win rates and exploitability) between sampling techniques and some state-of-the-art
 algorithms in imperfect information search (ISMCTS, PIMC, MMCTS), 
-possibly also show exploitation / exploitability tradeoffs as in RNash work
+possibly also show exploitation / exploitability trade-offs as in RNash work
 \item (probably too much for this one paper) What if there are a sequence of multiple matches and we can reuse computation from 
 previous matches? 
 \item How does the story change with or without \{ incremental tree-building, targeting, retaining memory between searches \}
@@ -608,7 +608,7 @@ Search time & Performance \\
 \end{table}
 \end{center}
 
-There are several ways that the expoitability of the strategies produced by these search algorithms can be evaluated 
+There are several ways that the exploitability of the strategies produced by these search algorithms can be evaluated 
 (in each case $X \in \{$ OOS, ISMCTS $\}$ and $B$ is some fixed benchmark strategy):
 \begin{itemize}
 \item The {\bf single-match method}. Runs algorithm $X$ vs $B$ for a single match.
