@@ -94,7 +94,7 @@
 % The file aaai.sty is the style file for AAAI Press 
 % proceedings, working notes, and technical reports.
 %
-\title{Search in Imperfect Information Games using Online\\Counterfactual Regret Minimization}
+\title{Search in Imperfect Information Games using Online\\Monte Carlo Counterfactual Regret Minimization}
 \author{Authors}
 %\author{Author info\\
 %Association for the Advancement of Artificial Intelligence\\
@@ -106,13 +106,17 @@
 
 \begin{abstract}
 Online search in games has been a classic interest of artificial intelligence.
-Advances made in search for perfect information games (such as Chess, Checkers, Go, and Backgammon) have led to AI capable of defeating the world's top human experts. 
-The progress of search in imperfect information games (such as Poker, Bridge, and Skat) has comparatively lagged behind, mainly due to the complexities introduced by hidden information. 
-In this paper, we present Online Outcome Sampling (OOS), the first imperfect information search algorithm with formal guarantees of convergence to an equilibrium strategy in a zero-sum game.   
+Advances made in search for perfect information games (such as Chess, Checkers, Go, and Backgammon) have led to AI capable of defeating 
+the world's top human experts. 
+Search in imperfect information games (such as Poker, Bridge, and Skat) is significantly more challenging 
+due to the complexities introduced by hidden information. 
+In this paper, we present Online Outcome Sampling (OOS), the first imperfect information search algorithm that is guaranteed to
+converge to an equilibrium strategy in a zero-sum game.   
 In addition, we show that OOS avoids the common problems encountered by determinization.
-We evaluate the practical performance and convergence rate of OOS and compare to two modern imperfect information search algorithms.
-OOS is shown to outperform its competitors in randomly generated game trees as well as several complex domains: 
-Dudo, Phantom Tic-Tac-Toe, and (a bigger one). 
+We evaluate the practical performance and convergence rate of OOS and evaluate its performance against benchmark players and compare 
+it to Information Set Monte Carlo Tree Search (ISMCTS). 
+OOS is shown to outperform its competitor in randomly generated game trees as well as two complex domains: Liar's Dice and 
+Phantom Tic-Tac-Toe. 
 \end{abstract}
 
 \section{Introduction}
@@ -125,7 +129,7 @@ Dudo, Phantom Tic-Tac-Toe, and (a bigger one).
 %\item introduce the first one that does, and show that it can compete with the others in practice
 %\end{itemize}
 
-In many sequential multi-agent interactions, the agents first have some initial time to prepare for the interaction and then after each decision, they have an additional thinking time to decide about their next move. When the preparation time is abundant and the computational resources sufficient, an equilibrium strategy for a smaller abstract game can be pre-computed and then used during the game play. This {\it offline approach} has been remarkably successful in Computer Poker \cite{}.
+In many sequential multi-agent interactions, agents have some initial time to prepare for the interaction and then after each decision, have  additional thinking time to decide about their next move. When preparation time is abundant and the computational resources are sufficient, an equilibrium strategy for a smaller abstract game can be pre-computed and then used during the game play. This {\it offline approach} has been remarkably successful in Computer Poker \cite{Johanson07Msc}.
 However, the preparation time is often very limited. The exact model of the game may become known only shortly before acting is necessary, such as in general game-playing, security enforcement in previously unknown environment, and general-purpose robotics. In a short time, only a very small abstract game could be solved in advance. Moreover, it might not even be possible to create a sufficiently small and still useful abstraction to be solved in time. In these cases, agents may need to {\it decide online}: make initial decisions quickly and then put additional effort to improving their strategy in the current situation while the interaction is taking place.
 
 %Search in game-playing has been a classic interest of artificial intelligence. 
@@ -147,16 +151,16 @@ Scotland Yard~\cite{Nijssen12SY}, Dou Di Zhu, Magic: The Gathering, and other ca
 %For example, the notion of a subgame is required for backward induction, 
 %which most perfect information search algorithms are based on, is not well-defined in imperfect information games. 
 
-The main problem with current techniques is a lack of theoretical foundations of the algorithms. There are no guarantees that the algorithms will always find a good strategy in a game, given a sufficient thinking time. In fact, there is practical evidence suggesting that some of these techniques will not converge to the optimal solution even in very small games like Biased Rock-Paper-Scissors and Kuhn poker~\cite{Shafiei09,Ponsen11Computing}.
+The main problem with current techniques is a lack of theoretical foundations of the algorithms. There are no guarantees that the algorithms will always find a good strategy in a game, given a sufficient thinking time. In fact, there is empirical evidence suggesting that some of these techniques will not converge to the optimal solution even in very small games like Biased Rock-Paper-Scissors and Kuhn poker~\cite{Shafiei09,Ponsen11Computing}.
 
 In this paper, we start by formalizing the problem of imperfect information search from the ground up. That is, we return to the game-theoretic 
 foundations upon which search in games is built to motivate the importance of Nash equilibrium as the optimal strategy in zero-sum games. We explain the subtleties introduced by imperfect information that cause the current approaches not to converge to the optimal strategy. We introduce Online Outcome Sampling (OOS), a simulation-based algorithm that builds its search tree incrementally, like MCTS.  
-We formally prove that OOS converges to an equilibrium strategy as time increases, making it the first 
-known imperfect information search algorithm satisfying this property, which we call {\it consistency}. Furthermore, we analyze methods for incorporating the information obtained by the players in the game to the search process, so that the consistency property is preserved. We show the empirical convergence rates and performance of OOS, comparing them to three modern imperfect information search algorithms: 
-PIMC~\cite{Long10Understanding}, ISMCTS~\cite{Cowling12ISMCTS}, and MMCTS~\cite{Auger11Multiple}.
-We show results in synthetic game trees as well as several complex domains: Dudo, Phantom Tic-Tac-Toe, 
-and (a bigger one).
+We show that OOS converges to an equilibrium strategy as time increases, making it the first 
+known imperfect information search algorithm satisfying this property, which we call {\it consistency}. Furthermore, we analyze methods for incorporating the information obtained by the players in the game to the search process, so that the consistency property is preserved. We show the empirical convergence rates and performance of OOS, comparing them to benchmark players and to ISMCTS~\cite{Cowling12ISMCTS}, a 
+recent algorithm currently used in a popular mobile phone implementation of Spades~\cite{Whitehouse13Integrating}. 
+We present results in synthetic game trees as well as two complex domains: Liar's Dice and Phantom Tic-Tac-Toe.
 
+%PIMC~\cite{Long10Understanding}, ISMCTS~\cite{Cowling12ISMCTS}, and MMCTS~\cite{Auger11Multiple}.
 
 %\vlnote{Current intro targets particularly the search community.}
 
