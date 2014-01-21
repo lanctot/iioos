@@ -364,7 +364,7 @@ int main(int argc, char ** argv)
     covector1 result1; 
     covector2 result2;
 
-    randMixRM *= 0.999;
+    randMixRM *= 0.99;
 
     GameState gs1; 
     bidseq = 0; 
@@ -398,7 +398,7 @@ int main(int argc, char ** argv)
 
       computeBestResponses(false, false);
       report("pcsreport.txt", totaltime, (2.0*MAX(b1,b2)), ttlUpdates, ttlLeafEvals, 0);
-      //dumpInfosets("iss");
+      dumpInfosets("iss");
       cout << endl;
      
       nextCheckpoint += cpWidth;

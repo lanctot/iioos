@@ -82,9 +82,11 @@ int getMoveKeyboard(int player, GameState gs, unsigned long long bidseq)
   return move;
 }
 
-
 int getMoveStrat(int player, GameState gs, unsigned long long bidseq)
 {
+  cout << "Player " << player << ", my roll is: " << 
+      (player == 1 ? gs.p1roll : gs.p2roll) << " sampling from lookup strategy." << endl;
+
   unsigned long long pisk = 0; 
   Infoset pis; 
   int maxBid = (gs.curbid == 0 ? BLUFFBID-1 : BLUFFBID);
@@ -112,7 +114,27 @@ int getMoveStrat(int player, GameState gs, unsigned long long bidseq)
 
   int index = -1;
   double prob = 0;
+
   sampleMoveAvg(pis, actionshere, index, prob);
+
+  double den = 0;
+  for (int i = 0; i < actionshere; i++)
+    den += pis.totalMoveProbs[i];
+
+  for (int i = 0; i < actionshere; i++) 
+  {
+    double val = (pis.totalMoveProbs[i] / den); 
+
+    cout << "move " << i; 
+    if (gs.curbid + 1 + i == BLUFFBID) cout << " (bluff)"; 
+    else { 
+      int quantity = 0;
+      int face = 0;
+      convertbid(quantity, face, gs.curbid + 1 + i);
+      cout << " (" << quantity << "-" << face << ")"; 
+    }
+    cout << " = " << val << endl;
+  }
 
   assert(index >= 0);
   CHKPROBNZ(prob);
@@ -227,14 +249,15 @@ int main(int argc, char ** argv)
   double v1 = 0;
   double v2 = 0;
 
-  if (p2type == TYPE_MCTS) { 
-    v1 = searchComputeHalfBR(2, &sgiss2, true);
-    v2 = searchComputeHalfBR(1, &sgiss1, false);
-  }
-  else if (p1type == TYPE_MCTS) { 
-    v1 = searchComputeHalfBR(2, &sgiss2, false);
+  if (p1type == TYPE_MCTS) 
     v2 = searchComputeHalfBR(1, &sgiss1, true);
-  }
+  else if (p1type == TYPE_OOS) 
+    v2 = searchComputeHalfBR(1, &sgiss1, false);
+
+  if (p2type == TYPE_MCTS) 
+    v1 = searchComputeHalfBR(2, &sgiss2, true);
+  else if (p2type == TYPE_OOS)
+    v1 = searchComputeHalfBR(2, &sgiss2, false);
 
   cout << "v1 (expl of P2 strategy) = " << v1 << endl; 
   cout << "v2 (expl of P1 strategy) = " << v2 << endl;
