@@ -11,6 +11,9 @@ using namespace std;
 static unsigned long long ttlLeafEvals = 0; 
 static unsigned long long ttlUpdates = 0;
 
+static unsigned long long nextReport = 1000000;
+static unsigned long long reportMult = 2;
+
 /* 
  * It seems that ehere is currently issue with this implementations of PCS
  * when the number of chance outcomes are not the same for both players.
@@ -115,6 +118,8 @@ void pcs(GameState & gs, int player, int depth, unsigned long long bidseq,
     handleLeaf(gs, updatePlayer, reach1, reach2, result1, result2);
     return;
   }
+
+  nodesTouched++;
 
   // chance nodes (just bogus entries)
   // note: for expected values to make sense, should iterate over each move.
@@ -359,6 +364,8 @@ int main(int argc, char ** argv)
     covector1 result1; 
     covector2 result2;
 
+    randMixRM *= 0.999;
+
     GameState gs1; 
     bidseq = 0; 
     pcs(gs1, 1, 0, bidseq, 1, reach1, reach2, 1, result1, result2);
@@ -376,7 +383,8 @@ int main(int argc, char ** argv)
       stopwatch.reset();
     }
 
-    if (totaltime > nextCheckpoint)
+    //if (totaltime > nextCheckpoint)
+    if (iter == 1 || nodesTouched >= ntNextReport)
     {
       cout << endl;
 
@@ -394,6 +402,8 @@ int main(int argc, char ** argv)
       cout << endl;
      
       nextCheckpoint += cpWidth;
+      nextReport *= reportMult;
+      ntNextReport *= ntMultiplier;
 
       stopwatch.reset(); 
     }

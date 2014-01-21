@@ -321,7 +321,7 @@ bool InfosetStore::get_priv(unsigned long long infoset_key, Infoset & infoset, i
   {
     int movenum = m;
     
-    infoset.curMoveProbs[movenum] = 0.01*uniform + 0.99*infoset.curMoveProbs[movenum]; 
+    infoset.curMoveProbs[movenum] = randMixRM*uniform + (1.0 - randMixRM)*infoset.curMoveProbs[movenum]; 
      
     probSum += infoset.curMoveProbs[movenum];
   }

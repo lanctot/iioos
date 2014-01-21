@@ -49,8 +49,8 @@ target_link_libraries(pbos m)
 #add_executable (fsimt fsimt.cpp ${LIBFILES})
 #target_link_libraries(fsimt m pthread)
 
-#add_executable (pcs pcs.cpp ${LIBFILES})
-#target_link_libraries(pcs m)
+add_executable (pcs pcs.cpp ${LIBFILES})
+target_link_libraries(pcs m)
 
 #add_executable (br brmain.cpp ${LIBFILES})
 #target_link_libraries(br m)

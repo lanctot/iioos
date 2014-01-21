@@ -187,6 +187,7 @@ extern int sg_curPlayer;
 extern double timeLimit; 
 extern InfosetStore sgiss1;
 extern InfosetStore sgiss2;
+extern double randMixRM; 
 int getMoveKeyboard(int player, GameState gs, unsigned long long bidseq);
 int getMoveStrat(int player, GameState gs, unsigned long long bidseq);
 int getMoveMCTS(int player, GameState gs, unsigned long long bidseq); 

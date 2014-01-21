@@ -197,7 +197,7 @@ We present results in synthetic game trees as well as two complex domains: Liar'
 
 Some of the first imperfect information search algorithms were inspired by the application to 
 Bridge~\cite{Frank98Finding,Ginsberg96Partition}, and notably by the success of GIB~\cite{Ginsberg01}.
-In GIB, game tree search is performed by running perfection information search on a {\it determinized} 
+In GIB, perfect information search is performed on a {\it determinized} 
 instance of the game: one where all players can see usually hidden information, a concept 
 originally proposed in~\cite{Levy89Heuristic}. This approach has also performed well in other 
 games like Scrabble~\cite{Sheppard02World}, Hearts~\cite{Sturtevant08An}, and Skat~\cite{Buro09Improving}. 
@@ -211,13 +211,14 @@ information set, which is inconsistent with the constraints imposed by the game'
 Non-locality occurs due to the assumption that subgames are well-defined and that hence search can be 
 recursively applied by computing and comparing values of subgames. 
 
-Strategy fusion can be alleviated by imposing the proper information constraints during search, as was done in 
+Strategy fusion can be overcome by imposing the proper information constraints during search, as was done in 
 Kriegspiel~\cite{Ciancarini10Kriegspiel}, Kuhn Poker~\cite{Ponsen11Computing}, pursuit-evasion games~\cite{Lisy12peg}, 
 and examples given in~\cite{Cowling12ISMCTS}. 
 Non-locality, however, is a fundamental problem that prevents PIMC approaches from being consistent.
 Consequently, the usual minimax formulation of payoffs defined over future states is not applicable.  
 The authors of \cite{Parker10iss,Parker06Overconfidence} showed that minimax-style backups at opponent information 
 sets can lead to overly paranoid search, and by switching to an overconfident formulation can performs better.
+We also make similar observations for MCTS in Liar's Dice. 
 
 ISMCTS is similar to MCTS except that it places a bandit at each information set rather than at each 
 state~\cite{Cowling12ISMCTS}. ISMCTS builds an information set tree and aggregates utility estimates of actions 
@@ -493,6 +494,10 @@ Public subgame targeting samples $z \in Z_{p,I(\tth)}$ with higher probability t
 %Nonetheless, the intuition is to spend more time in parts of the tree that are relevant given the progression of the match. Unlike 
 %information set targeting, public subgame targeting should not reveal anything about private information. 
 
+\begin{theorem}
+IST and PST are consistent.
+\end{theorem}
+
 \subsection{Algorithm}
 
 \begin{algorithm2e}[t]
@@ -538,7 +543,7 @@ terminal history. At each information set in memory, $I$, there are two tables m
 regret for each action $a \in A(I)$, and $s_I$ stores the cumulative average strategy probability of each 
 action. 
 
-Depending on the method being used, define $Z_{sub}$ as $Z_{I(\tth)}$ or $Z_{p,I(\tth)}$. 
+Depending on the targeting method, define $Z_{sub}$ as $Z_{I(\tth)}$ or $Z_{p,I(\tth)}$. 
 The pseudo-code is presented as Algorithm~\ref{alg}. 
 Each iteration is represented by two calls of OOS where the update player $i \in \{1,2\}$ is alternated. 
 Before each iteration, a {\it scenario} is decided: 
@@ -600,20 +605,26 @@ update player histories, while average strategy tables at opponent histories.
 
 \section{Empirical Evaluation}
 
-Here are some ides for what we could look at empirically: 
+\mlnote{This section is still quite rough. I've commented out much of the text for now.}
 
-\begin{itemize}
-\item Compare sampling techniques in each domain
-\item Quality of OOS as a function of the length of the match history $\tth$ (and time limits?)
-\item Robustness/sensitivity of $\delta_I$ and $\delta_{I,\tth}$ with observed convergence,
-\item Importance of ``retaining the tree'' from previous searches along the same match $z$ (suspected to be high)
-\item Performance comparisons (win rates and exploitability) between sampling techniques and some state-of-the-art
-algorithms in imperfect information search (ISMCTS, PIMC, MMCTS), 
-possibly also show exploitation / exploitability trade-offs as in RNash work
-\item (probably too much for this one paper) What if there are a sequence of multiple matches and we can reuse computation from 
-previous matches? 
-\item How does the story change with or without \{ incremental tree-building, targeting, retaining memory between searches \}
-\end{itemize}
+%Here are some ides for what we could look at empirically: 
+%\begin{itemize}
+%\item Compare sampling techniques in each domain
+%\item Quality of OOS as a function of the length of the match history $\tth$ (and time limits?)
+%\item Robustness/sensitivity of $\delta_I$ and $\delta_{I,\tth}$ with observed convergence,
+%\item Importance of ``retaining the tree'' from previous searches along the same match $z$ (suspected to be high)
+%\item Performance comparisons (win rates and exploitability) between sampling techniques and some state-of-the-art
+%algorithms in imperfect information search (ISMCTS, PIMC, MMCTS), 
+%possibly also show exploitation / exploitability trade-offs as in RNash work
+%\item (probably too much for this one paper) What if there are a sequence of multiple matches and we can reuse computation from 
+%previous matches? 
+%\item How does the story change with or without \{ incremental tree-building, targeting, retaining memory between searches \}
+%\end{itemize}
+%
+% How does the story change: 
+% - with/without targeting (as a function of delta)
+% - with/without incremental tree-building
+% - with/without remembering between moves
 
 \subsection{Preliminary Results in Bluff(1,1)}
 
@@ -646,27 +657,27 @@ Search time & Performance \\
 \end{table}
 \end{center}
 
-There are several ways that the exploitability of the strategies produced by these search algorithms can be evaluated 
-(in each case $X \in \{$ OOS, ISMCTS $\}$ and $B$ is some fixed benchmark strategy):
-\begin{itemize}
-\item The {\bf single-match method}. Runs algorithm $X$ vs $B$ for a single match.
-      Then compute the exploitability of the strategy computed by $X$. 
-\item The {\bf multi-match method}. Run the single-match method for $M$ matches and save each full strategy. Then, compute the 
-      average strategy $\bar{\sigma}^M$ over all matches. Compute the exploitability of $\bar{\sigma}^M$.
-\item The {\bf partial-stitching method}. For all $I \in \cI_1$: run the search algorithm $X$ starting at $I$ and starting with 
-      empty strategy (nothing saved from previous match decisions). After each search, save the distribution $\bar{\sigma}(I)$ 
-      computed by $X$ to a global ``stitched'' strategy $\bar{\sigma}'$. Compute the exploitability of $\bar{\sigma}'$.      
-\item The {\bf full-stitching method}. For all $I \in \cI_1$: run a search at each $I'$ which is a predecessor of $I$ retaining
-      memory. Then, run a search from $I$, starting with a strategy computed from these previous searches. 
-      As in partial stitching, save the distribution computed at $I$ to a 
-      globally stitched strategy $\bar{\sigma}'$ and compute the exploitability of the stitched strategy.
-\end{itemize}
+%There are several ways that the exploitability of the strategies produced by these search algorithms can be evaluated 
+%(in each case $X \in \{$ OOS, ISMCTS $\}$ and $B$ is some fixed benchmark strategy):
+%\begin{itemize}
+%\item The {\bf single-match method}. Runs algorithm $X$ vs $B$ for a single match.
+%      Then compute the exploitability of the strategy computed by $X$. 
+%\item The {\bf multi-match method}. Run the single-match method for $M$ matches and save each full strategy. Then, compute the 
+%      average strategy $\bar{\sigma}^M$ over all matches. Compute the exploitability of $\bar{\sigma}^M$.
+%\item The {\bf partial-stitching method}. For all $I \in \cI_1$: run the search algorithm $X$ starting at $I$ and starting with 
+%      empty strategy (nothing saved from previous match decisions). After each search, save the distribution $\bar{\sigma}(I)$ 
+%      computed by $X$ to a global ``stitched'' strategy $\bar{\sigma}'$. Compute the exploitability of $\bar{\sigma}'$.      
+%\item The {\bf full-stitching method}. For all $I \in \cI_1$: run a search at each $I'$ which is a predecessor of $I$ retaining
+%      memory. Then, run a search from $I$, starting with a strategy computed from these previous searches. 
+%      As in partial stitching, save the distribution computed at $I$ to a 
+%      globally stitched strategy $\bar{\sigma}'$ and compute the exploitability of the stitched strategy.
+%\end{itemize}
 
 I have run the single-match method for a small number of matches (5 per data point), and averaged the results 
 
 \begin{center}
 \begin{tabular}{ccccc}
-alg & time & avg. exp(1) & avg. exp(2) & total avg. exploitability\\
+alg & time & exp(1) & exp(2) & total exp.\\
 \hline
 ISMCTS & 1s & 0.795 & 0.767 & 1.562 \\
 % Before the algorithm change:
