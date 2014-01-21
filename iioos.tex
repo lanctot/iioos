@@ -639,8 +639,8 @@ So far, the only variant of OOS implemented is IST with $(\epsilon, \delta) = (0
 ISMCTS uses $C = 2$ and manual tuning shows that the value of $C$ does not 
 affect the performance much. Both ISMCTS and OOS win against random 75-85\% of the time.
 
-\begin{center}
 \begin{table}[h!]
+\begin{center}
 \begin{tabular}{|c|c|}
 \hline
 Search time & Performance \\
@@ -654,9 +654,30 @@ Search time & Performance \\
     25s     & OOS wins 55.30 $\pm$ 3.08\% of games \\
 \hline
 \end{tabular}
-\caption{OOS vs. ISMCTS head-to-head performance on full games.}
-\end{table}
+\caption{Head-to-head performance: OOS vs. ISMCTS.}
 \end{center}
+\end{table}
+
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{|c|c|}
+\hline
+Search time & Performance ISMCTS \\
+\hline
+    1s      & ISMCTS wins 41.15 $\pm$ 2.08\% of games \\
+    5s      & ISMCTS wins 42.60 $\pm$ 3.06\% of games \\
+    25s     & ISMCTS wins ??.?? $\pm$ ??\% of games \\
+\hline
+Search time & Performance OOS \\
+\hline
+    1s      & OOS wins 45.35 $\pm$ 2.08\% of games \\
+    5s      & OOS wins 49.20 $\pm$ 3.10\% of games \\
+    25s     & OOS wins ??.?? $\pm$ ??.??\% of games \\
+\hline
+\end{tabular}
+\caption{Head-to-head performance: ISMCTS and OOS vs. a $0.001$-equilibrium. }
+\end{center}
+\end{table}
 
 %There are several ways that the exploitability of the strategies produced by these search algorithms can be evaluated 
 %(in each case $X \in \{$ OOS, ISMCTS $\}$ and $B$ is some fixed benchmark strategy):

@@ -123,7 +123,7 @@ InfosetStore sgiss1;
 InfosetStore sgiss2;
 
 // the amount of randomness to add to RM 
-double randMixRM = 0.001;
+double randMixRM = 0.01;
 
 // key is roll, value is # of time it shows up. Used only when determining chance outcomes
 map<int,int> outcomes; 

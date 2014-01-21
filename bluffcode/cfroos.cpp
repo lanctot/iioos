@@ -397,6 +397,9 @@ int getMoveOOS(int match_player, GameState match_gs, unsigned long long match_bi
     //              GameState & gs, int player, int depth, unsigned long long bidseq, 
     //              double reach1, double reach2, double sprob_bs, double sprob_us, bool biasedSample, int mode, int updatePlayer, 
     //              double & suffixreach, double & rtlSampleProb, bool treePhase)
+    if (iter % 1000 == 0)
+      randMixRM *= 0.99;
+
     bool biasedSample = drand48() < oos_delta; 
 
     GameState gs1; bidseq = 0;
