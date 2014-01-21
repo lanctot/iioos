@@ -85,7 +85,7 @@ int getMoveKeyboard(int player, GameState gs, unsigned long long bidseq)
 int getMoveStrat(int player, GameState gs, unsigned long long bidseq)
 {
   cout << "Player " << player << ", my roll is: " << 
-      (player == 1 ? gs.p1roll : gs.p2roll) << " sampling from lookup strategy." << endl;
+      (player == 1 ? gs.p1roll : gs.p2roll) << " ... sampling from lookup strategy." << endl;
 
   unsigned long long pisk = 0; 
   Infoset pis; 
