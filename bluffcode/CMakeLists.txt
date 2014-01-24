@@ -17,7 +17,10 @@ set(CMAKE_EXE_LINKER_FLAGS "-g -O2 -Wno-unused-variable -L/sw/lib")
 #set(CMAKE_EXE_LINKER_FLAGS "-O3 -DNDEBUG -L/sw/lib")
 
 #set (LIBFILES infosetstore.cpp bluff.cpp util.cpp br.cpp)
-set (LIBFILES infosetstore.cpp bluff.cpp util.cpp br.cpp abstraction.cpp eval.cpp sampling.cpp fsicommon.cpp seqstore.cpp ismcts.cpp cfroos.cpp)
+set (LIBFILES infosetstore.cpp bluff.cpp util.cpp br.cpp abstraction.cpp eval.cpp sampling.cpp fsicommon.cpp seqstore.cpp ismcts.cpp cfroos.cpp search.cpp)
+
+add_executable (stitching stitching.cpp ${LIBFILES})
+target_link_libraries(stitching m)
 
 #add_executable (cfroos cfroos.cpp ${LIBFILES})
 #target_link_libraries(cfroos m)

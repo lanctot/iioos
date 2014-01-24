@@ -21,12 +21,6 @@ class InfosetStore
   unsigned long long * indexVals; 
   unsigned long long indexSize;
  
-  // returns the position into the large table or indexSize if not found
-  // hashIndex is set to the index of the hash table where this key would go
-  unsigned long long getPosFromIndex(unsigned long long infoset_key, unsigned long long & hashIndex); 
-  // use this one if you don't care about the hashIndex
-  unsigned long long getPosFromIndex(unsigned long long infoset_key);
-
   // To avoid large contiguous portions of memory, store as rows of bitsets
   //DBitset * tablerows; 
   double ** tablerows;
@@ -82,6 +76,12 @@ public:
     destroy(); 
   }
   
+  // returns the position into the large table or indexSize if not found
+  // hashIndex is set to the index of the hash table where this key would go
+  unsigned long long getPosFromIndex(unsigned long long infoset_key, unsigned long long & hashIndex); 
+  // use this one if you don't care about the hashIndex
+  unsigned long long getPosFromIndex(unsigned long long infoset_key);
+
   unsigned long long getSize() { return size; }
 
   // First param: total # of doubles needed. 
@@ -118,7 +118,7 @@ public:
 
   // used by MCTS
   void clear(); 
-  void copy(InfosetStore & dest);
+  void copy(InfosetStore & dest, bool allocateDest);
   void mctsToCFR_pure();   // chose max mean reward
   void mctsToCFR_mixed();  // normalize visit counts
 };

@@ -901,9 +901,10 @@ void InfosetStore::dumpToDisk(std::string filename)
   out.close();
 }
 
-void InfosetStore::copy(InfosetStore & dest)
+void InfosetStore::copy(InfosetStore & dest, bool allocateDest)
 {
-  dest.destroy();
+  if (allocateDest)
+    dest.destroy();
 
   dest.indexSize = indexSize;
   dest.size = size;
@@ -911,29 +912,41 @@ void InfosetStore::copy(InfosetStore & dest)
   dest.rows = rows;
   dest.lastRowSize = lastRowSize;
 
-  dest.indexKeys = new unsigned long long [indexSize];
-  dest.indexVals = new unsigned long long [indexSize];
+  if (allocateDest) {
+    dest.indexKeys = new unsigned long long [indexSize];
+    dest.indexVals = new unsigned long long [indexSize];
+  }
+  else { 
+    //assert(sizeof(dest.indexKeys) == indexSize); 
+    //assert(sizeof(dest.indexVals) == indexSize); 
+  }
+
   for (unsigned long long i = 0; i < indexSize; i++)
   {
     dest.indexKeys[i] = indexKeys[i];
     dest.indexVals[i] = indexVals[i];
   }
 
-  dest.tablerows = new double* [rows];
+  if (allocateDest) 
+      dest.tablerows = new double* [rows];
+
   assert(dest.tablerows != NULL);
-  for (unsigned long long i = 0; i < rows; i++) 
-  {
-    if (i != (rows-1))
+
+  if (allocateDest) { 
+    for (unsigned long long i = 0; i < rows; i++) 
     {
-      dest.tablerows[i] = new double[rowsize];
-      assert(dest.tablerows[i] != NULL);
+      if (i != (rows-1))
+      {
+        dest.tablerows[i] = new double[rowsize];
+        assert(dest.tablerows[i] != NULL);
+      }
+      else 
+      {
+        dest.tablerows[i] = new double[lastRowSize];
+        assert(dest.tablerows[i] != NULL);
+      }
     }
-    else 
-    {
-      dest.tablerows[i] = new double[lastRowSize];
-      assert(dest.tablerows[i] != NULL);
-    }
-  }
+  } 
 
   unsigned long long pos = 0, row = 0, col = 0, curRowSize = rowsize; 
   while (pos < size) 

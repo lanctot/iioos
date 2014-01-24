@@ -119,8 +119,12 @@ double sumEV2 = 0.0;
 bool simgame = false;
 double timeLimit = 1.0;
 int sg_curPlayer = 0;
-InfosetStore sgiss1;
-InfosetStore sgiss2;
+// infoset stores used during search
+InfosetStore sgiss1;   
+InfosetStore sgiss2;   
+// infoset stores used during full-stitching
+InfosetStore fsiss1; 
+InfosetStore fsiss2; 
 
 // the amount of randomness to add to RM 
 double randMixRM = 0.01;

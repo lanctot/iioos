@@ -84,4 +84,10 @@
 #endif
 #endif
 
+// Player types for search
+#define PLYR_KEYBOARD    0 
+#define PLYR_MCTS        1
+#define PLYR_OOS         2 
+#define PLYR_STRAT       3
+#define PLYR_RANDOM      4
 
