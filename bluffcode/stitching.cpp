@@ -210,6 +210,7 @@ int main(int argc, char ** argv)
   unsigned long long maxIters = 0; 
   init();
   bool br = false;
+  timeLimit = 5.0;
 
   if (argc < 2)
   {
@@ -235,7 +236,7 @@ int main(int argc, char ** argv)
     p1type = to_int(argv[2]);   
     p2type = to_int(argv[3]);   
 
-    if (argc >= 4) 
+    if (argc >= 5) 
       br = true; 
   }  
   

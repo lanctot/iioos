@@ -121,7 +121,17 @@ sub get_cmd
 
   #my $cmd = "scripts/run.sh experiments.SimGame --game $game --p1 $alg1 --p2 $alg2 --seed $seed --timelimit $tl";
   #./sim scratch/iss.initial.dat scratch/iss.initial.dat 2 4
-  my $cmd = "./sim scratch/iss.initial.dat scratch/iss.initial.dat $alg1 $alg2";
+  my $cmd = "";
+
+  if ($alg1 eq "3") {
+    $cmd = "./sim scratch/iss.0001Nash.dat scratch/iss.initial.dat $alg1 $alg2";
+  }
+  elsif ($alg2 eq "3") { 
+    $cmd = "./sim scratch/iss.initial.dat scratch/iss.0001Nash.dat $alg1 $alg2";
+  }
+  else { 
+    $cmd = "./sim scratch/iss.initial.dat scratch/iss.initial.dat $alg1 $alg2";
+  }
   
   return $cmd;
 }
@@ -129,7 +139,8 @@ sub get_cmd
 my @jobs = (); 
 
 my @matchups = (); 
-push(@matchups, "1,2"); 
+push(@matchups, "1,3"); 
+push(@matchups, "2,3"); 
 
 # here's an example of a loop to initialize matchups instead of a static list
 #my @parms = ( 0.1, 0.05, 0.2, 0.3, 0.4, 0.5, 0.6, 0.25, 0.7, 0.8 ); 
@@ -178,6 +189,19 @@ for (my $i = 0; $i < scalar(@matchups); $i++)
     push(@jobs, $fullcmd); 
   }
 }
+
+sub fisher_yates_shuffle
+{
+    my $array = shift;
+    my $i = scalar(@$array);
+    while ( --$i )
+    {
+        my $j = int rand( $i+1 );
+        @$array[$i,$j] = @$array[$j,$i];
+    }
+}
+
+fisher_yates_shuffle( \@jobs );
 
 print "queued " . scalar(@jobs) . " jobs\n";
 sleep 1;
