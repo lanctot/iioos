@@ -25,20 +25,24 @@
 
 struct GameState
 {
-  int chance[NUMCARDS];
-  int p1cards[NUMCARDS]; 
-  int p2cards[NUMCARDS]; 
-  int bidOutcomes[NUMCARDS]; 
+  bool deck[NUMCARDS];      // true means it's still in the deck
+  bool p1hand[NUMCARDS];    // true = card left in hand
+  bool p2hand[NUMCARDS];    // true = card left in hand
+  int chance[NUMCARDS];     // cards that have appeared, in order (nonzero)
+  int p1bids[NUMCARDS];     // bid cards played, in order (nonzero)
+  int p2bids[NUMCARDS];     // bid cards played, in order (nonzero)
   int turn;
 
   GameState() 
   {
     turn = 0; 
     for (int i = 0; i < NUMCARDS; i++) {
+      deck[i] = true; 
+      p1hand[i] = true;
+      p2hand[i] = true;
       chance[i] = 0; 
-      p1cards[i] = 0; 
-      p2cards[i] = 0; 
-      bidOutcomes[i] = 0; 
+      p1bids[i] = 0; 
+      p2bids[i] = 0; 
     }
   }
 
@@ -121,7 +125,8 @@ double searchComputeHalfBR(int fixed_player, InfosetStore * _issPtr, bool _ismct
 
 // abstract versions of stuff
 void absInitInfosets();
-void getInfosetKey(GameState & gs, unsigned long long & infosetkey, int player, unsigned long long bidseq);
+void getInfosetKey(GameState & gs, unsigned long long & infosetkey, int player, unsigned long long chanceseq,
+                   unsigned long long outcomeseq, unsigned long long bidseq1, unsigned long long bidseq2);
 void getAbsInfosetKey(GameState & gs, unsigned long long & infosetkey, int player, unsigned long long bidseq, int chanceOutcome = -1);
 void brImportAbsStrategy(std::string file);
 void getAbsSSKey(GameState & gs, unsigned long long & sskey, int player, unsigned long long bidseq);

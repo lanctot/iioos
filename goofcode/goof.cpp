@@ -5,6 +5,7 @@
  * storing 2 doubles per iapair + 2 doubles per infoset
  * want size of index to be at least double # infosets (then 2 doubles per index size)
  *
+ *   Goof(4): size 102942 infosets 23116
  */
 
 
@@ -69,40 +70,48 @@ static int * bids = NULL;*/
 
 static StopWatch stopwatch;
 
-void getInfosetKey(GameState & gs, unsigned long long & infosetkey, int player, unsigned long long bidseq)
+void getInfosetKey(GameState & gs, unsigned long long & infosetkey, int player, unsigned long long chanceseq,
+                   unsigned long long outcomeseq, unsigned long long bidseq1, unsigned long long bidseq2)
 {
-  /*
-  infosetkey = bidseq;  
-  infosetkey <<= iscWidth; 
   if (player == 1)
   {
-    infosetkey |= gs.p1roll; 
+    infosetkey = bidseq1;  
+    infosetkey <<= (NUMCARDS*iscWidth);
+    infosetkey |= chanceseq;
+    infosetkey <<= (NUMCARDS*2);
+    infosetkey |= outcomeseq;
     infosetkey <<= 1; 
   }
   else if (player == 2)
   {
-    infosetkey |= gs.p2roll; 
+    infosetkey = bidseq2;  
+    infosetkey <<= (NUMCARDS*iscWidth);
+    infosetkey |= chanceseq;
+    infosetkey <<= (NUMCARDS*2);
+    infosetkey |= outcomeseq;
     infosetkey <<= 1; 
     infosetkey |= 1; 
-  }*/
+  }
 }
 
-void getInfoset(GameState & gs, int player, unsigned long long bidseq, Infoset & is, unsigned long long & infosetkey, int actionshere)
+void getInfoset(GameState & gs, int player, unsigned long long chanceseq, unsigned long long outcomeseq, 
+                unsigned long long bidseq1, unsigned long long bidseq2, 
+                Infoset & is, unsigned long long & infosetkey, int actionshere)
 {
   // when simultatig a game, get it from a diff place
   if (sg_curPlayer == 1) { 
-    getInfosetKey(gs, infosetkey, player, bidseq);
+    getInfosetKey(gs, infosetkey, player, chanceseq, outcomeseq, bidseq1, bidseq2);
     bool ret = sgiss1.get(infosetkey, is, actionshere, 0);
     assert(ret);
   }
   else if (sg_curPlayer == 2) { 
-    getInfosetKey(gs, infosetkey, player, bidseq);
+    getInfosetKey(gs, infosetkey, player, chanceseq, outcomeseq, bidseq1, bidseq2);
     bool ret = sgiss2.get(infosetkey, is, actionshere, 0);
     assert(ret);
   }
   else { 
     // normal case when using most algorithms, i.e. solving    
-    getInfosetKey(gs, infosetkey, player, bidseq);
+    getInfosetKey(gs, infosetkey, player, chanceseq, outcomeseq, bidseq1, bidseq2);
     bool ret = iss.get(infosetkey, is, actionshere, 0);
     assert(ret);
   }
@@ -232,94 +241,107 @@ void loadMetaData(std::string filename)
   inf.close();
 }
 
+void applyBid(GameState & gs, int bid, int player, unsigned long long & outcomeseq, unsigned long long & bidseq1, unsigned long long & bidseq2) { 
+  // bid is nonzero
+  
+  bool * myhand = (player == 1 ? gs.p1hand : gs.p2hand);
+  int * mybids = (player == 1 ? gs.p1bids : gs.p2bids);
+  unsigned long long & mybidseq = (player == 1 ? bidseq1 : bidseq2); 
 
+  myhand[bid-1] = false; 
+  mybids[gs.turn] = bid; 
+  mybidseq <<= iscWidth; 
+  mybidseq |= (bid-1); 
 
-void initInfosets(GameState & gs, int player, int depth, unsigned long long bidseq)
+  if (player == 2) { 
+    outcomeseq <<= 2; 
+
+    if (gs.p1bids[gs.turn] > gs.p2bids[gs.turn]) 
+      outcomeseq |= 1; 
+    else if (gs.p2bids[gs.turn] > gs.p1bids[gs.turn])
+      outcomeseq |= 2; 
+    else 
+      outcomeseq |= 3; 
+
+    gs.turn++;
+  }
+}
+
+void initInfosets(GameState & gs, int player, int depth, unsigned long long chanceseq, unsigned long long outcomeseq, 
+                  unsigned long long bidseq1, unsigned long long bidseq2)
 {
-#if 0
   if (terminal(gs))
     return;
 
-  // check for chance nodes
-  if (gs.p1roll == 0) 
+  // chance?
+  if (gs.chance[gs.turn] == 0) 
   {
-    for (int i = 1; i <= numChanceOutcomes1; i++) 
+    for (int i = 0; i <= NUMCARDS; i++) 
     {
-      GameState ngs = gs; 
-      ngs.p1roll = i; 
+      if (gs.deck[i]) {
+        GameState ngs = gs; 
+        
+        ngs.deck[i] = false; 
+        ngs.chance[ngs.turn] = i+1; 
+        chanceseq <<= iscWidth;
+        chanceseq |= i;
 
-      initInfosets(ngs, player, depth+1, bidseq); 
-    }
-
-    return;
-  }
-  else if (gs.p2roll == 0)
-  {
-    for (int i = 1; i <= numChanceOutcomes2; i++)
-    {
-      GameState ngs = gs; 
-      ngs.p2roll = i; 
-
-      initInfosets(ngs, player, depth+1, bidseq); 
+        initInfosets(ngs, player, depth+1, chanceseq, outcomeseq, bidseq1, bidseq2); 
+      }  
+      
     }
 
     return;
   }
 
-  int maxBid = (gs.curbid == 0 ? BLUFFBID-1 : BLUFFBID);
-  int actionshere = maxBid - gs.curbid; 
+  int actionshere = NUMCARDS-gs.turn; 
 
   assert(actionshere > 0);
   Infoset is;
   newInfoset(is, actionshere); 
+  bool * myhand = (player == 1 ? gs.p1hand : gs.p2hand); 
+  int * mybids = (player == 1 ? gs.p1bids : gs.p2bids); 
 
-  for (int i = gs.curbid+1; i <= maxBid; i++) 
+  for (int i = 0; i < NUMCARDS; i++) 
   {
-    if (depth == 2 && i == (gs.curbid+1)) {       
+    if (depth == 1) {       
       cout << "InitTrees. iss stats = " << iss.getStats() << endl;
       //cout << "InitTrees, d2 1r" << gs.p1roll << " 2r" << gs.p2roll << " i" << i << endl;
     }
 
+    if (!myhand[i]) 
+      continue;
+
+    unsigned long long new_bidseq1 = bidseq1; 
+    unsigned long long new_bidseq2 = bidseq2; 
+    unsigned long long new_outcomeseq = outcomeseq;
+
     GameState ngs = gs; 
-    ngs.prevbid = gs.curbid;
-    ngs.curbid = i; 
-    ngs.callingPlayer = player;
-    unsigned long long newbidseq = bidseq; 
-    newbidseq |= (1ULL << (BLUFFBID-i)); 
+    applyBid(ngs, i+1, player, new_outcomeseq, new_bidseq1, new_bidseq2); 
 
-    initInfosets(ngs, (3-player), depth+1, newbidseq); 
+    initInfosets(ngs, (3-player), depth+1, chanceseq, new_outcomeseq, new_bidseq1, new_bidseq2); 
   }
 
-  unsigned infosetkey = 0; 
-  infosetkey = bidseq;  
-  infosetkey <<= iscWidth; 
-  if (player == 1)
-  {
-    infosetkey |= gs.p1roll; 
-    infosetkey <<= 1; 
-    iss.put(infosetkey, is, actionshere, 0); 
-  }
-  else if (player == 2)
-  {
-    infosetkey |= gs.p2roll; 
-    infosetkey <<= 1; 
-    infosetkey |= 1; 
-    iss.put(infosetkey, is, actionshere, 0); 
-  }
-#endif
+  unsigned long long infosetkey = 0; 
+
+  //void getInfosetKey(GameState & gs, unsigned long long & infosetkey, int player, unsigned long long chanceseq,
+  //                 unsigned long long outcomeseq, unsigned long long bidseq1, unsigned long long bidseq2)
+
+  getInfosetKey(gs, infosetkey, player, chanceseq, outcomeseq, bidseq1, bidseq2);
+  iss.put(infosetkey, is, actionshere, 0); 
 }
 
 void initInfosets()
 {
-  unsigned long long bidseq = 0;
+  unsigned long long chanceseq = 0, outcomeseq = 0, bidseq1 = 0, bidseq2 = 0;
   GameState gs;
 
   cout << "Initialize info set store..." << endl;
 
-  if (NUMCARDS == 4) { 
-    // ... 
-    iss.init(196572, 100000);  
-  }
+  if (NUMCARDS == 4) 
+    iss.init(150000, 125000);  
+  else if (NUMCARDS == 5)
+    iss.init(10000000, 10000000);  
   else { 
     cerr << "initInfosets not defined for this NUMCARDS" << endl;
   }
@@ -328,7 +350,8 @@ void initInfosets()
 
   cout << "Initializing info sets..." << endl;
   stopwatch.reset(); 
-  initInfosets(gs, 1, 0, bidseq);
+
+  initInfosets(gs, 1, 0, chanceseq, outcomeseq, bidseq1, bidseq2);
 
   cout << "time taken = " << stopwatch.stop() << " seconds." << endl;
   iss.stopAdding(); 

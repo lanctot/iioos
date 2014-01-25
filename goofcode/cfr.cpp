@@ -207,7 +207,6 @@ double cfr(GameState & gs, int player, int depth, unsigned long long bidseq,
 
 int main(int argc, char ** argv)
 {
-  unsigned long long maxIters = 0; 
   init();
 
   if (argc < 2)
@@ -220,9 +219,6 @@ int main(int argc, char ** argv)
     string filename = argv[1];
     cout << "Reading the infosets from " << filename << "..." << endl;
     iss.readFromDisk(filename);
-
-    if (argc >= 3)
-      maxIters = to_ull(argv[2]);
   } 
 
   #if 0

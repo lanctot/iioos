@@ -751,29 +751,47 @@ Search time & Performance OOS \\
 %      globally stitched strategy $\bar{\sigma}'$ and compute the exploitability of the stitched strategy.
 %\end{itemize}
 
-I have run the single-match method for a small number of matches (5 per data point), and averaged the results 
 
+\begin{table}
 \begin{center}
 \begin{tabular}{ccccc}
 alg & time & exp(1) & exp(2) & total exp.\\
 \hline
 ISMCTS & 1s & 0.795 & 0.767 & 1.562 \\
-% Before the algorithm change:
-% OOS    & 1s & 0.703 & 0.444 & 1.147 \\
 OOS    & 1s & 0.629 & 0.453 & 1.082 \\
 \hline
 ISMCTS & 5s & 0.796 & 0.768 & 1.564 \\
-% Before the algorithm change:
-%OOS    & 5s & 0.518 & 0.283 & 0.801 \\
 OOS    & 5s & 0.401 & 0.273 & 0.674 \\
 \end{tabular}
+\caption{LD(1,1) exploitability using single-match method averaged over a small number of matches (5 per data point).}
 \end{center}
+\end{table}
 
 % Full stitching, 1 second:  ./stitching scratch/iss.initial.dat 2 2 br 
 % OOS 
 %Done. v1 (br to fixed p2) = 0.288687
 %Done. v2 (br to fixed p1) = 0.394711
+% total = 0.683398
 %
+% ISMCTS
+% Done. v1 (br to fixed p2) = 0.795492
+% Done. v2 (br to fixed p1) = 0.765997
+% 
+
+\begin{table}
+\begin{center}
+\begin{tabular}{ccccc}
+alg & time & exp(1) & exp(2) & total exp.\\
+\hline
+ISMCTS & 1s & 0.394 & 0.289 & 0.683 \\
+OOS    & 1s & 0.795 & 0.766 & 1.561 \\
+\hline
+ISMCTS & 5s &  &  &  \\
+OOS    & 5s &  &  &  \\
+\end{tabular}
+\caption{LD(1,1) exploitability using full-stitching method.}
+\end{center}
+\end{table}
 
 \subsection{Targeting, Incremental Tree-Building, and Resets}
 
