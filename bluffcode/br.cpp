@@ -155,7 +155,7 @@ void getInfoset(unsigned long long & infosetkey, Infoset & is, GameState gs, uns
       
       stitchedInfosets++; 
       double isPerSec = stitchedInfosets / stopwatch.stop();
-      double remaining = (24576 - stitchedInfosets)/isPerSec;     
+      double remaining = (147420 - stitchedInfosets)/isPerSec;     
 
       cout << "Stitching player = " << br_stitchingPlayer << ", infosets looked up: " << stitchedInfosets 
            << ", ispersec = " << isPerSec << ", remaining seconds = " << remaining << endl;

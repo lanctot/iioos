@@ -14,6 +14,7 @@
 \usepackage{comment}
 \usepackage{xspace}
 \usepackage{tikz}
+\usepackage{epsdice}
 \usetikzlibrary{trees}
 \usetikzlibrary{shapes.geometric}
 
@@ -115,7 +116,7 @@ converge to an equilibrium strategy in a zero-sum game.
 In addition, we show that OOS avoids the common problems encountered by determinization.
 We evaluate the practical performance and convergence rate of OOS and evaluate its performance against benchmark players and compare 
 it to Information Set Monte Carlo Tree Search (ISMCTS). 
-OOS is shown to outperform its competitor in randomly generated game trees as well as two complex domains: Liar's Dice and 
+OOS is shown to outperform its competitor in randomly generated game trees as well as two complex domains: Liar's Dice, Goofspiel, and 
 Phantom Tic-Tac-Toe. 
 \end{abstract}
 
@@ -274,7 +275,7 @@ the most common approach to producing strong Poker AI has been to use advances i
 algorithms to compute a near-optimal equilibrium of an abstract game and subsequently use the abstract strategies 
 when playing the full game~\cite{Sandholm10The}. This {\it offline} approach requires designing 
 abstractions and pre-computing Poker equilibria, which is often not possible. Also, due to the size of 
-abstractions~\cite{Johanson13Evaluating}, the memory resource may not be available or known in advance. 
+abstractions~\cite{Johanson13Evaluating}, the memory resources may not be available or known in advance. 
 
 \subsection{Extensive-Form Games}
 
@@ -439,14 +440,6 @@ particular, when an information set is reach is reached that is not in memory, i
 (\eg uniform random) then takes over for the remainder of the simulation. Along the playout portion (tail) of the simulation,  
 information sets are not added to memory nor updated. Along the tree portion (head) of simulation, information sets are updated as normal. 
 We call this modification \defword{playout-based outcome sampling}. 
-%Preliminary results shown in Figure~\ref{fig:os-vs-pbos} seem to indicate 
-%that the convergence rate of playout-based OS compares to OS (in Bluff(1,1)) when the match history $\tth = \emptyset$. 
-%\begin{figure}
-%\hspace{-0.2cm}\includegraphics[scale=0.7]{figs/first-pbos/os-vs-pbos}
-%\caption{Preliminary convergence rate analysis of OS vs. playout-based OS. The vertical axis represents exploitability $\epsilon_{\bar{\sigma}}$.
-%\label{fig:os-vs-pbos}} 
-%\end{figure}
-%Playout-based OS seems to perform comparatively to OS in one domain. 
 Playout-based OS is not a search algorithm since it does not take into account he current match history $\tth$; 
 it acts like a memory-saving offline technique since it is always the case that $\tth = \emptyset$.
 However, it will form the basis of our search algorithm. 
@@ -538,7 +531,7 @@ IST and PST are consistent.
   \caption{Online Outcome Sampling. \label{alg}}
 \end{algorithm2e}
 
-Much like MCTS, the algorithm is iterative and samples a single trajectory from the root $\emptyset$ to some 
+The algorithm is iterative and samples a single trajectory from the root $\emptyset$ to some 
 terminal history. At each information set in memory, $I$, there are two tables maintained: $r_I$ stores cumulative 
 regret for each action $a \in A(I)$, and $s_I$ stores the cumulative average strategy probability of each 
 action. 
@@ -605,7 +598,7 @@ update player histories, while average strategy tables at opponent histories.
 
 \section{Empirical Evaluation}
 
-\mlnote{This section is still quite rough. I've commented out much of the text for now.}
+%\mlnote{This section is still quite rough. I've commented out much of the text for now.}
 
 %Here are some ides for what we could look at empirically: 
 %\begin{itemize}
@@ -626,13 +619,71 @@ update player histories, while average strategy tables at opponent histories.
 % - with/without incremental tree-building
 % - with/without remembering between moves
 
-\subsection{Preliminary Results in Bluff(1,1)}
+In this section, we evaluate the practical performance of Online Outcome Sampling. We compare the head-to-head performance and approximate exploitability 
+of OOS and ISMCTS on three games with different sources of imperfect information. We show the effects of 
+different targeting methods and values for $\delta$, resetting memory between successive searches, and
+and the incremental tree-building. We start by describing the rules of each game. 
 
-Here are some first results for performance and/or exploitability analysis of the algorithms. 
-Note that unless otherwise stated, memory is retained and not cleared between successive searches
-(which has no effect in ISMCTS).
-\mlnote{I have played against the ISMCTS strategy and I believe it's converging to a particular 
-pure (and bad) strategy.}
+Liar's Dice, also known as Dudo, Perudo, and Bluff is a dice-bidding game. 
+In LD($D_1$,$D_2$), each die has six sides with faces \epsdice{1} to \epsdice{5} and a star $\star$. 
+Each player $i$ rolls $D_i$ of these dice and looks at them without showing them to their opponent. 
+Each round, players alternate by bidding on the outcome of all dice in play until one player ``calls liar'', 
+\ie claims that their opponent's latest bid does not hold.
+A bid consists of a quantity of dice and a face value.  
+A face of $\star$ is considered ``wild'' and counts as matching any other face.
+For example, the bid 2-$\epsdice{5}$ represents the claim that there are at least two dice with a face of 
+$\epsdice{5}$ or $\star$ among both players' dice. 
+To place a new bid, the player must increase either the quantity or face value of the current 
+bid (or both); in addition, lowering the face is allowed if the quantity is increased. 
+The losing player removes a number of dice $L$ from the game and a new round begins, starting
+with the player who won the previous round. 
+The number of dice removed is equal to the difference in the number of dice claimed and the number of actual 
+matches; in the case where the bid is exact, the calling player loses a single die. 
+When a player has no more dice left, they have lost the game. 
+A utility of $+1$ is given for a win and $-1$ for a loss.
+
+Imperfect Information II-Goofspiel($N$) is a two-player card game where each player is
+given a private hand of bid cards with values $1$ to $N$. A different
+deck of $N$ point cards is shuffled and the cards are placed face up
+in a stack. On their turn, each player bids for the top point card by 
+choosing a single card in their hand and revealing the chosen card simultaneously. 
+Whoever bid the highest value gets the point card and adds the point total to their score.  
+In the case of a tie, the point card is discarded.  Whether they won or
+lost the bid, both players discard the card they used to bid.  
+This bidding process is repeated until players have no bid cards left. 
+The player with the highest score wins and receives a utility of 1. The losing player 
+receives a utility of -1. In, II-Goofspiel only whether the player won or lost a bid is 
+revealed, not the cards that were used to bid.  
+
+Phantom Tic-Tac-Toe (PTTT) is played on a 3-by-3 board, 
+initially empty, where the goal is to claim three squares along the same row, column, or diagonal. 
+However, in PTTT, players' actions are private. 
+Each turn, a player attempts to take a square of their choice. 
+If they fail due to the opponent having taken that square on a previous turn, the same player 
+keeps trying to take an alternative square until they succeed. 
+Players are not informed about how many attempts the opponent made before succeeding. 
+The game ends immediately if there is ever a connecting line of squares belonging to the same player. 
+The winner receives a payoff of $+1$, while the losing player receives $-1$. 
+
+\subsection{Head-to-Head Performance and Exploitability} 
+
+%Here are some first results for performance and/or exploitability analysis of the algorithms. 
+%Note that unless otherwise stated, memory is retained and not cleared between successive searches
+%(which has no effect in ISMCTS).
+%\mlnote{I have played against the ISMCTS strategy and I believe it's converging to a particular 
+%pure (and bad) strategy.}
+
+In perfect information online game-tree search, the standard metric used to evaluate performance 
+is head-to-head win rates. We measure this by simulating several games of each algorithm against the other
+and counting wins and losses. 
+However, when playing a game with a low low disambiguation 
+factor~\cite{Long10Understanding}, one where the hidden information is hardly revealed (such as Poker and Liar's Dice), 
+it may be critical to play in such a way that the opponent cannot easily infer the private information. Therefore, 
+we also measure exploitability of the resulting strategies. 
+
+In the offline setting, measuring exploitability is straight-forward: since the opponent strategy is fixed, the best 
+response values are computed by a recursive walk of the tree using expectimax. In online search, the algorithm 
+is defined 
 
 So far, the only variant of OOS implemented is IST with $(\epsilon, \delta) = (0.6, 0.9)$. 
 ISMCTS uses $C = 2$ and manual tuning shows that the value of $C$ does not 
@@ -717,6 +768,26 @@ ISMCTS & 5s & 0.796 & 0.768 & 1.564 \\
 OOS    & 5s & 0.401 & 0.273 & 0.674 \\
 \end{tabular}
 \end{center}
+
+% Full stitching, 1 second:  ./stitching scratch/iss.initial.dat 2 2 br 
+% OOS 
+%Done. v1 (br to fixed p2) = 0.288687
+%Done. v2 (br to fixed p1) = 0.394711
+%
+
+\subsection{Targeting, Incremental Tree-Building, and Resets}
+
+%The first experiment we ran was the comparison of playout-based OS to OS in the offline
+%case. Preliminary results shown in Figure~\ref{fig:os-vs-pbos} seem to indicate 
+%that the convergence rate of playout-based OS compares to OS (in Bluff(1,1)) when the match history $\tth = \emptyset$. 
+%\begin{figure}
+%\hspace{-0.2cm}\includegraphics[scale=0.7]{figs/first-pbos/os-vs-pbos}
+%\caption{Preliminary convergence rate analysis of OS vs. playout-based OS. The vertical axis represents exploitability $\epsilon_{\bar{\sigma}}$.
+%\label{fig:os-vs-pbos}} 
+%\end{figure}
+%Playout-based OS seems to perform comparatively to OS in one domain. 
+
+
 
 
 \section{Conclusion}
