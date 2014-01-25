@@ -192,6 +192,7 @@ extern InfosetStore fsiss2;
 extern double randMixRM; 
 extern int p1type; 
 extern int p2type;
+extern int br_stitchingPlayer; 
 double simloop();
 int getMove(int player, GameState gs, unsigned long long bidseq);
 int getMoveKeyboard(int player, GameState gs, unsigned long long bidseq);

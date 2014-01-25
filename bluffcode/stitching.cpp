@@ -209,6 +209,7 @@ int main(int argc, char ** argv)
 {
   unsigned long long maxIters = 0; 
   init();
+  bool br = false;
 
   if (argc < 2)
   {
@@ -218,7 +219,7 @@ int main(int argc, char ** argv)
   else 
   { 
     if (argc < 4) { 
-      cout << "Usage: sim init.issfile.dat ptype1 ptype2" << endl;
+      cout << "Usage: sim init.issfile.dat ptype1 ptype2 [br]" << endl;
       exit(-1);
     }
 
@@ -233,36 +234,38 @@ int main(int argc, char ** argv)
 
     p1type = to_int(argv[2]);   
     p2type = to_int(argv[3]);   
+
+    if (argc >= 4) 
+      br = true; 
   }  
   
-  // get the iteration
-  string filename = argv[1];
-  vector<string> parts; 
-  split(parts, filename, '.'); 
-  if (parts.size() != 3 || parts[1] == "initial")
-    iter = 1; 
-  else
-    iter = to_ull(parts[1]); 
-  cout << "Set iteration to " << iter << endl;
-  iter = MAX(1,iter);
-
   unsigned long long bidseq = 0; 
     
   stopwatch.reset();
   double totaltime = 0; 
 
-  cout << "Starting CFR iterations" << endl;
+  cout << "Starting stitching operations" << endl;
 
-  for (; true; iter++)
-  {
-    GameState match_gs; 
-    bidseq = 0; 
+  GameState match_gs; 
+  bidseq = 0; 
 
+  if (!br) { 
     cout << "Starting stitch for player 1!" << endl; 
     fullstitch(match_gs, 1, 0, bidseq, 1);
-    
-    cout << "Starting stitch for player 1!" << endl; 
+  
+    cout << "Starting stitch for player 2!" << endl; 
     fullstitch(match_gs, 1, 0, bidseq, 2);
+
+    cout << "Done stitching; seconds taken: " << stopwatch.stop() << endl;
+  }
+  else { 
+
+    br_stitchingPlayer = 2; 
+    double v1 = searchComputeHalfBR(2, NULL, (p2type == PLYR_MCTS));
+
+    br_stitchingPlayer = 1;
+    double v2 = searchComputeHalfBR(1, NULL, (p1type == PLYR_MCTS));
+    
   }
 }
 

@@ -30,6 +30,10 @@ extern InfosetStore issfull;
 InfosetStore briss2;
 extern SequenceStore seqstore;
 
+int br_stitchingPlayer = 0;
+static StopWatch stopwatch;
+static int stitchedInfosets = 0;
+
 using namespace std; 
 
 static vector<unsigned long long> oppChanceOutcomes; // all roll outcomes
@@ -124,6 +128,31 @@ void getInfoset(unsigned long long & infosetkey, Infoset & is, GameState gs, uns
   if (player == 2) infosetkey |= 1; 
 
   bool ret = false; 
+  
+  if (br_stitchingPlayer > 0) { 
+    
+    InfosetStore & myISS = (player == 1 ? fsiss1 : fsiss2); 
+    unsigned long long uniqueId = myISS.getPosFromIndex(infosetkey);
+    int type = (player == 1 ? p1type : p2type);
+
+    ostringstream oss; 
+    oss << "scratch/stitched-iss-" << player << "-" << type << "-" << uniqueId << ".dat"; 
+
+    string filename = oss.str(); 
+    bool succ = myISS.readFromDisk(filename);
+    assert(succ); 
+
+    succ = myISS.get(infosetkey, is, actionshere, 0); 
+    assert(succ); 
+    
+    stitchedInfosets++; 
+    double isPerSec = stitchedInfosets / stopwatch.stop();
+    double remaining = (24757 - stitchedInfosets)*isPerSec;     
+
+    cout << "Infosets looked up: " << stitchedInfosets << ", ispersec = " << isPerSec << ", remaining seconds = " << remaining << endl;
+
+    return; 
+  }
 
   if (twofiles && player == 2) 
     ret = briss2.get(infosetkey, is, actionshere, 0); 
@@ -849,6 +878,8 @@ double searchComputeHalfBR(int fixed_player, InfosetStore * _issPtr, bool _ismct
 {
   ismcts = _ismcts;
   issPtr = _issPtr;
+  stitchedInfosets = 0;
+  stopwatch.reset();
 
   int CO = (fixed_player == 1 ? numChanceOutcomes(1) : numChanceOutcomes(2)); 
 
