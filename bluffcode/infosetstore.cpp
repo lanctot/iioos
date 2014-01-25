@@ -957,7 +957,7 @@ void InfosetStore::copy(InfosetStore & dest, bool allocateDest)
 }
 
 
-bool InfosetStore::readFromDisk(std::string filename)
+bool InfosetStore::readFromDisk(std::string filename, bool allocate)
 {
   addingInfosets = false; 
   nextInfosetPos = 0; 
@@ -976,8 +976,11 @@ bool InfosetStore::readFromDisk(std::string filename)
   readBytes(in, &lastRowSize, 8);        
  
   // the index
-  indexKeys = new unsigned long long [indexSize]; 
-  indexVals = new unsigned long long [indexSize]; 
+  if (allocate) { 
+    indexKeys = new unsigned long long [indexSize]; 
+    indexVals = new unsigned long long [indexSize]; 
+  }
+
   for (unsigned long long i = 0; i < indexSize; i++)
   {
     readBytes(in, indexKeys + i, 8); 
@@ -985,20 +988,26 @@ bool InfosetStore::readFromDisk(std::string filename)
   }
 
   // table rows (allocation)
-  tablerows = new double* [rows];
+  if (allocate)
+      tablerows = new double* [rows];
+
   assert(tablerows != NULL);
   for (unsigned long long i = 0; i < rows; i++) 
   {
     if (i != (rows-1))
     {
-      tablerows[i] = new double[rowsize];
+      if (allocate) 
+          tablerows[i] = new double[rowsize];
+
       assert(tablerows[i] != NULL);
       for (unsigned long long j = 0; j < rowsize; j++)
         tablerows[i][j] = 0.0;
     }
     else 
     {
-      tablerows[i] = new double[lastRowSize];
+      if (allocate)
+          tablerows[i] = new double[lastRowSize];
+
       assert(tablerows[i] != NULL);
       for (unsigned int j = 0; j < lastRowSize; j++)
         tablerows[i][j] = 0.0;

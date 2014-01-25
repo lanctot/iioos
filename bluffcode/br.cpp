@@ -132,26 +132,35 @@ void getInfoset(unsigned long long & infosetkey, Infoset & is, GameState gs, uns
   if (br_stitchingPlayer > 0) { 
     
     InfosetStore & myISS = (player == 1 ? fsiss1 : fsiss2); 
-    unsigned long long uniqueId = myISS.getPosFromIndex(infosetkey);
-    int type = (player == 1 ? p1type : p2type);
 
-    ostringstream oss; 
-    oss << "scratch/stitched-iss-" << player << "-" << type << "-" << uniqueId << ".dat"; 
+    if (player != br_stitchingPlayer) { 
+      ret = myISS.get(infosetkey, is, actionshere, 0); 
+      assert(ret); 
+      assert(false); // should not get here
+      return;
+    }
+    else {
+      unsigned long long uniqueId = myISS.getPosFromIndex(infosetkey);
+      int type = (player == 1 ? p1type : p2type);
 
-    string filename = oss.str(); 
-    bool succ = myISS.readFromDisk(filename);
-    assert(succ); 
+      ostringstream oss; 
+      oss << "scratch/stitched-iss-" << player << "-" << type << "-" << uniqueId << ".dat"; 
 
-    succ = myISS.get(infosetkey, is, actionshere, 0); 
-    assert(succ); 
-    
-    stitchedInfosets++; 
-    double isPerSec = stitchedInfosets / stopwatch.stop();
-    double remaining = (24576 - stitchedInfosets)/isPerSec;     
+      string filename = oss.str(); 
+      bool succ = myISS.readFromDisk(filename, false);  // no allocate!
+      assert(succ); 
 
-    cout << "Infosets looked up: " << stitchedInfosets << ", ispersec = " << isPerSec << ", remaining seconds = " << remaining << endl;
+      succ = myISS.get(infosetkey, is, actionshere, 0); 
+      assert(succ); 
+      
+      stitchedInfosets++; 
+      double isPerSec = stitchedInfosets / stopwatch.stop();
+      double remaining = (24576 - stitchedInfosets)/isPerSec;     
 
-    return; 
+      cout << "Infosets looked up: " << stitchedInfosets << ", ispersec = " << isPerSec << ", remaining seconds = " << remaining << endl;
+
+      return; 
+    }
   }
 
   if (twofiles && player == 2) 

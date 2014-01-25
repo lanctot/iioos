@@ -102,7 +102,7 @@ public:
   void readBytes(std::ifstream & in, void * addr, unsigned int num); 
 
   void dumpToDisk(std::string filename);
-  bool readFromDisk(std::string filename);
+  bool readFromDisk(std::string filename, bool allocate = true);
 
   bool contains(unsigned long long infoset_key);
 

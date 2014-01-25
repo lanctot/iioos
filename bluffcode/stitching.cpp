@@ -20,7 +20,7 @@ bool fullload(unsigned long long infosetkey, Infoset & is, int actionshere, int 
   oss << "scratch/stitched-iss-" << player << "-" << type << "-" << uniqueId << ".dat"; 
 
   string filename = oss.str(); 
-  bool succ = myISS.readFromDisk(filename);
+  bool succ = myISS.readFromDisk(filename, false);  // no allocate!
   return succ; 
 }
 

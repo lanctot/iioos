@@ -261,7 +261,7 @@ would give incentive to the maximizer to play left more often and change the min
 
 One particularly related work is the MMCTS algorithm~\cite{Auger11Multiple} that has been 
 applied to Phantom Tic-Tac-Toe. 
-MMCTS uses regret minimization at each information set in its Monte Carlo tree search, and scales the payoff 
+MMCTS uses Exp3 at each information set in its search, and scales the payoff 
 received by the depth of each playout. 
 %While we have not implemented MMCTS, we have been able to test our 
 %algorithm against it thanks to the authors sharing their code. 
@@ -269,7 +269,6 @@ received by the depth of each playout.
 % Poker and the game-theoretic offline approach
 %Billings04Game
 
-\mlnote{Mention FSICFR!}
 Game-tree search techniques have also been applied to Poker~\cite{Billings04Game}. In recent years, however, 
 the most common approach to producing strong Poker AI has been to use advances in equilibrium approximation 
 algorithms to compute a near-optimal equilibrium of an abstract game and subsequently use the abstract strategies 
@@ -402,19 +401,19 @@ OS, a single $z \in Z$ is sampled and the information sets along the path to $z$
 %Show what can go wrong if you use a perfect information search method.
 
 In Poker, CFR and MCCFR have been used with remarkable success as offline methods 
-for pre-computing approximate equilibria in abstract Poker games. 
+for pre-computing approximate equilibria in abstract games~\cite{CFR,Johanson12CFRBR}; the same general 
+approach has also been used in Liar's Dice~\cite{Lanctot12IR,Neller11}. 
+%additional optimizations that can be applied in Liar's Dice~\cite{Neller11}.
 %Essentially, CFR takes time (weeks?) {\it pre-computing} 
 %approximate equilibria on abstract poker games, which are then used to look up actions when a decision needs to be made during play. 
-In a \defword{match} (online game), each player is allowed little (or no) preparation time before playing.
-There is a current \defword{match history}, $\tth$, initially set to 
-the empty history $\emptyset$ representing the start of the match. On each turn, 
+In a \defword{match} (online game), each player is allowed little or no preparation time before playing.
+There is a current \defword{match history}, $\tth$, initially the empty history $\emptyset$ representing the start of the match. Each turn, 
 the agent controlling $P(\tth)$ is given $t$ time units to decide on an \defword{match action} $\tta \in A(\tth)$ and the 
 match history then changes using $\tth \leftarrow \tth \tta$. There is a single referee who knows $\tth$, sampling chance outcomes 
 as needed from $\sigma_c(\tth)$, and revealing $I(\tth)$ to $P(\tth)$ on their turn. The players play until the match is terminated, 
 giving each player $i$ a payoff of $u_i(\ttz)$.
 
-Every perfect information games can be recursively broken down into 
-subgames and solved independently. 
+Every perfect information game can be broken down into subgames and solved independently. 
 An equilibrium is called subgame perfect if its portion used in every subgame is also an equilibrium in that subgame. 
 Every perfect information game has a pure subgame perfect equilibrium, which can be found by backward induction. 
 Search algorithm such as minimax and MCTS simply aim to identify the single optimal action at the search tree's root. 
