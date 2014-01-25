@@ -158,7 +158,7 @@ void fullstitch(GameState & match_gs, int player, int depth, unsigned long long 
 
     infosetsSearched++; 
     double isPerSec = infosetsSearched / stopwatch.stop();
-    double remaining = (24757 - infosetsSearched)*isPerSec;     
+    double remaining = (24576 - infosetsSearched)*isPerSec;     
 
     cout << "Infosets searched: " << infosetsSearched << ", ispersec = " << isPerSec << ", remaining seconds = " << remaining << endl;
   }
