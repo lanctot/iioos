@@ -31,8 +31,8 @@ InfosetStore briss2;
 extern SequenceStore seqstore;
 
 int br_stitchingPlayer = 0;
+int stitchedInfosets = 0;
 static StopWatch stopwatch;
-static int stitchedInfosets = 0;
 
 using namespace std; 
 

@@ -262,12 +262,14 @@ int main(int argc, char ** argv)
 
     br_stitchingPlayer = 2; 
     double v1 = searchComputeHalfBR(2, NULL, (p2type == PLYR_MCTS));
+    int infosets2 = stitchedInfosets; 
 
     br_stitchingPlayer = 1;
     double v2 = searchComputeHalfBR(1, NULL, (p1type == PLYR_MCTS));
+    int infosets1 = stitchedInfosets; 
    
-    cout << "Done. v1 (br to fixed p2) = " << v1 << endl;
-    cout << "Done. v2 (br to fixed p1) = " << v2 << endl;
+    cout << "Done. infosets2 = " << infosets2 << ", v1 (br to fixed p2) = " << v1 << endl;
+    cout << "Done. infosets1 = " << infosets1 << ", v2 (br to fixed p1) = " << v2 << endl;
   }
 }
 
