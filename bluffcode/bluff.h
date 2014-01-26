@@ -194,13 +194,14 @@ extern int p1type;
 extern int p2type;
 extern int br_stitchingPlayer; 
 extern int stitchedInfosets;
-double simloop();
-int getMove(int player, GameState gs, unsigned long long bidseq);
-int getMoveKeyboard(int player, GameState gs, unsigned long long bidseq);
-int getMoveStrat(int player, GameState gs, unsigned long long bidseq);
-int getMoveMCTS(int player, GameState gs, unsigned long long bidseq); 
-int getMoveOOS(int player, GameState gs, unsigned long long bidseq);
-int getMoveRandom(int player, GameState gs, unsigned long long bidseq);
+double simloop(InfosetStore * saveISS1, InfosetStore * saveISS2);
+
+int getMove(int player, GameState gs, unsigned long long bidseq, Infoset & is);
+int getMoveKeyboard(int player, GameState gs, unsigned long long bidseq, Infoset & is);
+int getMoveStrat(int player, GameState gs, unsigned long long bidseq, Infoset & is);
+int getMoveMCTS(int player, GameState gs, unsigned long long bidseq, Infoset & is); 
+int getMoveOOS(int player, GameState gs, unsigned long long bidseq, Infoset & is);
+int getMoveRandom(int player, GameState gs, unsigned long long bidseq, Infoset & is);
 
 
 class StopWatch

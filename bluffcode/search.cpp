@@ -15,7 +15,7 @@ int p2type = 0;
 //extern InfosetStore sgiss1;
 //extern InfosetStore sgiss2;
 
-int getMoveRandom(int player, GameState gs, unsigned long long bidseq) {
+int getMoveRandom(int player, GameState gs, unsigned long long bidseq, Infoset &is) {
   // count the number of actions. Can't call Bluff as first action when there is no bid
   int maxBid = (gs.curbid == 0 ? BLUFFBID-1 : BLUFFBID);
   int actionshere = maxBid - gs.curbid; 
@@ -25,7 +25,7 @@ int getMoveRandom(int player, GameState gs, unsigned long long bidseq) {
   return (gs.curbid + 1 + action);
 }
 
-int getMoveKeyboard(int player, GameState gs, unsigned long long bidseq)
+int getMoveKeyboard(int player, GameState gs, unsigned long long bidseq, Infoset & is)
 {
   int seq[BLUFFBID] = {0};
   int j = 0;
@@ -75,7 +75,7 @@ int getMoveKeyboard(int player, GameState gs, unsigned long long bidseq)
   return move;
 }
 
-int getMoveStrat(int player, GameState gs, unsigned long long bidseq)
+int getMoveStrat(int player, GameState gs, unsigned long long bidseq, Infoset & is)
 {
   cout << "Player " << player << ", my roll is: " << 
       (player == 1 ? gs.p1roll : gs.p2roll) << " ... sampling from lookup strategy." << endl;
@@ -135,7 +135,7 @@ int getMoveStrat(int player, GameState gs, unsigned long long bidseq)
   return (gs.curbid + 1 + index);
 }
 
-int getMove(int player, GameState gs, unsigned long long bidseq)
+int getMove(int player, GameState gs, unsigned long long bidseq, Infoset & is)
 {
   int ptype = (player == 1 ? p1type : p2type); 
 
@@ -144,16 +144,16 @@ int getMove(int player, GameState gs, unsigned long long bidseq)
 
   switch(ptype)
   {
-    case PLYR_KEYBOARD: return getMoveKeyboard(player, gs, bidseq); 
-    case PLYR_MCTS: return getMoveMCTS(player, gs, bidseq); 
-    case PLYR_STRAT: return getMoveStrat(player, gs, bidseq); 
-    case PLYR_OOS: return getMoveOOS(player, gs, bidseq); 
-    case PLYR_RANDOM: return getMoveRandom(player, gs, bidseq); 
+    case PLYR_KEYBOARD: return getMoveKeyboard(player, gs, bidseq, is); 
+    case PLYR_MCTS: return getMoveMCTS(player, gs, bidseq, is); 
+    case PLYR_STRAT: return getMoveStrat(player, gs, bidseq, is); 
+    case PLYR_OOS: return getMoveOOS(player, gs, bidseq, is); 
+    case PLYR_RANDOM: return getMoveRandom(player, gs, bidseq, is); 
     default: cerr << "Error, unknown ptype" << endl; exit(-1);
   }
 }
 
-double simloop()
+double simloop(InfosetStore * saveISS1, InfosetStore * saveISS2) 
 {
   unsigned long long bidseq = 0; 
     
@@ -169,8 +169,31 @@ double simloop()
 
   do 
   {
-    int move = getMove(player, gs, bidseq);
+    Infoset is;
+    unsigned long long infosetkey = 0;
+    getInfosetKey(gs, infosetkey, player, bidseq);
+    
+    int maxBid = (gs.curbid == 0 ? BLUFFBID-1 : BLUFFBID);
+    int actionshere = maxBid - gs.curbid; 
+
+    int move = getMove(player, gs, bidseq, is);
     assert(move >= gs.curbid+1 && move <= BLUFFBID); 
+
+    // add to the collected infosets if necessary
+    if (sg_curPlayer == 1 && saveISS1 != NULL) {       
+      saveISS1->add(infosetkey, is, actionshere, 0);
+
+      // play a random move to explore the space
+      int a = static_cast<int>(drand48() * actionshere); 
+      move = gs.curbid+1+a; 
+    }
+    if (sg_curPlayer == 2 && saveISS2 != NULL) { 
+      saveISS2->add(infosetkey, is, actionshere, 0);
+      
+      // play a random move to explore the space
+      int a = static_cast<int>(drand48() * actionshere); 
+      move = gs.curbid+1+a; 
+    }
 
     if (move < BLUFFBID) {
       int quantity = 0;

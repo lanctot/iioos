@@ -5,14 +5,287 @@
 
 #include "bluff.h"
 
+static InfosetStore psGlobalISS;  
+static InfosetStore psTailISS;  
+static int infosetsSearched = 0;
+
+
 using namespace std; 
+
+void single_match() { 
+  double payoff = simloop(NULL, NULL);
+
+  if (payoff > 0) 
+    cout << "Game over. P1 wins!" << endl; 
+  else if (payoff == 0) 
+    cout << "game over. draw" << endl;
+  else if (payoff < 0) 
+    cout << "Game over. P2 wins!" << endl;
+}
+
+void multi_match() { 
+ 
+  // multiple matches; 50 for each combo: 
+  //   combo1: p1type p1type 
+  //   combo2: p2type p2type
+  //   combo3: p1type p2type
+  //   combo4: p2type p1type
+  
+  int actualP1type = p1type;
+  int actualP2type = p2type; 
+  
+  InfosetStore averageISS1; // iss for player type 1 
+  InfosetStore averageISS2; // iss for player type 2
+
+  sgiss1.copy(averageISS1, true); // allocate
+  sgiss2.copy(averageISS2, true); // allocate
+
+  StopWatch sw;
+  int runs = 0;
+  int simsPerCombo = 25;
+  
+  for (int combo = 1; combo <= 4; combo++) { 
+
+    if (combo == 1) { 
+      //   combo1: p1type p1type 
+      p1type = actualP1type; 
+      p2type = actualP1type;
+    }
+    else if (combo == 2) { 
+      //   combo4: p2type p2type
+      p1type = actualP2type; 
+      p2type = actualP2type;
+    }
+    else if (combo == 3) { 
+      //   combo2: p1type p2type
+      p1type = actualP1type; 
+      p2type = actualP2type;
+    }
+    else if (combo == 4) { 
+      //   combo3: p2type p1type
+      p1type = actualP2type; 
+      p2type = actualP1type;
+    }
+
+    for (int sim = 0; sim < simsPerCombo; sim++) { 
+      sgiss1.clear();
+      sgiss2.clear();
+      double payoff = 0;
+      
+      cout << "Sim Starting combo " << combo << " match " << sim << endl;
+
+      // check the combo again
+      if (combo == 1) {
+        payoff = simloop(&averageISS1, &averageISS1);
+        //averageISS1.aggregate(sgiss1, 1); 
+        //averageISS1.aggregate(sgiss2, 2); 
+      }
+      else if (combo == 2) {
+        payoff = simloop(&averageISS2, &averageISS2);
+        //averageISS2.aggregate(sgiss1, 1); 
+        //averageISS2.aggregate(sgiss2, 2); 
+      }
+      else if (combo == 3) { 
+        payoff = simloop(&averageISS1, &averageISS2);
+        //averageISS1.aggregate(sgiss1, 1); 
+        //averageISS2.aggregate(sgiss2, 2); 
+      }
+      else if (combo == 4) { 
+        payoff = simloop(&averageISS2, &averageISS1);
+        //averageISS2.aggregate(sgiss1, 1); 
+        //averageISS1.aggregate(sgiss2, 2); 
+      }
+
+      cout << "Sim ended, payoff = " << payoff << endl;
+
+      runs++; 
+      double runsPerSec = runs / sw.stop();
+      double remaining = (4*simsPerCombo - runs) / runsPerSec; 
+      cout << "Remining seconds: " << remaining << endl;
+      cout << endl;
+    }
+  }
+
+  double p1typeExp1 = 0;
+  double p1typeExp2 = 0; 
+
+  double p2typeExp1 = 0;
+  double p2typeExp2 = 0; 
+
+  p1type = actualP1type; 
+  p2type = actualP2type; 
+
+  p1typeExp1 = searchComputeHalfBR(1, &averageISS1, p1type == PLYR_MCTS);
+  p1typeExp2 = searchComputeHalfBR(2, &averageISS1, p1type == PLYR_MCTS);
+  
+  p2typeExp1 = searchComputeHalfBR(1, &averageISS2, p2type == PLYR_MCTS);
+  p2typeExp2 = searchComputeHalfBR(2, &averageISS2, p2type == PLYR_MCTS);
+
+  double p1totalExp = p1typeExp1 + p1typeExp2;
+  double p2totalExp = p2typeExp1 + p2typeExp2;
+
+  cout << "Player type " << p1type << " expl as player 1 is " << p1typeExp1
+       << " expl as player 2 is " << p1typeExp2 << ", total expl is " << p1totalExp 
+       << endl;
+  
+  cout << "Player type " << p2type << " expl as player 1 is " << p2typeExp1
+       << " expl as player 2 is " << p2typeExp2 << ", total expl is " << p2totalExp 
+       << endl;
+}
+
+
+void partialstitch(GameState & match_gs, int player, int depth, unsigned long long bidseq, int stitchingPlayer, int depthLimit) {
+  // at terminal node?
+  if (terminal(match_gs)) {
+    return;
+  }
+
+  if (match_gs.p1roll == 0) 
+  {
+    if (stitchingPlayer == 1) { 
+      for (int i = 1; i <= numChanceOutcomes(1); i++) 
+      {
+        GameState new_match_gs = match_gs; 
+        new_match_gs.p1roll = i; 
+        partialstitch(new_match_gs, player, depth, bidseq, stitchingPlayer, depthLimit); 
+      }
+    }
+    else {
+      // bogus value
+      GameState new_match_gs = match_gs; 
+      new_match_gs.p1roll = 1;
+      partialstitch(new_match_gs, player, depth, bidseq, stitchingPlayer, depthLimit); 
+    }
+
+    return;
+  }
+  else if (match_gs.p2roll == 0)
+  {
+    double EV = 0.0; 
+
+    if (stitchingPlayer == 2) { 
+      for (int i = 1; i <= numChanceOutcomes(2); i++)
+      {
+        GameState new_match_gs = match_gs; 
+        new_match_gs.p2roll = i; 
+        partialstitch(new_match_gs, player, depth, bidseq, stitchingPlayer, depthLimit); 
+      }
+    }
+    else { 
+      GameState new_match_gs = match_gs; 
+      new_match_gs.p2roll = 1;
+      partialstitch(new_match_gs, player, depth, bidseq, stitchingPlayer, depthLimit); 
+    }
+
+    return;
+  }
+ 
+  // declare the variables
+  Infoset is;
+  unsigned long long infosetkey = 0;
+  int action = -1;
+
+  int maxBid = (match_gs.curbid == 0 ? BLUFFBID-1 : BLUFFBID);
+  int actionshere = maxBid - match_gs.curbid; 
+  
+  assert(actionshere > 0);
+
+  // compute the infoset key
+
+  infosetkey = bidseq;  
+  infosetkey <<= iscWidth; 
+  if (player == 1)
+  {
+    infosetkey |= match_gs.p1roll; 
+    infosetkey <<= 1; 
+  }
+  else if (player == 2)
+  {
+    infosetkey |= match_gs.p2roll; 
+    infosetkey <<= 1; 
+    infosetkey |= 1; 
+  }
+
+  if (player == stitchingPlayer && depth <= depthLimit) { 
+
+    cout << "Starting stitch of infoset #" << infosetsSearched << " with key " << infosetkey << endl;
+    
+    // load this from the global one (will be uninitlizied when we get here)
+    bool succ = psGlobalISS.get(infosetkey, is, actionshere, 0); 
+    assert(succ); 
+
+    sgiss1.clear();
+    sgiss2.clear();
+
+    // copy over to the searching ISS's
+    if (player == 1) { 
+      psGlobalISS.copy(sgiss1, false);
+    }
+    else if (player == 2) {  
+      psGlobalISS.copy(sgiss2, false);
+    }
+
+    // need to set the searching player to know which infoset to load
+    Infoset resultIS = is;
+    int move = getMove(player, match_gs, bidseq, resultIS);
+
+    // save it to the global one back
+    
+    psGlobalISS.put(infosetkey, resultIS, actionshere, 0); 
+      
+    infosetsSearched++; 
+    //double isPerSec = infosetsSearched / stopwatch.stop();
+    //double remaining = (24576 - infosetsSearched)/isPerSec;     
+
+    cout << "Infosets searched: " << infosetsSearched << endl; 
+  }
+  else if (player == stitchingPlayer && depth >= depthLimit) { 
+    cout << "Saving suffix infoset..." << endl; 
+
+    // simply get it from the searching one
+    bool succ = sgiss1.get(infosetkey, is, actionshere, 0); 
+    assert(succ); 
+    
+    // and save it back to the 
+    psGlobalISS.put(infosetkey, is, actionshere, 0); 
+  }
+
+    
+  // iterate over the actions
+  for (int i = match_gs.curbid+1; i <= maxBid; i++) 
+  {
+    // there is a valid action here
+    action++;
+    assert(action < actionshere);
+    
+    unsigned long long newbidseq = bidseq;
+
+    GameState new_match_gs = match_gs; 
+    new_match_gs.prevbid = match_gs.curbid;
+    new_match_gs.curbid = i; 
+    new_match_gs.callingPlayer = player;
+    newbidseq |= (1ULL << (BLUFFBID-i)); 
+    
+    partialstitch(new_match_gs, 3-player, depth+1, newbidseq, stitchingPlayer, depthLimit); 
+    
+    //iss.put(infosetkey, is, actionshere, 0); 
+  }
+
+  return;
+}
+
+void partial_stitch_matches() { 
+  sgiss1.copy(psGlobalISS, true); // allocate
+  sgiss1.copy(psTailISS, true);   // allocate
+}
 
 int main(int argc, char ** argv)
 {
   init();
   
   simgame = true; 
-  timeLimit = 5.0;
+  timeLimit = 1.0;
+  string simtype = "";
 
   if (argc < 2)
   {
@@ -21,8 +294,8 @@ int main(int argc, char ** argv)
   }
   else 
   { 
-    if (argc < 5) { 
-      cout << "Usage: sim isfile1 isfile2 ptype1 ptype2" << endl;
+    if (argc < 6) { 
+      cout << "Usage: sim isfile1 isfile2 ptype1 ptype2 [single|multimatch|partstitch]" << endl;
       exit(-1);
     }
 
@@ -36,32 +309,21 @@ int main(int argc, char ** argv)
 
     p1type = to_int(argv[3]);   
     p2type = to_int(argv[4]);   
+
+    simtype = argv[5]; 
   }  
 
-  double payoff = simloop();
+  if (simtype == "single") 
+    single_match();
+  else if (simtype == "multi")
+    multi_match();
+  else if (simtype == "partstitch")
+    partial_stitch_matches();
+  else { 
+    cout << "Unknown simulation type!" << endl;
+    cout << "Usage: sim isfile1 isfile2 ptype1 ptype2 [single|multi|partstitch]" << endl;
+    exit(-1);
+  }
 
-  if (payoff > 0) 
-    cout << "Game over. P1 wins!" << endl; 
-  else if (payoff == 0) 
-    cout << "game over. draw" << endl;
-  else if (payoff < 0) 
-    cout << "Game over. P2 wins!" << endl;
-
-  cout << "Single-match exploitability." << endl; 
-  double v1 = 0;
-  double v2 = 0;
-
-  if (p1type == PLYR_MCTS) 
-    v2 = searchComputeHalfBR(1, &sgiss1, true);
-  else if (p1type == PLYR_OOS) 
-    v2 = searchComputeHalfBR(1, &sgiss1, false);
-
-  if (p2type == PLYR_MCTS) 
-    v1 = searchComputeHalfBR(2, &sgiss2, true);
-  else if (p2type == PLYR_OOS)
-    v1 = searchComputeHalfBR(2, &sgiss2, false);
-
-  cout << "v1 (expl of P2 strategy) = " << v1 << endl; 
-  cout << "v2 (expl of P1 strategy) = " << v2 << endl;
 }
   

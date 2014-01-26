@@ -135,7 +135,7 @@ double getMoveMCTS_rec(int player, GameState & gs, unsigned long long bidseq, in
   return tppayoff;
 }
 
-int getMoveMCTS(int player, GameState match_gs, unsigned long long match_bidseq)
+int getMoveMCTS(int player, GameState match_gs, unsigned long long match_bidseq, Infoset & is)
 {
   int myroll = (player == 1 ? match_gs.p1roll : match_gs.p2roll); 
   cout << "Player: " << player << ", My Roll is: " << myroll << endl << "Running MCTS simulations ..." << endl;
@@ -217,7 +217,6 @@ int getMoveMCTS(int player, GameState match_gs, unsigned long long match_bidseq)
   
   // final move selection; highest value
   unsigned long long infosetkey = 0; 
-  Infoset is; 
   int maxBid = (match_gs.curbid == 0 ? BLUFFBID-1 : BLUFFBID);
   int actionshere = maxBid - match_gs.curbid; 
 

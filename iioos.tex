@@ -765,10 +765,10 @@ Search time & Performance OOS \\
 \begin{table}
 \begin{center}
 \begin{tabular}{ccccc}
-alg & time & exp(1) & exp(2) & total exp.\\
+alg         & time & exp(1) & exp(2) & total exp.\\
 \hline
-ISMCTS & 1s & 0.795 & 0.767 & 1.562 \\
-OOS    & 1s & 0.629 & 0.453 & 1.082 \\
+ISMCTS(max) & 1s   & 0.795 & 0.767 & 1.562 \\
+OOS         & 1s   & 0.629 & 0.453 & 1.082 \\
 \hline
 ISMCTS & 5s & 0.796 & 0.768 & 1.564 \\
 OOS    & 5s & 0.401 & 0.273 & 0.674 \\
@@ -788,16 +788,22 @@ OOS    & 5s & 0.401 & 0.273 & 0.674 \\
 % Done. v2 (br to fixed p1) = 0.765997
 % 
 
+%Done. v1 (br to fixed p2) = 0.562958
+%Done. v2 (br to fixed p1) = 0.249643
+
+
 \begin{table}
 \begin{center}
 \begin{tabular}{ccccc}
-alg & time & exp(1) & exp(2) & total exp.\\
+alg            & time & exp(1) & exp(2) & total exp.\\
 \hline
-ISMCTS    & 1s & 0.795 & 0.766 & 1.561 \\
-OOS       & 1s & 0.394 & 0.289 & 0.683 \\
+ISMCTS(max)   & 1s   & 0.222  & 0.666  & 0.888 \\
+ISMCTS(mix)   & 1s   & 0.250  & 0.563  & 0.813 \\
+OOS           & 1s   & 0.394  & 0.289  & 0.683 \\
 \hline
-ISMCTS & 5s &  &  &  \\
-OOS    & 5s &  &  &  \\
+ISMCTS(max)   & 5s   &        &        &  \\
+ISMCTS(mix)   & 5s   &        &        &  \\
+OOS           & 5s   &        &        &  \\
 \end{tabular}
 \caption{LD(1,1) exploitability using full-stitching method. \mlnote{5 second results will take 68 hours {\tt :)} currently running...}} 
 \end{center}

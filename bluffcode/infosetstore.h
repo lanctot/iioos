@@ -45,6 +45,7 @@ class InfosetStore
 
   bool get_priv(unsigned long long infoset_key, Infoset & infoset, int moves, int firstmove); 
   void put_priv(unsigned long long infoset_key, Infoset & infoset, int moves, int firstmove); 
+  void add_priv(unsigned long long infoset_key, Infoset & infoset, int moves, int firstmove); 
 
   void next(unsigned long long & row, unsigned long long & col, unsigned long long & pos, unsigned long long & curRowSize); 
 
@@ -97,6 +98,7 @@ public:
 
   bool get(unsigned long long infoset_key, Infoset & infoset, int moves, int firstmove); 
   void put(unsigned long long infoset_key, Infoset & infoset, int moves, int firstmove); 
+  void add(unsigned long long infoset_key, Infoset & infoset, int moves, int firstmove); 
 
   void writeBytes(std::ofstream & out, void * addr, unsigned int num);  
   void readBytes(std::ifstream & in, void * addr, unsigned int num); 
@@ -118,6 +120,7 @@ public:
 
   // used by MCTS
   void clear(); 
+  void aggregate(InfosetStore & from, int player);
   void copy(InfosetStore & dest, bool allocateDest);
   void mctsToCFR_pure();   // chose max mean reward
   void mctsToCFR_mixed();  // normalize visit counts

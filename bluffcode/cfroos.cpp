@@ -378,7 +378,7 @@ double cfroos(GameState & match_gs, unsigned long long match_bidseq, int match_p
 }
 
 // Called from sim.cpp
-int getMoveOOS(int match_player, GameState match_gs, unsigned long long match_bidseq) { 
+int getMoveOOS(int match_player, GameState match_gs, unsigned long long match_bidseq, Infoset & is) { 
   
   unsigned long long bidseq = 0; 
     
@@ -429,7 +429,6 @@ int getMoveOOS(int match_player, GameState match_gs, unsigned long long match_bi
   int actionshere = maxBid - match_gs.curbid; 
   assert(actionshere > 0);
 
-  Infoset is; 
   getInfoset(match_gs, match_player, match_bidseq, is, infosetkey, actionshere);
 
   sampleMoveAvg(is, actionshere, action, sampleProb); 

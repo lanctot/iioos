@@ -123,6 +123,11 @@ void InfosetStore::put(unsigned long long infoset_key, Infoset & infoset, int mo
   put_priv(infoset_key, infoset, moves, firstmove);
 }
 
+void InfosetStore::add(unsigned long long infoset_key, Infoset & infoset, int moves, int firstmove)
+{
+  add_priv(infoset_key, infoset, moves, firstmove);
+}
+
 
 bool InfosetStore::contains(unsigned long long infoset_key)
 {
@@ -478,6 +483,148 @@ void InfosetStore::put_priv(unsigned long long infoset_key, Infoset & infoset, i
     added++;
   }
 }
+
+void InfosetStore::add_priv(unsigned long long infoset_key, Infoset & infoset, int moves, int firstmove)
+{
+  unsigned long long row, col, pos, curRowSize;
+
+  // the key can be big now since it is hashed
+  //assert(infoset_key < size);
+
+  assert(moves > 0);
+  bool newinfoset = false; 
+
+  unsigned long long hashIndex = 0;
+  unsigned long long thepos = getPosFromIndex(infoset_key, hashIndex);  
+  if (addingInfosets && thepos >= size)
+  {
+    newinfoset = true; 
+
+    // new infoset to be added at the end
+    assert(nextInfosetPos < size); 
+
+    // only add it if it's a new info set
+    pos = nextInfosetPos;
+    row = nextInfosetPos / rowsize;
+    col = nextInfosetPos % rowsize;
+    curRowSize = (row < (rows-1) ? rowsize : lastRowSize);
+    
+    //index[infoset_key] = pos;
+    assert(pos < size); 
+    indexKeys[hashIndex] = infoset_key;
+    indexVals[hashIndex] = pos;
+
+    //cout << "Adding infosetkey: " << infoset_key << endl; 
+  }
+  else 
+  {
+    // we've seen this one before, load it
+    newinfoset = false; 
+
+    //pos = index[infoset_key];
+    //pos = indexVals[hashIndex]; 
+    assert(thepos < size); 
+    pos = thepos; 
+    row = pos / rowsize;
+    col = pos % rowsize;
+    curRowSize = (row < (rows-1) ? rowsize : lastRowSize);
+  }
+  
+  //int moves = infoset.curMoveProbs.get_cap(); 
+  //gMoveMap<double>::valuesType::iterator iter = infoset.curMoveProbs.begin(); 
+  //int firstmove = iter->first; 
+ 
+  /*
+  #if (CFRMC2EXT == 1 || CFRMC2 == 1) && (CFRMC_AVGMETHOD == 1)
+  // the first one is an integer
+  long long x; 
+  assert(sizeof(x) == sizeof(double));
+  x = infoset.updateProbsIter; 
+  memcpy(&tablerows[row][col], &x, sizeof(x)); 
+  next(row, col, pos, curRowSize);
+  #endif
+  */
+
+  // store the number of moves at this infoset
+  assert(row < rows);
+  assert(col < curRowSize); 
+  assert(pos < size); 
+  unsigned long long x = moves;
+  double y; 
+  assert(sizeof(x) == sizeof(double));
+  memcpy(&y, &x, sizeof(x));
+  tablerows[row][col] = y; 
+  next(row, col, pos, curRowSize);
+
+  // store the last update iter of this infoset
+  assert(row < rows);
+  assert(col < curRowSize); 
+  assert(pos < size); 
+  x = infoset.lastUpdate;
+  assert(sizeof(x) == sizeof(double));
+  memcpy(&y, &x, sizeof(x));
+  tablerows[row][col] = y; 
+  next(row, col, pos, curRowSize);
+
+  #if FSICFR
+  // reach1
+  assert(row < rows); assert(col < curRowSize);  assert(pos < size); 
+  tablerows[row][col] = infoset.reach1;
+  next(row, col, pos, curRowSize);
+  
+  // reach2
+  assert(row < rows); assert(col < curRowSize);  assert(pos < size); 
+  tablerows[row][col] = infoset.reach2;
+  next(row, col, pos, curRowSize);
+  
+  // value
+  assert(row < rows); assert(col < curRowSize);  assert(pos < size); 
+  tablerows[row][col] = infoset.value;
+  next(row, col, pos, curRowSize);
+  #endif
+  
+  // moves are from 1 to moves, so write them in order. 
+  // first, regret, then avg. strat
+  for (int i = 0, m = firstmove; i < moves; i++, m++) 
+  { 
+    //cout << "pos = " << pos << ", row = " << row << endl;
+    if (row >= rows) {
+      cout << "iss stats: " << iss.getStats() << endl;
+    }
+
+    assert(row < rows);
+    assert(col < curRowSize); 
+    assert(pos < size); 
+    CHKDBL(infoset.cfr[m]); 
+    tablerows[row][col] += infoset.cfr[m];
+
+    next(row, col, pos, curRowSize);
+
+    assert(row < rows);
+    assert(col < curRowSize); 
+    assert(pos < size); 
+    tablerows[row][col] += infoset.totalMoveProbs[m];
+
+    next(row, col, pos, curRowSize); 
+    
+    // ADA
+    assert(row < rows);
+    assert(col < curRowSize); 
+    assert(pos < size); 
+    tablerows[row][col] += infoset.weight[m];
+
+    next(row, col, pos, curRowSize); 
+    
+  }
+
+  if (newinfoset && addingInfosets)
+  {
+    nextInfosetPos = pos;
+    //assert(nextInfosetPos < size); <-- can't have this
+    //put it back up to the start
+    added++;
+  }
+}
   
 void InfosetStore::printValues()
 {
@@ -575,6 +722,67 @@ void InfosetStore::clear()
         
         tablerows[row][col] = 0.0;
 
+        next(row, col, pos, curRowSize);
+        // next ADA
+        
+        tablerows[row][col] = 0.0;
+        
+        next(row, col, pos, curRowSize);
+        // next cfr
+      }
+    }
+  }
+}
+
+void InfosetStore::aggregate(InfosetStore & from, int agplayer) { 
+  for (unsigned int i = 0; i < indexSize; i++) 
+  {
+    if (indexVals[i] < size) 
+    {
+      // which player is it?
+      unsigned long long key = indexKeys[i]; 
+      int player = ((key & 1ULL) == 1ULL ? 2 : 1); 
+      if (player != agplayer)
+        continue;
+
+      // this is a valid position
+      unsigned long long row, col, pos, curRowSize;
+      pos = indexVals[i];
+      row = pos / rowsize;
+      col = pos % rowsize;
+      curRowSize = (row < (rows-1) ? rowsize : lastRowSize);
+
+      // read # actions
+      unsigned long long actionshere = 0;
+      assert(sizeof(actionshere) == sizeof(double)); 
+      memcpy(&actionshere, &tablerows[row][col], sizeof(actionshere)); 
+      next(row, col, pos, curRowSize);
+      
+      // read the integer
+      unsigned long long lastUpdate = 0;
+      double x = tablerows[row][col];
+      memcpy(&lastUpdate, &x, sizeof(actionshere)); 
+      tablerows[row][col] = 0.0;
+      next(row, col, pos, curRowSize);
+
+      for (unsigned long long a = 0; a < actionshere; a++) 
+      {
+        // cfr
+        assert(row < rows);
+        assert(col < curRowSize); 
+
+        tablerows[row][col] += from.tablerows[row][col]; 
+      
+        next(row, col, pos, curRowSize);
+        // total move probs
+        
+        tablerows[row][col] += from.tablerows[row][col];
+
+        next(row, col, pos, curRowSize);
+        // next ADA
+        
+        tablerows[row][col] += from.tablerows[row][col];
+        
         next(row, col, pos, curRowSize);
         // next cfr
       }

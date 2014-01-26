@@ -141,7 +141,8 @@ void fullstitch(GameState & match_gs, int player, int depth, unsigned long long 
     cout << "Searching.." << endl;
 
     // need to set the searching player to know which infoset to load
-    int move = getMove(player, match_gs, bidseq);
+    Infoset dummyIS;
+    int move = getMove(player, match_gs, bidseq, dummyIS);
 
     // copy it back
     //
@@ -210,7 +211,7 @@ int main(int argc, char ** argv)
   unsigned long long maxIters = 0; 
   init();
   bool br = false;
-  timeLimit = 5.0;
+  timeLimit = 1.0;
 
   if (argc < 2)
   {
@@ -247,15 +248,18 @@ int main(int argc, char ** argv)
 
   cout << "Starting stitching operations" << endl;
 
-  GameState match_gs; 
-  bidseq = 0; 
-
   if (!br) { 
+    GameState match_gs1; 
+    bidseq = 0; 
+
     cout << "Starting stitch for player 1!" << endl; 
-    fullstitch(match_gs, 1, 0, bidseq, 1);
+    fullstitch(match_gs1, 1, 0, bidseq, 1);
   
+    GameState match_gs2;
+    bidseq = 0; 
+
     cout << "Starting stitch for player 2!" << endl; 
-    fullstitch(match_gs, 1, 0, bidseq, 2);
+    fullstitch(match_gs2, 1, 0, bidseq, 2);
 
     cout << "Done stitching; seconds taken: " << stopwatch.stop() << endl;
   }
