@@ -153,6 +153,70 @@ int getMove(int player, GameState gs, unsigned long long bidseq, Infoset & is)
   }
 }
 
+
+void saveMeAndTheChildren(GameState & match_gs, int player, int depth, unsigned long long bidseq, InfosetStore * issPtr) {
+  if (terminal(match_gs)) {
+    return;
+  }
+
+  // will not be called at chance nodes
+ 
+  // declare the variables
+  Infoset is;
+  unsigned long long infosetkey = 0;
+  int action = -1;
+
+  int maxBid = (match_gs.curbid == 0 ? BLUFFBID-1 : BLUFFBID);
+  int actionshere = maxBid - match_gs.curbid; 
+  
+  assert(actionshere > 0);
+
+  // compute the infoset key
+
+  infosetkey = bidseq;  
+  infosetkey <<= iscWidth; 
+  if (player == 1)
+  {
+    infosetkey |= match_gs.p1roll; 
+    infosetkey <<= 1; 
+  }
+  else if (player == 2)
+  {
+    infosetkey |= match_gs.p2roll; 
+    infosetkey <<= 1; 
+    infosetkey |= 1; 
+  }
+  
+  // load it from the searcher, place it into the real thing
+
+  InfosetStore & myloadISS = (sg_curPlayer == 1 ? sgiss1 : sgiss2); 
+  bool succ = myloadISS.get(infosetkey, is, actionshere, 0); 
+  assert(succ); 
+
+  issPtr->put(infosetkey, is, actionshere, 0);
+
+  // iterate over the actions
+  for (int i = match_gs.curbid+1; i <= maxBid; i++) 
+  {
+    // there is a valid action here
+    action++;
+    assert(action < actionshere);
+
+    unsigned long long newbidseq = bidseq;
+
+    GameState new_match_gs = match_gs; 
+    new_match_gs.prevbid = match_gs.curbid;
+    new_match_gs.curbid = i; 
+    new_match_gs.callingPlayer = player;
+    newbidseq |= (1ULL << (BLUFFBID-i)); 
+    
+    saveMeAndTheChildren(new_match_gs, 3-player, depth+1, newbidseq, issPtr); 
+  }
+
+  return;
+}
+
+
 double simloop(InfosetStore * saveISS1, InfosetStore * saveISS2) 
 {
   unsigned long long bidseq = 0; 
@@ -181,18 +245,12 @@ double simloop(InfosetStore * saveISS1, InfosetStore * saveISS2)
 
     // add to the collected infosets if necessary
     if (sg_curPlayer == 1 && saveISS1 != NULL) {       
-      saveISS1->add(infosetkey, is, actionshere, 0);
-
-      // play a random move to explore the space
-      int a = static_cast<int>(drand48() * actionshere); 
-      move = gs.curbid+1+a; 
+      GameState ngs = gs; 
+      saveMeAndTheChildren(ngs, player, 0, bidseq, saveISS1);
     }
     if (sg_curPlayer == 2 && saveISS2 != NULL) { 
-      saveISS2->add(infosetkey, is, actionshere, 0);
-      
-      // play a random move to explore the space
-      int a = static_cast<int>(drand48() * actionshere); 
-      move = gs.curbid+1+a; 
+      GameState ngs = gs; 
+      saveMeAndTheChildren(ngs, player, 0, bidseq, saveISS2);
     }
 
     if (move < BLUFFBID) {

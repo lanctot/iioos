@@ -20,9 +20,82 @@ void single_match() {
     cout << "game over. draw" << endl;
   else if (payoff < 0) 
     cout << "Game over. P2 wins!" << endl;
+  
+  double exp1 = searchComputeHalfBR(1, &sgiss1, p1type == PLYR_MCTS);
+  double exp2 = searchComputeHalfBR(2, &sgiss2, p1type == PLYR_MCTS); 
+  cout << "expl1 = " << exp1 << ", exp2 = " << exp2 << endl;
 }
 
 void multi_match() { 
+
+  int matches = 3;
+  double sumExpl1 = 0;
+  double sumExpl2 = 0;
+  double played1 = 0;
+  double played2 = 0;
+
+  InfosetStore matchISS1;
+  InfosetStore matchISS2;
+  sgiss1.copy(matchISS1, true); 
+  sgiss2.copy(matchISS2, true); 
+
+  assert(p1type == p2type); 
+
+  int testType = p1type; 
+
+  // 1: testType random
+  // 2: testType mcts
+  // 3: testType oos
+  // 4: random   testType
+  // 5: mcts     testType
+  // 6: oos      testType
+  
+  StopWatch sw;
+
+  for (int scenario = 1; scenario <= 6; scenario++) { 
+
+    if      (scenario == 1) { p1type = testType; p2type = PLYR_RANDOM; }
+    else if (scenario == 2) { p1type = testType; p2type = PLYR_MCTS; }
+    else if (scenario == 3) { p1type = testType; p2type = PLYR_OOS; }
+    else if (scenario == 4) { p1type = PLYR_RANDOM; p2type = testType; }
+    else if (scenario == 5) { p1type = PLYR_MCTS; p2type = testType; }
+    else if (scenario == 6) { p1type = PLYR_OOS; p2type = testType; }
+
+    for (int match = 1; match <= matches; match++) {
+      cout << endl;
+      cout << "Starting scenario " << scenario << ", match " << match << endl;
+
+      sgiss1.clear();
+      sgiss2.clear(); 
+      matchISS1.clear();
+      matchISS2.clear();
+
+      simloop(&matchISS1, &matchISS2);
+   
+      if (scenario <= 3) {
+        sumExpl1 += searchComputeHalfBR(1, &matchISS1, p1type == PLYR_MCTS);
+        played1++;
+      }
+      else {
+        sumExpl2 += searchComputeHalfBR(2, &matchISS2, p2type == PLYR_MCTS); 
+        played2++;
+      }
+
+      double gamesPerSec = (played1+played2) / sw.stop(); 
+      double timeRemaining = (6*matches - (played1+played2)) / gamesPerSec;
+      cout << "Remaining seconds: " << timeRemaining << endl;
+    }
+  }
+  
+  double ttlAvgExpl = (sumExpl1/played1) + (sumExpl2/played2);
+
+  cout << "matches played " << played1 << " " << played2 << ", avg. expl1 = " 
+       << (sumExpl1/played1) << ", exp2 = " << (sumExpl2/played2) 
+       << ", ttlAvgExpl = " << ttlAvgExpl << endl;
+
+}
+
+void multi_match_old() { 
  
   // multiple matches; 50 for each combo: 
   //   combo1: p1type p1type 
@@ -332,7 +405,7 @@ int main(int argc, char ** argv)
   init();
   
   simgame = true; 
-  timeLimit = 1.0;
+  timeLimit = 30.0;
   string simtype = "";
 
   if (argc < 2)
