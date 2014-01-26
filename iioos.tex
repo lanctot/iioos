@@ -665,7 +665,7 @@ Players are not informed about how many attempts the opponent made before succee
 The game ends immediately if there is ever a connecting line of squares belonging to the same player. 
 The winner receives a payoff of $+1$, while the losing player receives $-1$. 
 
-\subsection{Head-to-Head Performance and Exploitability} 
+\subsection{Head-to-Head Performance versus Exploitability} 
 
 %Here are some first results for performance and/or exploitability analysis of the algorithms. 
 %Note that unless otherwise stated, memory is retained and not cleared between successive searches
@@ -676,14 +676,25 @@ The winner receives a payoff of $+1$, while the losing player receives $-1$.
 In perfect information online game-tree search, the standard metric used to evaluate performance 
 is head-to-head win rates. We measure this by simulating several games of each algorithm against the other
 and counting wins and losses. 
-However, when playing a game with a low low disambiguation 
-factor~\cite{Long10Understanding}, one where the hidden information is hardly revealed (such as Poker and Liar's Dice), 
+However, when playing a game with a 
+one where the size of the information sets do not shrink during the 
+game\footnote{Games with low {\it disambiguation factor}; see \cite{Long10Understanding}.} (such as Poker and Liar's Dice), 
 it may be critical to play in such a way that the opponent cannot easily infer the private information. Therefore, 
 we also measure exploitability of the resulting strategies. 
 
 In the offline setting, measuring exploitability is straight-forward: since the opponent strategy is fixed, the best 
-response values are computed by a recursive walk of the tree using expectimax. In online search, the algorithm 
-is defined 
+response values are computed by a recursive walk of the tree using expectimax. In online search, the algorithm computes only 
+a partial strategy. We propose two ways to determine the (eventual) exploitability of these strategies in the online search
+case. The \defword{full-stitching} method tries to capture as closely as possible the distributions that would have been computed 
+for each $I$ if they were reached in a match: it enumerates each $I \in \cI_i$ in topological order starting at the root, 
+running a search from $I$ re-using only those distributions computed in previous searches from ancestors of $I$, and saving 
+only the distribution computed at $I$. 
+We therefore do not save any future changes to ancestors of $I$ when searching $I$; this was necessary to ensure 
+a fair comparison between OOS and ISMCTS. This method is computationally intensive, requiring $|\cI|$ searches, so we also propose 
+a the \defword{multi-match} method, which simulates several matches between the algorithms saving the values from searches starting
+at information sets $I$ encountered along the matches, combining the values those $I$ which are encountered several times across the 
+matches. Any information sets that are not reached in the simulations play uniform random. 
+
 
 So far, the only variant of OOS implemented is IST with $(\epsilon, \delta) = (0.6, 0.9)$. 
 ISMCTS uses $C = 2$ and manual tuning shows that the value of $C$ does not 
@@ -789,7 +800,7 @@ OOS    & 1s & 0.795 & 0.766 & 1.561 \\
 ISMCTS & 5s &  &  &  \\
 OOS    & 5s &  &  &  \\
 \end{tabular}
-\caption{LD(1,1) exploitability using full-stitching method.}
+\caption{LD(1,1) exploitability using full-stitching method. \mlnote{5 second results will take 68 hours {\tt :)} currently running...}} 
 \end{center}
 \end{table}
 
