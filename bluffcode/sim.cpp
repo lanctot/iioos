@@ -293,7 +293,7 @@ void partial_stitch_matches() {
 
   sgiss1.copy(psGlobalISS, true); // allocate
 
-  int depthLimit = 3; 
+  int depthLimit = 4; 
   StopWatch stopwatch;
 
   InfosetStore finalISS1; 
