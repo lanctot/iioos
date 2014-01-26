@@ -12,7 +12,7 @@ int main(int argc, char ** argv)
   init();
   
   simgame = true; 
-  timeLimit = 1.0;
+  timeLimit = 5.0;
 
   if (argc < 2)
   {

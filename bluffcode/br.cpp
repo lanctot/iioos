@@ -14,6 +14,7 @@ static bool mccfrAvgFix = false;
 static bool cfrbr = false;
 static bool twofiles = false;
 static bool ismcts = false;
+static bool ismctsMix = false; 
 static InfosetStore * issPtr = &iss;
 
 bool uctbr = false;
@@ -30,9 +31,10 @@ extern InfosetStore issfull;
 InfosetStore briss2;
 extern SequenceStore seqstore;
 
+static StopWatch stopwatch;
+
 int br_stitchingPlayer = 0;
 int stitchedInfosets = 0;
-static StopWatch stopwatch;
 
 using namespace std; 
 
@@ -194,6 +196,9 @@ void getInfoset(unsigned long long & infosetkey, Infoset & is, GameState gs, uns
   
 double getMoveProbISMCTS(Infoset & is, int action, int actionshere) { 
   
+  // Note: when using MCTS cfr[i] is the total/accumulated reward
+  //       and totalMoveProbs[i] is the number of times it has been taken
+  
   int candidates[actionshere]; 
   int ua = 0; 
   double totalVisits = 0;
@@ -210,42 +215,53 @@ double getMoveProbISMCTS(Infoset & is, int action, int actionshere) {
     }
   }
 
-  if (ua == 0) { 
+  if (ua == actionshere) { 
     // MCTS has not searched this node yet, return default
     return (1.0 / static_cast<double>(actionshere)); 
   }
+ 
+  if (!ismctsMix) { 
+    // not mixing visit counts
+    // choose max valued action 
+    double maxval = -1000.0;
+    double tolerance = 0.0000001; 
+    ua = 0; 
+      
+    for (int i = 0; i < actionshere; i++) 
+    {
+      double val = (is.cfr[i] / is.totalMoveProbs[i]); 
+
+      if (val >= (maxval+tolerance)) {
+        // clear better choice
+        maxval = val; 
+        candidates[0] = i;
+        ua = 1; 
+      }
+      else if (val >= (maxval-tolerance) && val < (maxval+tolerance)) { 
+        // tie, add this as a candidate
+        candidates[ua] = i; 
+        ua++; 
+      }
+    }
+
+    assert(ua > 0);
+
+    // now, if the action is among the candidates, return 1/#candidates
+    // else return 0
+
+    for (int i = 0; i < ua; i++) { 
+      if (candidates[i] == action) 
+        return (1.0 / static_cast<double>(ua)); 
+    }
   
-  double maxval = -1000.0;
-  double tolerance = 0.0000001; 
-    
-  for (int i = 0; i < actionshere; i++) 
-  {
-    double val = (is.cfr[i] / is.totalMoveProbs[i]); 
-
-    if (val >= (maxval+tolerance)) {
-      // clear better choice
-      maxval = val; 
-      candidates[0] = i;
-      ua = 1; 
-    }
-    else if (val >= (maxval-tolerance) && val < (maxval+tolerance)) { 
-      // tie, add this as a candidate
-      candidates[ua] = i; 
-      ua++; 
-    }
+    // return 0 when not amongst the candidates
+    return 0.0;
+  }
+  else { 
+    // mix over visit counts
+    return (is.totalMoveProbs[action] / totalVisits);
   }
 
-  assert(ua > 0);
-
-  // now, if the action is among the candidates, return 1/#candidates
-  // else return 0
-
-  for (int i = 0; i < ua; i++) { 
-    if (candidates[i] == action) 
-      return (1.0 / static_cast<double>(ua)); 
-  }
-
-  return 0.0;
 }
 
 double getMoveProb(Infoset & is, int action, int actionshere)

@@ -693,8 +693,7 @@ We therefore do not save any future changes to ancestors of $I$ when searching $
 a fair comparison between OOS and ISMCTS. This method is computationally intensive, requiring $|\cI|$ searches, so we also propose 
 a the \defword{multi-match} method, which simulates several matches between the algorithms saving the values from searches starting
 at information sets $I$ encountered along the matches, combining the values those $I$ which are encountered several times across the 
-matches. Any information sets that are not reached in the simulations play uniform random. 
-
+matches. Any information sets that are not reached play uniform random. 
 
 So far, the only variant of OOS implemented is IST with $(\epsilon, \delta) = (0.6, 0.9)$. 
 ISMCTS uses $C = 2$ and manual tuning shows that the value of $C$ does not 
@@ -794,8 +793,8 @@ OOS    & 5s & 0.401 & 0.273 & 0.674 \\
 \begin{tabular}{ccccc}
 alg & time & exp(1) & exp(2) & total exp.\\
 \hline
-ISMCTS & 1s & 0.394 & 0.289 & 0.683 \\
-OOS    & 1s & 0.795 & 0.766 & 1.561 \\
+ISMCTS    & 1s & 0.795 & 0.766 & 1.561 \\
+OOS       & 1s & 0.394 & 0.289 & 0.683 \\
 \hline
 ISMCTS & 5s &  &  &  \\
 OOS    & 5s &  &  &  \\
