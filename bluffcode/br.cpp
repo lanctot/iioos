@@ -14,8 +14,8 @@ static bool mccfrAvgFix = false;
 static bool cfrbr = false;
 static bool twofiles = false;
 static bool ismcts = false;
-static bool ismctsMix = false; 
 static InfosetStore * issPtr = &iss;
+static bool ismctsMix = true; 
 
 bool uctbr = false;
 #if FSICFR

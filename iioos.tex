@@ -685,15 +685,14 @@ we also measure exploitability of the resulting strategies.
 In the offline setting, measuring exploitability is straight-forward: since the opponent strategy is fixed, the best 
 response values are computed by a recursive walk of the tree using expectimax. In online search, the algorithm computes only 
 a partial strategy. We propose two ways to determine the (eventual) exploitability of these strategies in the online search
-case. The \defword{full-stitching} method tries to capture as closely as possible the distributions that would have been computed 
+case. The \defword{full stitching} method tries to capture as closely as possible the distributions that would have been computed 
 for each $I$ if they were reached in a match: it enumerates each $I \in \cI_i$ in topological order starting at the root, 
 running a search from $I$ re-using only those distributions computed in previous searches from ancestors of $I$, and saving 
 only the distribution computed at $I$. 
 We therefore do not save any future changes to ancestors of $I$ when searching $I$; this was necessary to ensure 
 a fair comparison between OOS and ISMCTS. This method is computationally intensive, requiring $|\cI|$ searches, so we also propose 
-a the \defword{multi-match} method, which simulates several matches between the algorithms saving the values from searches starting
-at information sets $I$ encountered along the matches, combining the values those $I$ which are encountered several times across the 
-matches. Any information sets that are not reached play uniform random. 
+a the \defword{partial stitching} method which does the same as full stitching to a fixed depth from the root, except also 
+retains values from children information sets reached by the searches started along the frontier of the depth limit.
 
 So far, the only variant of OOS implemented is IST with $(\epsilon, \delta) = (0.6, 0.9)$. 
 ISMCTS uses $C = 2$ and manual tuning shows that the value of $C$ does not 
@@ -705,10 +704,6 @@ affect the performance much. Both ISMCTS and OOS win against random 75-85\% of t
 \hline
 Search time & Performance \\
 \hline
-% Before algorithm change
-%    1s      & OOS wins 59.10 $\pm$ 3.05\% of games \\
-%    5s      & OOS wins 54.70 $\pm$ 3.05\% of games \\
-%    25s     & OOS wins 54.80 $\pm$ 3.05\% of games \\
     1s      & OOS wins 61.20 $\pm$ 3.02\% of games \\
     5s      & OOS wins 58.60 $\pm$ 3.05\% of games \\
     25s     & OOS wins 55.30 $\pm$ 3.08\% of games \\
@@ -745,21 +740,26 @@ Search time & Performance OOS \\
 \end{center}
 \end{table}
 
-%There are several ways that the exploitability of the strategies produced by these search algorithms can be evaluated 
-%(in each case $X \in \{$ OOS, ISMCTS $\}$ and $B$ is some fixed benchmark strategy):
-%\begin{itemize}
-%\item The {\bf single-match method}. Runs algorithm $X$ vs $B$ for a single match.
-%      Then compute the exploitability of the strategy computed by $X$. 
-%\item The {\bf multi-match method}. Run the single-match method for $M$ matches and save each full strategy. Then, compute the 
-%      average strategy $\bar{\sigma}^M$ over all matches. Compute the exploitability of $\bar{\sigma}^M$.
-%\item The {\bf partial-stitching method}. For all $I \in \cI_1$: run the search algorithm $X$ starting at $I$ and starting with 
-%      empty strategy (nothing saved from previous match decisions). After each search, save the distribution $\bar{\sigma}(I)$ 
-%      computed by $X$ to a global ``stitched'' strategy $\bar{\sigma}'$. Compute the exploitability of $\bar{\sigma}'$.      
-%\item The {\bf full-stitching method}. For all $I \in \cI_1$: run a search at each $I'$ which is a predecessor of $I$ retaining
-%      memory. Then, run a search from $I$, starting with a strategy computed from these previous searches. 
-%      As in partial stitching, save the distribution computed at $I$ to a 
-%      globally stitched strategy $\bar{\sigma}'$ and compute the exploitability of the stitched strategy.
-%\end{itemize}
+% partial stitching (depth 2) 
+% 
+% ISMCTS max
+% depthLimit = 2, player type = 1, expl1 = 0.222222, expl2 = 0.666667, ttlexpl = 0.888889
+% depthLimit = 2, player type = 1, expl1 = 0.222222, expl2 = 0.666667, ttlexpl = 0.888889
+%
+% ISMCTS mix
+% depthLimit = 2, player type = 1, expl1 = 0.236124, expl2 = 0.589981, ttlexpl = 0.826105
+% depthLimit = 2, player type = 1, expl1 = 0.236395, expl2 = 0.594324, ttlexpl = 0.830719
+%
+% OOS 
+% depthLimit = 2, player type = 2, expl1 = 0.453416, expl2 = 0.611295, ttlexpl = 1.06471 
+% depthLimit = 2, player type = 2, expl1 = 0.61686, expl2 = 0.603736, ttlexpl = 1.2206
+%
+% 5 seconds
+% depthLimit = 2, player type = 2, expl1 = 0.571244, expl2 = 0.627698, ttlexpl = 1.19894
+%
+
+
+
 
 
 \begin{table}
@@ -767,30 +767,19 @@ Search time & Performance OOS \\
 \begin{tabular}{ccccc}
 alg         & time & exp(1) & exp(2) & total exp.\\
 \hline
-ISMCTS(max) & 1s   & 0.795 & 0.767 & 1.562 \\
-OOS         & 1s   & 0.629 & 0.453 & 1.082 \\
+ISMCTS(max) & 1s   & 0.222 & 0.666 & 0.889 \\
+ISMCTS(mix) & 1s   & 0.236 & 0.592 & 0.828 \\
+OOS         & 1s   & 0.530 & 0.608 & 1.138 \\
 \hline
-ISMCTS & 5s & 0.796 & 0.768 & 1.564 \\
-OOS    & 5s & 0.401 & 0.273 & 0.674 \\
+ISMCTS(max) & 5s   &       &       &       \\
+ISMCTS(mix) & 5s   &       &       &       \\
+OOS         & 5s   &       &       &       \\
 \end{tabular}
-\caption{LD(1,1) exploitability using single-match method averaged over a small number of matches (5 per data point).}
+\caption{LD(1,1) exploitability using partial stitching (depth 2).}
 \end{center}
 \end{table}
 
-% Full stitching, 1 second:  ./stitching scratch/iss.initial.dat 2 2 br 
-% OOS 
-%Done. v1 (br to fixed p2) = 0.288687
-%Done. v2 (br to fixed p1) = 0.394711
-% total = 0.683398
-%
-% ISMCTS
-% Done. v1 (br to fixed p2) = 0.795492
-% Done. v2 (br to fixed p1) = 0.765997
-% 
-
-%Done. v1 (br to fixed p2) = 0.562958
-%Done. v2 (br to fixed p1) = 0.249643
-
+\begin{comment}
 
 \begin{table}
 \begin{center}
@@ -808,6 +797,8 @@ OOS           & 5s   &        &        &  \\
 \caption{LD(1,1) exploitability using full-stitching method. \mlnote{5 second results will take 68 hours {\tt :)} currently running...}} 
 \end{center}
 \end{table}
+
+\end{comment}
 
 \subsection{Targeting, Incremental Tree-Building, and Resets}
 

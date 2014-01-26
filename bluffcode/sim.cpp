@@ -6,7 +6,6 @@
 #include "bluff.h"
 
 static InfosetStore psGlobalISS;  
-static InfosetStore psTailISS;  
 static int infosetsSearched = 0;
 
 
@@ -134,7 +133,8 @@ void multi_match() {
 }
 
 
-void partialstitch(GameState & match_gs, int player, int depth, unsigned long long bidseq, int stitchingPlayer, int depthLimit) {
+void partialstitch(GameState & match_gs, int player, int depth, unsigned long long bidseq, int stitchingPlayer, int depthLimit, 
+  InfosetStore * parentStore) {
   // at terminal node?
   if (terminal(match_gs)) {
     return;
@@ -147,14 +147,14 @@ void partialstitch(GameState & match_gs, int player, int depth, unsigned long lo
       {
         GameState new_match_gs = match_gs; 
         new_match_gs.p1roll = i; 
-        partialstitch(new_match_gs, player, depth, bidseq, stitchingPlayer, depthLimit); 
+        partialstitch(new_match_gs, player, depth, bidseq, stitchingPlayer, depthLimit, parentStore); 
       }
     }
     else {
       // bogus value
       GameState new_match_gs = match_gs; 
       new_match_gs.p1roll = 1;
-      partialstitch(new_match_gs, player, depth, bidseq, stitchingPlayer, depthLimit); 
+      partialstitch(new_match_gs, player, depth, bidseq, stitchingPlayer, depthLimit, parentStore); 
     }
 
     return;
@@ -168,13 +168,13 @@ void partialstitch(GameState & match_gs, int player, int depth, unsigned long lo
       {
         GameState new_match_gs = match_gs; 
         new_match_gs.p2roll = i; 
-        partialstitch(new_match_gs, player, depth, bidseq, stitchingPlayer, depthLimit); 
+        partialstitch(new_match_gs, player, depth, bidseq, stitchingPlayer, depthLimit, parentStore); 
       }
     }
     else { 
       GameState new_match_gs = match_gs; 
       new_match_gs.p2roll = 1;
-      partialstitch(new_match_gs, player, depth, bidseq, stitchingPlayer, depthLimit); 
+      partialstitch(new_match_gs, player, depth, bidseq, stitchingPlayer, depthLimit, parentStore); 
     }
 
     return;
@@ -206,12 +206,16 @@ void partialstitch(GameState & match_gs, int player, int depth, unsigned long lo
     infosetkey |= 1; 
   }
 
-  if (player == stitchingPlayer && depth <= depthLimit) { 
+  InfosetStore tmpStore; 
+
+  if (player == stitchingPlayer && depth < depthLimit) { 
+
+    parentStore->copy(tmpStore, true); 
 
     cout << "Starting stitch of infoset #" << infosetsSearched << " with key " << infosetkey << endl;
     
     // load this from the global one (will be uninitlizied when we get here)
-    bool succ = psGlobalISS.get(infosetkey, is, actionshere, 0); 
+    bool succ = tmpStore.get(infosetkey, is, actionshere, 0); 
     assert(succ); 
 
     sgiss1.clear();
@@ -219,10 +223,10 @@ void partialstitch(GameState & match_gs, int player, int depth, unsigned long lo
 
     // copy over to the searching ISS's
     if (player == 1) { 
-      psGlobalISS.copy(sgiss1, false);
+      tmpStore.copy(sgiss1, false);
     }
     else if (player == 2) {  
-      psGlobalISS.copy(sgiss2, false);
+      tmpStore.copy(sgiss2, false);
     }
 
     // need to set the searching player to know which infoset to load
@@ -232,6 +236,13 @@ void partialstitch(GameState & match_gs, int player, int depth, unsigned long lo
     // save it to the global one back
     
     psGlobalISS.put(infosetkey, resultIS, actionshere, 0); 
+
+    if (player == 1) { 
+      sgiss1.copy(tmpStore, false);
+    }
+    else if (player == 2) { 
+      sgiss2.copy(tmpStore, false);
+    }
       
     infosetsSearched++; 
     //double isPerSec = infosetsSearched / stopwatch.stop();
@@ -240,10 +251,10 @@ void partialstitch(GameState & match_gs, int player, int depth, unsigned long lo
     cout << "Infosets searched: " << infosetsSearched << endl; 
   }
   else if (player == stitchingPlayer && depth >= depthLimit) { 
-    cout << "Saving suffix infoset..." << endl; 
+    cout << "Saving suffix infoset, key = " << infosetkey << endl; 
 
     // simply get it from the searching one
-    bool succ = sgiss1.get(infosetkey, is, actionshere, 0); 
+    bool succ = parentStore->get(infosetkey, is, actionshere, 0); 
     assert(succ); 
     
     // and save it back to the 
@@ -257,7 +268,7 @@ void partialstitch(GameState & match_gs, int player, int depth, unsigned long lo
     // there is a valid action here
     action++;
     assert(action < actionshere);
-    
+
     unsigned long long newbidseq = bidseq;
 
     GameState new_match_gs = match_gs; 
@@ -266,17 +277,54 @@ void partialstitch(GameState & match_gs, int player, int depth, unsigned long lo
     new_match_gs.callingPlayer = player;
     newbidseq |= (1ULL << (BLUFFBID-i)); 
     
-    partialstitch(new_match_gs, 3-player, depth+1, newbidseq, stitchingPlayer, depthLimit); 
+    if (player == stitchingPlayer && depth < depthLimit)
+      partialstitch(new_match_gs, 3-player, depth+1, newbidseq, stitchingPlayer, depthLimit, &tmpStore); 
+    else
+      partialstitch(new_match_gs, 3-player, depth+1, newbidseq, stitchingPlayer, depthLimit, parentStore); 
     
-    //iss.put(infosetkey, is, actionshere, 0); 
   }
 
   return;
 }
 
 void partial_stitch_matches() { 
+
+  assert(p1type == p2type); 
+
   sgiss1.copy(psGlobalISS, true); // allocate
-  sgiss1.copy(psTailISS, true);   // allocate
+
+  int depthLimit = 3; 
+  StopWatch stopwatch;
+
+  InfosetStore finalISS1; 
+  InfosetStore finalISS2; 
+    
+  GameState match_gs1; 
+  unsigned long long bidseq = 0; 
+
+  cout << "Starting stitch for player 1!" << endl; 
+  partialstitch(match_gs1, 1, 0, bidseq, 1, depthLimit, &psGlobalISS);
+
+  psGlobalISS.copy(finalISS1, true); // allocate
+  psGlobalISS.clear(); 
+  
+  GameState match_gs2;
+  bidseq = 0; 
+
+  cout << "Starting stitch for player 2!" << endl; 
+  partialstitch(match_gs2, 1, 0, bidseq, 2, depthLimit, &psGlobalISS);
+  
+  psGlobalISS.copy(finalISS2, true); // allocate
+  psGlobalISS.clear(); 
+
+  cout << "Done stitching; seconds taken: " << stopwatch.stop() << endl;
+  
+  double expl1 = searchComputeHalfBR(1, &finalISS1, p1type == PLYR_MCTS);
+  double expl2 = searchComputeHalfBR(2, &finalISS2, p2type == PLYR_MCTS);
+  double ttlexpl = expl1 + expl2; 
+
+  cout << "depthLimit = " << depthLimit << ", player type = " << p1type << ", expl1 = " << expl1 
+       << ", expl2 = " << expl2 << ", ttlexpl = " << ttlexpl << endl;
 }
 
 int main(int argc, char ** argv)
