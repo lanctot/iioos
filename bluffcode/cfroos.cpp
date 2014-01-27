@@ -11,7 +11,7 @@ static string runname = "";
 
 static int expansions = 0; 
 
-static double oos_delta = 0.5; 
+static double oos_delta = 0.9; 
 static double oos_epsilon = 0.6;
 
 // 1 = IST
