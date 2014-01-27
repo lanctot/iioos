@@ -140,7 +140,7 @@ int getMove(int player, GameState gs, unsigned long long bidseq, Infoset & is)
   int ptype = (player == 1 ? p1type : p2type); 
 
   sg_curPlayer = player;
-  randMixRM = 0.01;
+  randMixRM = 0.001;
 
   switch(ptype)
   {
@@ -225,6 +225,9 @@ double simloop(InfosetStore * saveISS1, InfosetStore * saveISS2)
   bidseq = 0; 
   int player = 1; 
   double p1prob, p2prob;
+
+  bool firstmove1 = true;
+  bool firstmove2 = true;
     
   sampleChanceEvent(1, gs.p1roll, p1prob);
   sampleChanceEvent(2, gs.p2roll, p2prob);
@@ -246,11 +249,40 @@ double simloop(InfosetStore * saveISS1, InfosetStore * saveISS2)
     // add to the collected infosets if necessary
     if (sg_curPlayer == 1 && saveISS1 != NULL) {       
       GameState ngs = gs; 
-      saveMeAndTheChildren(ngs, player, 0, bidseq, saveISS1);
+      
+      //double expl1 = searchComputeHalfBR(1, saveISS1, false);
+      //cout << "expl1 before saving children " << expl1 << endl;
+      
+      //double sgexpl1 = searchComputeHalfBR(1, &sgiss1, false);
+      //cout << "sgexpl1 before saving children " << sgexpl1 << endl;
+
+      if (firstmove1) { 
+        sgiss1.copy(*saveISS1, false); 
+        firstmove1 = false; 
+      }
+      else {
+        saveMeAndTheChildren(ngs, player, 0, bidseq, saveISS1);
+      }
+      
+      //expl1 = searchComputeHalfBR(1, saveISS1, false);
+      //cout << "expl1 after saving children " << expl1 << endl;
     }
     if (sg_curPlayer == 2 && saveISS2 != NULL) { 
       GameState ngs = gs; 
-      saveMeAndTheChildren(ngs, player, 0, bidseq, saveISS2);
+      
+      //double expl2 = searchComputeHalfBR(2, saveISS2, false);
+      //cout << "expl2 before saving children " << expl2 << endl;
+
+      if (firstmove2) { 
+        sgiss2.copy(*saveISS2, false); 
+        firstmove2 = false;
+      }
+      else { 
+        saveMeAndTheChildren(ngs, player, 0, bidseq, saveISS2);
+      }
+      
+      //expl2 = searchComputeHalfBR(2, saveISS1, false); 
+      //cout << "expl2 after saving children " << expl2 << endl;
     }
 
     if (move < BLUFFBID) {

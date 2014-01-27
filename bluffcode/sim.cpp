@@ -28,7 +28,7 @@ void single_match() {
 
 void multi_match() { 
 
-  int matches = 3;
+  int matches = 1;
   double sumExpl1 = 0;
   double sumExpl2 = 0;
   double played1 = 0;
@@ -52,18 +52,19 @@ void multi_match() {
   
   StopWatch sw;
 
-  for (int scenario = 1; scenario <= 6; scenario++) { 
+  //for (int scenario = 1; scenario <= 6; scenario++) { 
 
-    if      (scenario == 1) { p1type = testType; p2type = PLYR_RANDOM; }
+    /*if      (scenario == 1) { p1type = testType; p2type = PLYR_RANDOM; }
     else if (scenario == 2) { p1type = testType; p2type = PLYR_MCTS; }
     else if (scenario == 3) { p1type = testType; p2type = PLYR_OOS; }
     else if (scenario == 4) { p1type = PLYR_RANDOM; p2type = testType; }
     else if (scenario == 5) { p1type = PLYR_MCTS; p2type = testType; }
-    else if (scenario == 6) { p1type = PLYR_OOS; p2type = testType; }
+    else if (scenario == 6) { p1type = PLYR_OOS; p2type = testType; }*/
 
     for (int match = 1; match <= matches; match++) {
       cout << endl;
-      cout << "Starting scenario " << scenario << ", match " << match << endl;
+      cout << "Starting mtch " << match << endl;
+      //cout << "Starting scenario " << scenario << ", match " << match << endl;
 
       sgiss1.clear();
       sgiss2.clear(); 
@@ -72,20 +73,17 @@ void multi_match() {
 
       simloop(&matchISS1, &matchISS2);
    
-      if (scenario <= 3) {
-        sumExpl1 += searchComputeHalfBR(1, &matchISS1, p1type == PLYR_MCTS);
-        played1++;
-      }
-      else {
-        sumExpl2 += searchComputeHalfBR(2, &matchISS2, p2type == PLYR_MCTS); 
-        played2++;
-      }
+      sumExpl1 += searchComputeHalfBR(1, &matchISS1, p1type == PLYR_MCTS);
+      played1++;
+
+      sumExpl2 += searchComputeHalfBR(2, &matchISS2, p2type == PLYR_MCTS); 
+      played2++;
 
       double gamesPerSec = (played1+played2) / sw.stop(); 
       double timeRemaining = (6*matches - (played1+played2)) / gamesPerSec;
       cout << "Remaining seconds: " << timeRemaining << endl;
     }
-  }
+  //}
   
   double ttlAvgExpl = (sumExpl1/played1) + (sumExpl2/played2);
 
@@ -283,7 +281,13 @@ void partialstitch(GameState & match_gs, int player, int depth, unsigned long lo
 
   if (player == stitchingPlayer && depth < depthLimit) { 
 
-    parentStore->copy(tmpStore, true); 
+    sgiss1.clear();
+    sgiss2.clear();
+
+    if (parentStore == NULL)
+      sgiss1.copy(tmpStore, true);
+    else
+      parentStore->copy(tmpStore, true); 
 
     cout << "Starting stitch of infoset #" << infosetsSearched << " with key " << infosetkey << endl;
     
@@ -291,8 +295,6 @@ void partialstitch(GameState & match_gs, int player, int depth, unsigned long lo
     bool succ = tmpStore.get(infosetkey, is, actionshere, 0); 
     assert(succ); 
 
-    sgiss1.clear();
-    sgiss2.clear();
 
     // copy over to the searching ISS's
     if (player == 1) { 
@@ -307,7 +309,6 @@ void partialstitch(GameState & match_gs, int player, int depth, unsigned long lo
     int move = getMove(player, match_gs, bidseq, resultIS);
 
     // save it to the global one back
-    
     psGlobalISS.put(infosetkey, resultIS, actionshere, 0); 
 
     if (player == 1) { 
@@ -366,7 +367,7 @@ void partial_stitch_matches() {
 
   sgiss1.copy(psGlobalISS, true); // allocate
 
-  int depthLimit = 4; 
+  int depthLimit = 2; 
   StopWatch stopwatch;
 
   InfosetStore finalISS1; 
@@ -376,7 +377,7 @@ void partial_stitch_matches() {
   unsigned long long bidseq = 0; 
 
   cout << "Starting stitch for player 1!" << endl; 
-  partialstitch(match_gs1, 1, 0, bidseq, 1, depthLimit, &psGlobalISS);
+  partialstitch(match_gs1, 1, 0, bidseq, 1, depthLimit, NULL);
 
   psGlobalISS.copy(finalISS1, true); // allocate
   psGlobalISS.clear(); 
@@ -385,7 +386,7 @@ void partial_stitch_matches() {
   bidseq = 0; 
 
   cout << "Starting stitch for player 2!" << endl; 
-  partialstitch(match_gs2, 1, 0, bidseq, 2, depthLimit, &psGlobalISS);
+  partialstitch(match_gs2, 1, 0, bidseq, 2, depthLimit, NULL);
   
   psGlobalISS.copy(finalISS2, true); // allocate
   psGlobalISS.clear(); 
@@ -405,7 +406,7 @@ int main(int argc, char ** argv)
   init();
   
   simgame = true; 
-  timeLimit = 30.0;
+  timeLimit = 1.0;
   string simtype = "";
 
   if (argc < 2)

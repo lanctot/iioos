@@ -88,6 +88,7 @@ int whowon(int bid, int bidder, int callingPlayer, int p1roll, int p2roll, int &
 void init();
 double getChanceProb(int player, int outcome); 
 void convertbid(int & dice, int & face, int bid);
+std::string bidtostring(int bid); // actual bid 1-13
 int countMatchingDice(const GameState & gs, int player, int face);
 void getRoll(int * roll, int chanceOutcome, int player);  // currently array must be size 3 (may contain 0s)
 int numChanceOutcomes(int player);

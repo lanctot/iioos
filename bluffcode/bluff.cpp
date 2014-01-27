@@ -39,6 +39,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <set>
+#include <sstream>
 
 #include "bluff.h"
 #include "infosetstore.h"
@@ -127,7 +128,7 @@ InfosetStore fsiss1;
 InfosetStore fsiss2; 
 
 // the amount of randomness to add to RM 
-double randMixRM = 0.01;
+double randMixRM = 0.001;
 
 // key is roll, value is # of time it shows up. Used only when determining chance outcomes
 map<int,int> outcomes; 
@@ -504,6 +505,22 @@ void newInfoset(Infoset & is, int actions)
 bool terminal(GameState & gs)
 {
   return (gs.curbid == BLUFFBID); 
+}
+
+string bidtostring(int bid) {
+  if (bid == BLUFFBID) 
+    return "(bluff)"; 
+  else { 
+    int quantity = 0;
+    int face = 0;
+    convertbid(quantity, face, bid);
+
+    ostringstream oss; 
+    oss << " (" << quantity << "-" << face << ")"; 
+    return oss.str();
+  }
+
+  return "";
 }
 
 // a bid is from 1 to 12, for example

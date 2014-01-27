@@ -712,19 +712,19 @@ void InfosetStore::clear()
       for (unsigned long long a = 0; a < actionshere; a++) 
       {
         // cfr
-        assert(row < rows);
-        assert(col < curRowSize); 
-
+        assert(row < rows); assert(col < curRowSize); assert(pos < size); 
         tablerows[row][col] = 0.0;
       
         next(row, col, pos, curRowSize);
         // total move probs
         
+        assert(row < rows); assert(col < curRowSize); assert(pos < size); 
         tablerows[row][col] = 0.0;
 
         next(row, col, pos, curRowSize);
         // next ADA
         
+        assert(row < rows); assert(col < curRowSize); assert(pos < size); 
         tablerows[row][col] = 0.0;
         
         next(row, col, pos, curRowSize);

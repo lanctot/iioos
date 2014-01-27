@@ -8,6 +8,7 @@
 using namespace std; 
 
 static string runname = "";
+static double totaltime = 0;
 
 static int expansions = 0; 
 
@@ -63,6 +64,22 @@ double pbos(GameState & gs, int player, int depth, unsigned long long bidseq,
 
   // get the info set
   getInfoset(gs, player, bidseq, is, infosetkey, actionshere);
+
+  if (depth == 2 && totaltime > 14.0) { 
+    cout << "START" << endl;
+    cout << "player = " << player << " roll = " << (player == 1 ? gs.p1roll : gs.p2roll) << endl;
+
+    double den = 0;
+    for (int a = 0; a < actionshere; a++) 
+      den += is.totalMoveProbs[a];
+    
+    for (int a = 0; a < actionshere; a++) {
+      int bid = gs.curbid + 1 + a;
+      cout << "final prob " << bidtostring(bid) << " is " << (is.totalMoveProbs[a] / den) << endl;
+    }
+
+    cout << "END" << endl;
+  }
 
   // this is the incremental tree-building part
   
@@ -217,7 +234,6 @@ int main(int argc, char ** argv)
 
   unsigned long long bidseq = 0; 
     
-  double totaltime = 0; 
   StopWatch stopwatch;
 
   for (; true; iter++)

@@ -744,20 +744,23 @@ Search time & Performance OOS \\
 \end{center}
 \end{table}
 
-% multi-match method - 1 second
-%
-% ISMCTS(max)
+% fair single match 1s
+% ISMCTS: matches played 9 9, avg. expl1 = 0.653978, exp2 = 0.800351, ttlAvgExpl = 1.45433
+% OOS matches played 1 1, avg. expl1 = 0.411507, exp2 = 0.680676, ttlAvgExpl = 1.09218
 % 
-% ISMCTS(mix)
-% matches played 15 15, avg. expl1 = 0.697268, exp2 = 0.799991, ttlAvgExpl = 1.49726
+% fair single match 5s
+% ISMCTS matches played 1 1, avg. expl1 = 0.681294, exp2 = 0.795492, ttlAvgExpl = 1.47679
+
+% partial stitching 1s
+% ISMCTS depthLimit = 2, player type = 1, expl1 = 0.236209, expl2 = 0.579107, ttlexpl = 0.815316
+% OOS depthLimit = 2, player type = 2, expl1 = 0.586164, expl2 = 0.499334, ttlexpl = 1.0855
+% OOS depthLimit = 3, player type = 2, expl1 = 0.470872, expl2 = 0.615558, ttlexpl = 1.08643
 %
-% OOS 
-% matches played 30 30, avg. expl1 = 0.383926, exp2 = 0.625234, ttlAvgExpl = 1.00916
+% partial stitching 5s
+% OSS depthLimit = 2, player type = 2, expl1 = 0.601451, expl2 = 0.583998, ttlexpl = 1.18545
+%
 %
 
-% multi-match method - 5 seconds
-% ISMCTS(max)
-% matches played 30 30, avg. expl1 = 0.687672, exp2 = 0.800723, ttlAvgExpl = 1.48839
 
 
 \begin{table}
@@ -779,6 +782,10 @@ OOS         & 25s   &       &       &       \\
 \end{center}
 \end{table}
 
+% Full stitching 1 second ISMCTS
+%Done. v1 (br to fixed p2) = 0.573817
+%Done. v2 (br to fixed p1) = 0.234504
+
 
 \begin{table}
 \begin{center}
@@ -786,7 +793,7 @@ OOS         & 25s   &       &       &       \\
 alg            & time & exp(1) & exp(2) & total exp.\\
 \hline
 ISMCTS(max)   & 1s   &        &        &       \\
-ISMCTS(mix)   & 1s   &        &        &       \\
+ISMCTS(mix)   & 1s   & 0.235  & 0.574  & 0.808 \\
 OOS           & 1s   &        &        &       \\
 \hline
 ISMCTS(max)   & 5s   &        &        &       \\
