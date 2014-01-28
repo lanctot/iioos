@@ -8,6 +8,7 @@
 static InfosetStore psGlobalISS;  
 static int infosetsSearched = 0;
 
+static int runMatches = 0;
 
 using namespace std; 
 
@@ -203,6 +204,31 @@ void multi_match_old() {
        << endl;
 }
 
+void multi_aggregate() { 
+  InfosetStore averageISS1; // iss for player type 1 
+  InfosetStore averageISS2; // iss for player type 2
+
+  sgiss1.copy(averageISS1, true); // allocate
+  sgiss2.copy(averageISS2, true); // allocate
+
+  StopWatch sw;
+    
+  for (int sim = 0; sim < runMatches; sim++) { 
+    cout << "Starting match " << sim << endl;
+    sgiss1.clear();
+    sgiss2.clear();
+    simloop(&averageISS1, &averageISS2);
+
+    double simsPerSec = (sim+1) / sw.stop();
+    double remTime = (runMatches - (sim+1)) / simsPerSec; 
+    cout << "Remaining time: " << remTime << endl << endl;
+  }
+  
+  double expl1 = searchComputeHalfBR(1, &averageISS1, p1type == PLYR_MCTS);
+  double expl2 = searchComputeHalfBR(2, &averageISS2, p2type == PLYR_MCTS);
+  
+  cout << "Exploitabilities: " << expl1 << " " << expl2 << " " << (expl1+expl2) << endl;
+}
 
 void partialstitch(GameState & match_gs, int player, int depth, unsigned long long bidseq, int stitchingPlayer, int depthLimit, 
   InfosetStore * parentStore) {
@@ -417,7 +443,7 @@ int main(int argc, char ** argv)
   else 
   { 
     if (argc < 6) { 
-      cout << "Usage: sim isfile1 isfile2 ptype1 ptype2 [single|multimatch|partstitch]" << endl;
+      cout << "Usage: sim isfile1 isfile2 ptype1 ptype2 [single|multimatch|partstitch|agg] runmatches" << endl;
       exit(-1);
     }
 
@@ -433,6 +459,9 @@ int main(int argc, char ** argv)
     p2type = to_int(argv[4]);   
 
     simtype = argv[5]; 
+
+    if (simtype == "agg")
+      runMatches = to_int(argv[6]); 
   }  
 
   if (simtype == "single") 
@@ -441,9 +470,11 @@ int main(int argc, char ** argv)
     multi_match();
   else if (simtype == "partstitch")
     partial_stitch_matches();
+  else if (simtype == "agg")
+    multi_aggregate();
   else { 
     cout << "Unknown simulation type!" << endl;
-    cout << "Usage: sim isfile1 isfile2 ptype1 ptype2 [single|multi|partstitch]" << endl;
+    cout << "Usage: sim isfile1 isfile2 ptype1 ptype2 [single|multi|partstitch|agg] runmatches" << endl;
     exit(-1);
   }
 
