@@ -370,6 +370,12 @@ double simloop(InfosetStore * saveISS1, InfosetStore * saveISS2)
       //saveISS2->add(infosetkey, is, actionshere, 0); 
     }
 
+    // Explore the space; 
+    double roll = drand48(); 
+    if (roll < 0.5) { 
+      move = gs.curbid+1+static_cast<int>(drand48()*actionshere);
+    }
+
     if (move < BLUFFBID) {
       int quantity = 0;
       int face = 0;
