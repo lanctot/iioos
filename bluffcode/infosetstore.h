@@ -45,7 +45,7 @@ class InfosetStore
 
   bool get_priv(unsigned long long infoset_key, Infoset & infoset, int moves, int firstmove); 
   void put_priv(unsigned long long infoset_key, Infoset & infoset, int moves, int firstmove); 
-  void add_priv(unsigned long long infoset_key, Infoset & infoset, int moves, int firstmove); 
+  void add_priv(unsigned long long infoset_key, Infoset & infoset, int moves, int firstmove, double factor); 
 
   void next(unsigned long long & row, unsigned long long & col, unsigned long long & pos, unsigned long long & curRowSize); 
 
@@ -98,7 +98,7 @@ public:
 
   bool get(unsigned long long infoset_key, Infoset & infoset, int moves, int firstmove); 
   void put(unsigned long long infoset_key, Infoset & infoset, int moves, int firstmove); 
-  void add(unsigned long long infoset_key, Infoset & infoset, int moves, int firstmove); 
+  void add(unsigned long long infoset_key, Infoset & infoset, int moves, int firstmove, double factor); 
 
   void writeBytes(std::ofstream & out, void * addr, unsigned int num);  
   void readBytes(std::ifstream & in, void * addr, unsigned int num); 

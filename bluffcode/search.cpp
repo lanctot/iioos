@@ -193,7 +193,7 @@ void saveMeAndTheChildren(GameState & match_gs, int player, int depth, unsigned 
   bool succ = myloadISS.get(infosetkey, is, actionshere, 0); 
   assert(succ); 
 
-  issPtr->add(infosetkey, is, actionshere, 0);
+  issPtr->add(infosetkey, is, actionshere, 0, 0.1);
   //issPtr->put(infosetkey, is, actionshere, 0);
 
   // iterate over the actions
@@ -282,7 +282,7 @@ void saveEverything(GameState & match_gs, int player, int depth, unsigned long l
   bool succ = myloadISS.get(infosetkey, is, actionshere, 0); 
   assert(succ); 
 
-  issPtr->add(infosetkey, is, actionshere, 0);
+  issPtr->add(infosetkey, is, actionshere, 0, 0.1);
   //issPtr->put(infosetkey, is, actionshere, 0);
 
   // iterate over the actions
@@ -341,14 +341,16 @@ double simloop(InfosetStore * saveISS1, InfosetStore * saveISS2)
       
       if (firstmove1) { 
         //sgiss1.copy(*saveISS1, false);
-        GameState newgs;
-        unsigned long long newbidseq = 0;
-        saveEverything(newgs, 1, 0, newbidseq, saveISS1);
+        saveISS1->add(infosetkey, is, actionshere, 0, 1.0);
+        //GameState newgs;
+        //unsigned long long newbidseq = 0;
+        //saveEverything(newgs, 1, 0, newbidseq, saveISS1);
         firstmove1 = false; 
       }
       else {
-        GameState ngs = gs; 
-        saveMeAndTheChildren(ngs, player, 0, bidseq, saveISS1);
+        saveISS1->add(infosetkey, is, actionshere, 0, 1.0);
+        //GameState ngs = gs; 
+        //saveMeAndTheChildren(ngs, player, 0, bidseq, saveISS1);
       }
 
       //saveISS1->add(infosetkey, is, actionshere, 0); 
@@ -357,14 +359,17 @@ double simloop(InfosetStore * saveISS1, InfosetStore * saveISS2)
       
       if (firstmove2) { 
         //sgiss2.copy(*saveISS2, false); 
-        GameState newgs;
-        unsigned long long newbidseq = 0;
-        saveEverything(newgs, 1, 0, newbidseq, saveISS2);
+        saveISS2->add(infosetkey, is, actionshere, 0, 1.0);
+        //GameState newgs;
+        //unsigned long long newbidseq = 0;
+        //saveEverything(newgs, 1, 0, newbidseq, saveISS2);
         firstmove2 = false;
       }
       else { 
-        GameState ngs = gs; 
-        saveMeAndTheChildren(ngs, player, 0, bidseq, saveISS2);
+        saveISS2->add(infosetkey, is, actionshere, 0, 1.0);
+        
+        //GameState ngs = gs; 
+        //saveMeAndTheChildren(ngs, player, 0, bidseq, saveISS2);
       }      
 
       //saveISS2->add(infosetkey, is, actionshere, 0); 

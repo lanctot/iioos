@@ -123,9 +123,9 @@ void InfosetStore::put(unsigned long long infoset_key, Infoset & infoset, int mo
   put_priv(infoset_key, infoset, moves, firstmove);
 }
 
-void InfosetStore::add(unsigned long long infoset_key, Infoset & infoset, int moves, int firstmove)
+void InfosetStore::add(unsigned long long infoset_key, Infoset & infoset, int moves, int firstmove, double factor)
 {
-  add_priv(infoset_key, infoset, moves, firstmove);
+  add_priv(infoset_key, infoset, moves, firstmove, factor);
 }
 
 
@@ -484,7 +484,7 @@ void InfosetStore::put_priv(unsigned long long infoset_key, Infoset & infoset, i
   }
 }
 
-void InfosetStore::add_priv(unsigned long long infoset_key, Infoset & infoset, int moves, int firstmove)
+void InfosetStore::add_priv(unsigned long long infoset_key, Infoset & infoset, int moves, int firstmove, double factor)
 {
   unsigned long long row, col, pos, curRowSize;
 
@@ -603,7 +603,7 @@ void InfosetStore::add_priv(unsigned long long infoset_key, Infoset & infoset, i
     assert(row < rows);
     assert(col < curRowSize); 
     assert(pos < size); 
-    tablerows[row][col] += infoset.totalMoveProbs[m];
+    tablerows[row][col] += factor*infoset.totalMoveProbs[m];
 
     next(row, col, pos, curRowSize); 
     
