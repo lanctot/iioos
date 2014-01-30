@@ -460,8 +460,10 @@ int main(int argc, char ** argv)
 
     simtype = argv[5]; 
 
-    if (simtype == "agg")
+    if (simtype == "agg") {
       runMatches = to_int(argv[6]); 
+      timeLimit = to_double(argv[7]); 
+    }
   }  
 
   if (simtype == "single") 
@@ -474,7 +476,7 @@ int main(int argc, char ** argv)
     multi_aggregate();
   else { 
     cout << "Unknown simulation type!" << endl;
-    cout << "Usage: sim isfile1 isfile2 ptype1 ptype2 [single|multi|partstitch|agg] runmatches" << endl;
+    cout << "Usage: sim isfile1 isfile2 ptype1 ptype2 [single|multi|partstitch|agg] runmatches timelimit" << endl;
     exit(-1);
   }
 
