@@ -710,9 +710,13 @@ affect the performance much. Both ISMCTS and OOS win against random 75-85\% of t
 \hline
 Search time & Performance \\
 \hline
-    1s      & OOS wins 61.20 $\pm$ 3.02\% of games \\
-    5s      & OOS wins 58.60 $\pm$ 3.05\% of games \\
-    25s     & OOS wins 55.30 $\pm$ 3.08\% of games \\
+    1s      & IST wins 61.20 $\pm$ 3.02\% of games \\
+    5s      & IST wins 58.60 $\pm$ 3.05\% of games \\
+\hline
+    1s      & PST wins 48.40 $\pm$ 4.38\% of games \\
+    5s      & PST wins 48.75 $\pm$ 4.90\% of games \\
+\hline
+    25s     & IST wins 55.30 $\pm$ 3.08\% of games \\
 \hline
 \end{tabular}
 \caption{Head-to-head performance: OOS vs. ISMCTS.}
@@ -737,9 +741,9 @@ Search time & Performance ISMCTS \\
 \hline
 Search time & Performance OOS \\
 \hline
-    1s      & OOS wins 45.35 $\pm$ 2.08\% of games \\
-    5s      & OOS wins 49.20 $\pm$ 3.10\% of games \\
-    25s     & OOS wins 49.20 $\pm$ 3.10\% of games \\
+    1s      & IST wins 45.35 $\pm$ 2.08\% of games \\
+    5s      & IST wins 49.20 $\pm$ 3.10\% of games \\
+    25s     & IST wins 49.20 $\pm$ 3.10\% of games \\
 \hline
 \end{tabular}
 \caption{Head-to-head performance: ISMCTS and OOS vs. a $0.001$-equilibrium. }
@@ -771,17 +775,20 @@ Search time & Performance OOS \\
 alg         & time & exp(1) & exp(2) & total exp.\\
 \hline
 ISMCTS(mix) & 1s   & 0.23  & 0.58  & 0.81 \\
-OOS         & 1s   & 0.32  & 0.44  & 0.76 \\
+IST         & 1s   & 0.32  & 0.44  & 0.76 \\
+PST         & 1s   & 0.16  & 0.47  & 0.63 \\
 \hline
 ISMCTS(mix) & 5s   & 0.23  & 0.57  & 0.80  \\
-OOS         & 5s   & 0.17  & 0.29  & 0.46  \\
+IST         & 5s   & 0.17  & 0.29  & 0.46  \\
+PST         & 5s   & 0.10  & 0.25  & 0.35  \\  
 %\hline
 %OOS         & 10s  & 0.15  & 0.23  & 0.38  \\
 \hline
 ISMCTS(mix) & 25s   &       &       &       \\
-OOS         & 25s   &       &       &       \\
+IST         & 25s   &       &       &       \\
+PST         & 25s   &       &       &       \\
 \end{tabular}
-\caption{LD(1,1) exploitability using aggregate multi-match method.}
+\caption{LD(1,1) exploitability using aggregate multi-match method. }
 \end{center}
 \end{table}
 
@@ -798,6 +805,11 @@ OOS         & 25s   &       &       &       \\
 % OOS
 % Done. v1 (br to fixed p2) = 0.228946
 % Done. v2 (br to fixed p1) = 0.295227
+%
+% ISMCTS
+% Done. v1 (br to fixed p2) = 0.548373
+% Done. v2 (br to fixed p1) = 0.251125
+% 
 
 
 \begin{table}
@@ -805,15 +817,13 @@ OOS         & 25s   &       &       &       \\
 \begin{tabular}{ccccc}
 alg            & time & exp(1) & exp(2) & total exp.\\
 \hline
-ISMCTS(max)   & 1s   &        &        &       \\
 ISMCTS(mix)   & 1s   & 0.235  & 0.574  & 0.808 \\
-OOS           & 1s   & 0.337  & 0.311  & 0.648 \\
+IST           & 1s   & 0.337  & 0.311  & 0.648 \\
 \hline
-ISMCTS(max)   & 5s   &        &        &       \\
-ISMCTS(mix)   & 5s   &        &        &       \\
-OOS           & 5s   & 0.229  & 0.295  & 0.524 \\
+ISMCTS(mix)   & 5s   & 0.251  & 0.548  & 0.799 \\
+IST           & 5s   & 0.229  & 0.295  & 0.524 \\
 \end{tabular}
-\caption{LD(1,1) exploitability using full-stitching method. \mlnote{5 second strategies are now generated. Results coming soon.}} 
+\caption{LD(1,1) exploitability using full-stitching method. \mlnote{I am now generating strategies for PST; results should be in soon.}} 
 \end{center}
 \end{table}
 
