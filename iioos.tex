@@ -692,11 +692,13 @@ computed at $I$, and passing down the state of memory only for children of $I$.
 We therefore do not save any changes made to ancestors when searching $I$; this was necessary to ensure 
 a fair comparison between OOS and ISMCTS. 
 This method is computationally intensive, requiring $|\cI|$ searches, so we also propose 
-two other methods: a the \defword{partial stitching} method which does the same as full stitching to a fixed depth from the root, except also 
-retains values from children information sets reached by the searches started along the frontier of the depth limit.
+another methods to approximate the exploitability for very large games: the multi-match \defword{aggregation method}: 
+\mlnote{explain the method}.
+%a the \defword{partial stitching} method which does the same as full stitching to a fixed depth from the root, except also 
+%retains values from children information sets reached by the searches started along the frontier of the depth limit.
 % Probably will ditch this single-match method when partial stitching is working.
-And the \defword{single-match} method: this simply runs several matches and saves all values from each $I$ searched (as well as all of its reachable
-children information sets) search, overwriting previously saved values as necessary. 
+%And the \defword{single-match} method: this simply runs several matches and saves all values from each $I$ searched (as well as all of its reachable
+%children information sets) search, overwriting previously saved values as necessary. 
 
 So far, the only variant of OOS implemented is IST with $(\epsilon, \delta) = (0.6, 0.9)$. 
 ISMCTS uses $C = 2$ and manual tuning shows that the value of $C$ does not 
@@ -768,27 +770,36 @@ Search time & Performance OOS \\
 \begin{tabular}{ccccc}
 alg         & time & exp(1) & exp(2) & total exp.\\
 \hline
-ISMCTS(max) & 1s   &  &  &  \\
-ISMCTS(mix) & 1s   &  &  &  \\
-OOS         & 1s   &  &  &  \\
+ISMCTS(mix) & 1s   & 0.23  & 0.58  & 0.81 \\
+OOS         & 1s   & 0.32  & 0.44  & 0.76 \\
 \hline
-ISMCTS(mix) & 5s   &       &       &       \\
-OOS         & 5s   &       &       &       \\
+ISMCTS(mix) & 5s   & 0.23  & 0.57  & 0.80  \\
+OOS         & 5s   & 0.17  & 0.29  & 0.46  \\
+%\hline
+%OOS         & 10s  & 0.15  & 0.23  & 0.38  \\
 \hline
 ISMCTS(mix) & 25s   &       &       &       \\
 OOS         & 25s   &       &       &       \\
 \end{tabular}
-\caption{LD(1,1) exploitability using single-match method.}
+\caption{LD(1,1) exploitability using aggregate multi-match method.}
 \end{center}
 \end{table}
 
 % Full stitching 1 second ISMCTS
-%Done. v1 (br to fixed p2) = 0.573817
-%Done. v2 (br to fixed p1) = 0.234504
-
+% Done. v1 (br to fixed p2) = 0.573817
+% Done. v2 (br to fixed p1) = 0.234504
+%
+% OOS
 % Done. v1 (br to fixed p2) = 0.310557
 % Done. v2 (br to fixed p1) = 0.33718
- 
+
+% Full stitching 5 sec 
+%
+% OOS
+% Done. v1 (br to fixed p2) = 0.228946
+% Done. v2 (br to fixed p1) = 0.295227
+
+
 \begin{table}
 \begin{center}
 \begin{tabular}{ccccc}
@@ -800,9 +811,9 @@ OOS           & 1s   & 0.337  & 0.311  & 0.648 \\
 \hline
 ISMCTS(max)   & 5s   &        &        &       \\
 ISMCTS(mix)   & 5s   &        &        &       \\
-OOS           & 5s   &        &        &       \\
+OOS           & 5s   & 0.229  & 0.295  & 0.524 \\
 \end{tabular}
-\caption{LD(1,1) exploitability using full-stitching method. \mlnote{5 second results will take 68 hours {\tt :)}, will set to run as soon as 1s are done}} 
+\caption{LD(1,1) exploitability using full-stitching method. \mlnote{5 second strategies are now generated. Results coming soon.}} 
 \end{center}
 \end{table}
 

@@ -16,11 +16,13 @@ static double oos_epsilon = 0.6;
 
 // 1 = IST
 // 2 = PST
-static int oos_variant = 1; 
+static int oos_variant = 2; 
 
 bool isMatchPrefix(GameState & match_gs, unsigned long long match_bidseq, GameState & gs, unsigned long long bidseq, 
                    int player, int updatePlayer) { 
-  if (oos_variant == 1) { 
+
+  if (oos_variant == 1 || oos_variant == 2) { 
+
     // for IST, we are in the prefix stage if: 
     // - update player's chance outcome is the same, 
     // - all the bids are the same up to here
@@ -29,10 +31,10 @@ bool isMatchPrefix(GameState & match_gs, unsigned long long match_bidseq, GameSt
     int maxBid = (gs.curbid == 0 ? BLUFFBID-1 : BLUFFBID);
     int match_curbid = match_gs.curbid; 
 
-    if (updatePlayer == 1 && match_gs.p1roll != gs.p1roll) { 
+    if (oos_variant == 1 && updatePlayer == 1 && match_gs.p1roll != gs.p1roll) { 
       return false; 
     }
-    else if (updatePlayer == 2 && match_gs.p2roll != gs.p2roll) { 
+    else if (oos_variant == 1 && updatePlayer == 2 && match_gs.p2roll != gs.p2roll) { 
       return false; 
     }
     else { 
@@ -130,8 +132,9 @@ double cfroos(GameState & match_gs, unsigned long long match_bidseq, int match_p
     GameState ngs = gs; 
     double new_bs = sprob_bs;
     double new_us = sprob_us;
-
-    if (biasedSample && match_player == 1) {
+    
+    // IST: force roll
+    if (oos_variant == 1 && biasedSample && match_player == 1) {
       // biased. force roll
       ngs.p1roll = match_gs.p1roll; 
       new_us *= getChanceProb(1, match_gs.p1roll); 
@@ -142,10 +145,13 @@ double cfroos(GameState & match_gs, unsigned long long match_bidseq, int match_p
       sampleChanceEvent(1, ngs.p1roll, sampleProb);
       CHKPROBNZ(sampleProb);
       
-      // need to keep track when we go off the match path
-      if (match_player == 1 && ngs.p1roll != match_gs.p1roll) {
+      // IST: need to keep track when we go off the match path
+      if (oos_variant == 1 && match_player == 1 && ngs.p1roll != match_gs.p1roll) {
         new_bs = 0; // off path
         mode = 3;
+      }
+      else if (oos_variant == 2) { 
+        new_bs *= sampleProb;
       }
       
       new_us *= sampleProb;
@@ -162,7 +168,8 @@ double cfroos(GameState & match_gs, unsigned long long match_bidseq, int match_p
     double new_bs = sprob_bs;
     double new_us = sprob_us;
 
-    if (biasedSample && match_player == 2) {
+    // IST: force roll
+    if (oos_variant == 1 && biasedSample && match_player == 2) {
       // biased. force roll
       ngs.p2roll = match_gs.p2roll; 
       new_us *= getChanceProb(2, match_gs.p2roll); 
@@ -174,9 +181,12 @@ double cfroos(GameState & match_gs, unsigned long long match_bidseq, int match_p
       CHKPROBNZ(sampleProb);
      
       // need to keep track when we go off the match path
-      if (match_player == 2 && ngs.p2roll != match_gs.p2roll) {        
+      if (oos_variant == 1 && match_player == 2 && ngs.p2roll != match_gs.p2roll) {        
         new_bs = 0; // off path
         mode = 3;
+      }
+      else if (oos_variant == 2) { 
+        new_bs *= sampleProb;
       }
       
       new_us *= sampleProb;
