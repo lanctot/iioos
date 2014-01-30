@@ -340,17 +340,18 @@ double simloop(InfosetStore * saveISS1, InfosetStore * saveISS2)
     if (sg_curPlayer == 1 && saveISS1 != NULL) {       
       
       if (firstmove1) { 
-        //sgiss1.copy(*saveISS1, false);
-        saveISS1->add(infosetkey, is, actionshere, 0, 1.0);
-        //GameState newgs;
-        //unsigned long long newbidseq = 0;
-        //saveEverything(newgs, 1, 0, newbidseq, saveISS1);
+        saveISS1->add(infosetkey, is, actionshere, 0, 0.9);
+        
+        GameState newgs;
+        unsigned long long newbidseq = 0;
+        saveEverything(newgs, 1, 0, newbidseq, saveISS1);
         firstmove1 = false; 
       }
       else {
-        saveISS1->add(infosetkey, is, actionshere, 0, 1.0);
-        //GameState ngs = gs; 
-        //saveMeAndTheChildren(ngs, player, 0, bidseq, saveISS1);
+        saveISS1->add(infosetkey, is, actionshere, 0, 0.9);
+
+        GameState ngs = gs; 
+        saveMeAndTheChildren(ngs, player, 0, bidseq, saveISS1);
       }
 
       //saveISS1->add(infosetkey, is, actionshere, 0); 
@@ -359,17 +360,18 @@ double simloop(InfosetStore * saveISS1, InfosetStore * saveISS2)
       
       if (firstmove2) { 
         //sgiss2.copy(*saveISS2, false); 
-        saveISS2->add(infosetkey, is, actionshere, 0, 1.0);
-        //GameState newgs;
-        //unsigned long long newbidseq = 0;
-        //saveEverything(newgs, 1, 0, newbidseq, saveISS2);
+        saveISS2->add(infosetkey, is, actionshere, 0, 0.9);
+
+        GameState newgs;
+        unsigned long long newbidseq = 0;
+        saveEverything(newgs, 1, 0, newbidseq, saveISS2);
         firstmove2 = false;
       }
       else { 
-        saveISS2->add(infosetkey, is, actionshere, 0, 1.0);
+        saveISS2->add(infosetkey, is, actionshere, 0, 0.9);
         
-        //GameState ngs = gs; 
-        //saveMeAndTheChildren(ngs, player, 0, bidseq, saveISS2);
+        GameState ngs = gs; 
+        saveMeAndTheChildren(ngs, player, 0, bidseq, saveISS2);
       }      
 
       //saveISS2->add(infosetkey, is, actionshere, 0); 

@@ -1,6 +1,7 @@
 #!/bin/sh
 
-matches="30 50 100 200 500"
+#`matches="30 50 100 200 500"
+matches="30 50 100 200 500 1000 2000"
 f1="aggfile.mcts.txt"
 f2="aggfile.oos.txt"
 
