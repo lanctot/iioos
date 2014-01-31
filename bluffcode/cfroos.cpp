@@ -11,12 +11,12 @@ static string runname = "";
 
 static int expansions = 0; 
 
-static double oos_delta = 0.9; 
 static double oos_epsilon = 0.6;
 
 // 1 = IST
 // 2 = PST
-static int oos_variant = 2; 
+int oos_variant = 2; 
+double oos_delta = 0.9; 
 
 bool isMatchPrefix(GameState & match_gs, unsigned long long match_bidseq, GameState & gs, unsigned long long bidseq, 
                    int player, int updatePlayer) { 
