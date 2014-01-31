@@ -111,13 +111,14 @@ Advances made in search for perfect information games (such as Chess, Checkers, 
 the world's top human experts. 
 Search in imperfect information games (such as Poker, Bridge, and Skat) is significantly more challenging 
 due to the complexities introduced by hidden information. 
-In this paper, we present Online Outcome Sampling (OOS), the first imperfect information search algorithm that is guaranteed to
-converge to an equilibrium strategy in a zero-sum game.   
-In addition, we show that OOS avoids the common problems encountered by determinization.
-We evaluate the practical performance and convergence rate of OOS and evaluate its performance against benchmark players and compare 
-it to Information Set Monte Carlo Tree Search (ISMCTS). 
-OOS is shown to outperform its competitor in randomly generated game trees as well as two complex domains: Liar's Dice, Goofspiel, and 
-Phantom Tic-Tac-Toe. 
+In this paper, we present Online Outcome Sampling (OOS), the first imperfect information search algorithm that is 
+guaranteed to converge to an equilibrium strategy in a two-player zero-sum game.   
+In addition, we show that OOS avoids common problems encountered by determinization.
+We evaluate the practical performance and convergence rate of OOS and comparing it to benchmark strategies and 
+to Information Set Monte Carlo Tree Search (ISMCTS).
+We show that OOS performs at well as ISMCTS in head-to-head play while producing strategies with lower 
+exploitability on two domains: Liar's Dice and an imperfect information variant of Goofspiel. 
+Finally, we show that exploitability of strategies produced by OOS decreases as the amount of search time increases. 
 \end{abstract}
 
 \section{Introduction}

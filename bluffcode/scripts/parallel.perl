@@ -124,13 +124,13 @@ sub get_cmd
   my $cmd = "";
 
   if ($alg1 eq "3") {
-    $cmd = "./sim scratch/iss.0001Nash.dat scratch/iss.initial.dat $alg1 $alg2";
+    $cmd = "./sim scratch/iss.0001Nash.dat scratch/iss.initial.dat $alg1 $alg2 single";
   }
   elsif ($alg2 eq "3") { 
-    $cmd = "./sim scratch/iss.initial.dat scratch/iss.0001Nash.dat $alg1 $alg2";
+    $cmd = "./sim scratch/iss.initial.dat scratch/iss.0001Nash.dat $alg1 $alg2 single";
   }
   else { 
-    $cmd = "./sim scratch/iss.initial.dat scratch/iss.initial.dat $alg1 $alg2";
+    $cmd = "./sim scratch/iss.initial.dat scratch/iss.initial.dat $alg1 $alg2 single";
   }
   
   return $cmd;
@@ -139,8 +139,8 @@ sub get_cmd
 my @jobs = (); 
 
 my @matchups = (); 
-push(@matchups, "1,3"); 
-push(@matchups, "2,3"); 
+push(@matchups, "1,2"); 
+#push(@matchups, "2,3"); 
 
 # here's an example of a loop to initialize matchups instead of a static list
 #my @parms = ( 0.1, 0.05, 0.2, 0.3, 0.4, 0.5, 0.6, 0.25, 0.7, 0.8 ); 
