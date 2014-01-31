@@ -443,7 +443,7 @@ int main(int argc, char ** argv)
   else 
   { 
     if (argc < 6) { 
-      cout << "Usage: sim isfile1 isfile2 ptype1 ptype2 [single|multimatch|partstitch|agg] runmatches" << endl;
+      cout << "Usage: sim isfile1 isfile2 ptype1 ptype2 [single|multimatch|partstitch|agg] runmatches timelimit oos_variant oos_delta" << endl;
       exit(-1);
     }
 
