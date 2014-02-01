@@ -68,6 +68,41 @@ sub winstats
   push(@$statslistref, $line);
 }
 
+sub print_agg 
+{
+  opendir(DIR, "$scratchdir");
+  my @FILES= readdir(DIR);
+  foreach my $file (@FILES) 
+  {
+    if ($file =~ /\.log$/) { 
+      #print "$file\n"; 
+      #scratch/2-2-agg-5.0-2-1.00-1.log
+      my $fname = $file;
+      $fname =~ s/\.log$//;    
+      my @parts = split('-', $file); 
+      my $p1type = $parts[0];
+      my $p2type = $parts[1];
+      my $type = $parts[2];
+      if (not ($type eq "agg")) { 
+        next;
+      }
+      my $tl = $parts[3];
+      my $ov = $parts[4]; 
+      my $delta = $parts[5];
+      my $line = `grep Exploitabilities scratch/$file`;
+      chomp($line); 
+      if (not ($line eq "")) { 
+        print "tl=$tl ov=$ov de=$delta $line\n";
+      }
+    }
+  }
+}
+
+if ($simtype eq "agg") {
+  print_agg();
+  exit;
+}
+
 
 # matchup -> number of games
 my %matchmap = (); 

@@ -133,7 +133,7 @@ sub get_cmd
     $arglist = "single 1 $timelimit $oosvariant $delta"; 
   }
   else {
-    $arglist = "agg 300 $timelimit $oosvariant $delta"; 
+    $arglist = "agg 1 $timelimit $oosvariant $delta"; 
   }
 
   if ($alg1 eq "3") {
@@ -181,23 +181,42 @@ my @matchups = ();
 #push(@matchups, "sim,3,2,25.0,2,0.95"); 
 #push(@matchups, "sim,3,2,25.0,2,1.0"); 
 
+
+#MCRNR
+#my @times = ( "1.0", "5.0" );
+#my @oosv = ( "1", "2" ); 
+#my @deltas = ("0.00", "0.10", "0.50", "0.65", "0.80", "0.90", "0.95", "0.99", "1.00"); 
+#push(@matchups, "sim,1,2,5.0,1,0.00"); 
+#for (my $i = 0; $i < scalar(@times); $i++) { 
+#  for (my $j = 0; $j < scalar(@oosv); $j++) { 
+#    for (my $k = 0; $k < scalar(@deltas); $k++) { 
+#      my $time = $times[$i];
+#      my $ov = $oosv[$j]; 
+#      my $delta = $deltas[$k];
+#      my $matchup = "sim,1,2,$time,$ov,$delta";
+#      push(@matchups, "$matchup"); 
+#    }
+#  }
+#}
+
+#Expl
 my @times = ( "1.0", "5.0" );
 my @oosv = ( "1", "2" ); 
 my @deltas = ("0.00", "0.10", "0.50", "0.65", "0.80", "0.90", "0.95", "0.99", "1.00"); 
-
-#push(@matchups, "sim,1,2,5.0,1,0.00"); 
-
+push(@matchups, "sim,1,2,5.0,1,0.00"); 
 for (my $i = 0; $i < scalar(@times); $i++) { 
   for (my $j = 0; $j < scalar(@oosv); $j++) { 
     for (my $k = 0; $k < scalar(@deltas); $k++) { 
       my $time = $times[$i];
       my $ov = $oosv[$j]; 
       my $delta = $deltas[$k];
-      my $matchup = "sim,1,2,$time,$ov,$delta";
+      my $matchup = "agg,2,2,$time,$ov,$delta";
       push(@matchups, "$matchup"); 
     }
   }
 }
+
+
 
 
 print "queuing jobs... \n";
@@ -225,20 +244,22 @@ for (my $i = 0; $i < scalar(@matchups); $i++)
     my $cmd = get_cmd($alg1, $alg2, $seed, $simtype, $timelimit, $oosvariant, $delta); 
     my $fullcmd = "$cmd >$scratchdir/$runname.log 2>&1";
     
-    #print "queueing $fullcmd\n";
     push(@jobs, $fullcmd); 
-
-    # now swap seats
-    $alg1 = $parts[2];
-    $alg2 = $parts[1];
-
-    $runname = "$alg1-$alg2-$simtype-$timelimit-$oosvariant-$delta-$run";
-
-    $cmd = get_cmd($alg1, $alg2, $seed, $simtype, $timelimit, $oosvariant, $delta); 
-    $fullcmd = "$cmd >$scratchdir/$runname.log 2>&1";
     
     #print "queueing $fullcmd\n";
-    push(@jobs, $fullcmd); 
+    if ($simtype eq "sim") { 
+      # now swap seats
+      $alg1 = $parts[2];
+      $alg2 = $parts[1];
+
+      $runname = "$alg1-$alg2-$simtype-$timelimit-$oosvariant-$delta-$run";
+
+      $cmd = get_cmd($alg1, $alg2, $seed, $simtype, $timelimit, $oosvariant, $delta); 
+      $fullcmd = "$cmd >$scratchdir/$runname.log 2>&1";
+      
+      #print "queueing $fullcmd\n";
+      push(@jobs, $fullcmd); 
+    }
   }
 }
 
@@ -253,7 +274,8 @@ sub fisher_yates_shuffle
     }
 }
 
-fisher_yates_shuffle( \@jobs );
+# shut off for exploitability runs
+#fisher_yates_shuffle( \@jobs );
 
 print "queued " . scalar(@jobs) . " jobs\n";
 sleep 1;
