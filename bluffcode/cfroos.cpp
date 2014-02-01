@@ -114,6 +114,8 @@ int getMatchAction(GameState & match_gs, unsigned long long match_bidseq, GameSt
   return action;
 }
 
+static double r = 0.75;
+
 double policyProb(int player, Infoset & is, int action, unsigned long long infosetkey, int actionshere) { 
   if (   (player == 1 && opp1loaded && sg_curPlayer == 2)
       || (player == 2 && opp2loaded && sg_curPlayer == 1) ) {
@@ -138,7 +140,8 @@ double policyProb(int player, Infoset & is, int action, unsigned long long infos
     for (int a = 0; a < actionshere; a++) 
       den += oppis.totalMoveProbs[a];
 
-    return (den == 0.0 ? (1.0 / actionshere) : (oppis.totalMoveProbs[action] / den));
+    double ismcts_pr = (den == 0.0 ? (1.0 / actionshere) : (oppis.totalMoveProbs[action] / den));
+    return (r*ismcts_pr + (1.0-is.curMoveProbs[action]));
   }
   else {
     return is.curMoveProbs[action];
@@ -153,7 +156,6 @@ int oosSampleAction(int player, int updatePlayer, Infoset & is, int actionshere,
 
     // play restricted strategy
     double epsilon = (player == updatePlayer ? 0.6 : 0.0); 
-    double r = 0.75;
     
     Infoset oppis; 
 
@@ -188,14 +190,14 @@ int oosSampleAction(int player, int updatePlayer, Infoset & is, int actionshere,
       if (roll >= sum && roll < (sum+policy_pr)) { 
         sampleprob = policy_pr; 
         takeAction = a;
-        //break;
+        break;
       }
 
       sum += policy_pr;
     }
   
     //cout << sum << endl;
-    assert(sum >= (0.999999) && sum <= (1.000001)); 
+    //assert(sum >= (0.999999) && sum <= (1.000001)); 
   }
   else { 
     if (player == updatePlayer)
