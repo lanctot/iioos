@@ -3,12 +3,13 @@
 use strict;
 use warnings;
 
-if (not defined($ARGV[0])) { 
-  print "Usage: parseres.perl <scratch dir>\n";
+if (not defined($ARGV[1])) { 
+  print "Usage: parseres.perl <scratch dir> [sim|agg]\n";
   exit;
 }
 
 my $scratchdir = $ARGV[0];
+my $simtype = $ARGV[1];
 
 sub winstats
 {
@@ -77,17 +78,24 @@ foreach my $file (@FILES)
 {
   if ($file =~ /\.log$/) { 
     #print "$file\n"; 
-    $file =~ s/\.log$//;
+    $file =~ s/\.log$//;    
     my @parts = split('-', $file); 
+
+    if (not ($parts[2] eq $simtype)) { 
+      next;
+    }
+
+    #print "$file\n";
+
     if ($parts[0] gt $parts[1]) { 
       my $tmp = $parts[1];
       $parts[1] = $parts[0];
       $parts[0] = $tmp;
     }
-    my $match = $parts[0] . "," . $parts[1];
+    my $match = $parts[0] . "," . $parts[1] . "," . $parts[2] . "," . $parts[3] . "," . $parts[4] . "," . $parts[5]; 
     if (not defined $matchmap{$match}) { $matchmap{$match} = 0; }
-    if ($matchmap{$match} < $parts[2]) { 
-      $matchmap{$match} = $parts[2]; 
+    if ($matchmap{$match} < $parts[6]) { 
+      $matchmap{$match} = $parts[6]; 
     }
     #print "$match\n";
   }
@@ -100,10 +108,15 @@ my %totalgames = ();
 foreach my $match (keys %matchmap) { 
 
   my $gamespermatch = $matchmap{$match};
-  my @players = split(",", $match); 
+  my @matchinfo = split(",", $match); 
 
-  my $p1 = $players[0]; 
-  my $p2 = $players[1];
+  my $p1 = $matchinfo[0]; 
+  my $p2 = $matchinfo[1];
+
+  my $simtype = $matchinfo[2];
+  my $timelimit = $matchinfo[3];
+  my $oosvariant = $matchinfo[4];
+  my $delta = $matchinfo[5];
 
   my %wins = (); 
   $wins{$p1} = 0;
@@ -113,7 +126,7 @@ foreach my $match (keys %matchmap) {
   #p1 as first player, p2 as second player
   for (my $m = 1; $m <= $gamespermatch; $m++) { 
   
-    my $runname = "$p1-$p2-$m";
+    my $runname = "$p1-$p2-$simtype-$timelimit-$oosvariant-$delta-$m";
     #print "opening $scratchdir/$runname.log\n";
 
     my $doesnotexist = 0; 
@@ -154,7 +167,7 @@ foreach my $match (keys %matchmap) {
   #p2 as first player, p1 as second player
   for (my $m = 1; $m <= $gamespermatch; $m++) { 
   
-    my $runname = "$p2-$p1-$m";
+    my $runname = "$p2-$p1-$simtype-$timelimit-$oosvariant-$delta-$m";
 
     my $doesnotexist = 0; 
     open(FILE, '<', "$scratchdir/$runname.log") or $doesnotexist = 1;
@@ -187,7 +200,7 @@ foreach my $match (keys %matchmap) {
     }
   }
 
-  print "matchup summary: $p1-$p2 " . $wins{$p1} . " " . $wins{$p2} . " " . $ties;
+  print "$p1-$p2 tl=$timelimit ov=$oosvariant de=$delta " . $wins{$p1} . " " . $wins{$p2} . " " . $ties;
   my $diff = ($wins{$p1} - $wins{$p2});
   my $games = ($wins{$p1} + $wins{$p2} + $ties);
   print "  (diff $diff, games $games)  ";

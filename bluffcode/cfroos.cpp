@@ -153,7 +153,7 @@ int oosSampleAction(int player, int updatePlayer, Infoset & is, int actionshere,
 
     // play restricted strategy
     double epsilon = (player == updatePlayer ? 0.6 : 0.0); 
-    double r = 0.75;
+    double r = 0.5;
     
     Infoset oppis; 
 

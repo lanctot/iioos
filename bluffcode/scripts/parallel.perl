@@ -115,22 +115,35 @@ sub run_parallel {
 
 sub get_cmd
 {
+  #push(@matchups, "sim,1,2,1.0,1,0.0"); 
+
   my $alg1 = shift;
   my $alg2 = shift;
   my $seed = shift;
 
-  #my $cmd = "scripts/run.sh experiments.SimGame --game $game --p1 $alg1 --p2 $alg2 --seed $seed --timelimit $tl";
-  #./sim scratch/iss.initial.dat scratch/iss.initial.dat 2 4
+  my $simtype = shift;
+  my $timelimit = shift;
+  my $oosvariant = shift;
+  my $delta = shift;
+
   my $cmd = "";
+  my $arglist = "";
+
+  if ($simtype eq "sim") {
+    $arglist = "single 1 $timelimit $oosvariant $delta"; 
+  }
+  else {
+    $arglist = "agg 300 $timelimit $oosvariant $delta"; 
+  }
 
   if ($alg1 eq "3") {
-    $cmd = "./sim scratch/iss.0001Nash.dat scratch/iss.initial.dat $alg1 $alg2 single";
+    $cmd = "./sim scratch/iss.0001Nash.dat scratch/iss.initial.dat $alg1 $alg2 $arglist";
   }
   elsif ($alg2 eq "3") { 
-    $cmd = "./sim scratch/iss.initial.dat scratch/iss.0001Nash.dat $alg1 $alg2 single";
+    $cmd = "./sim scratch/iss.initial.dat scratch/iss.0001Nash.dat $alg1 $alg2 $arglist";
   }
   else { 
-    $cmd = "./sim scratch/iss.initial.dat scratch/iss.initial.dat $alg1 $alg2 single";
+    $cmd = "./sim scratch/iss.initial.dat scratch/iss.initial.dat $alg1 $alg2 $arglist";
   }
   
   return $cmd;
@@ -139,28 +152,49 @@ sub get_cmd
 my @jobs = (); 
 
 my @matchups = (); 
-push(@matchups, "1,2"); 
-#push(@matchups, "2,3"); 
 
-# here's an example of a loop to initialize matchups instead of a static list
-#my @parms = ( 0.1, 0.05, 0.2, 0.3, 0.4, 0.5, 0.6, 0.25, 0.7, 0.8 ); 
-#for (my $i = 0; $i < scalar(@parms); $i++) { 
-#  my $parm = $parms[$i];
-#  #my $tag = "mcts_h_pd$pd,mcts_h_pd${pd}_im"; 
-#  my $tag = "mcts_h_ege$parm,mcts_h_ege${parm}_im"; 
-#  push(@matchups, $tag); 
-#}
+# sim or exp
+# player type A
+# player type B
+# time limit
+# oos variant, 1 = IST, 2 = PST
+# oos delta
 
-# this is a list of matchups 
-# a matchup is a string of "playertype1,playertype2"
-# you can also use a loop to fill this with different player types
-#my @matchups = ( "mcts,mcts_h", "mcts_h_pd4,mcts_h_pd4_im" );
+# player types: 1 = mcts, 2 = oos, 3 = 0.001 Nash, 4 = random
+
+#push(@matchups, "sim,1,4,25.0,2,0.0"); 
+#push(@matchups, "sim,1,3,25.0,2,0.0"); 
+
+#push(@matchups, "sim,4,2,25.0,2,0.0"); 
+#push(@matchups, "sim,4,2,25.0,2,0.1"); 
+#push(@matchups, "sim,4,2,25.0,2,0.5"); 
+#push(@matchups, "sim,4,2,25.0,2,0.65"); 
+#push(@matchups, "sim,4,2,25.0,2,0.8"); 
+#push(@matchups, "sim,4,2,25.0,2,0.95"); 
+#push(@matchups, "sim,4,2,25.0,2,1.0"); 
+
+#push(@matchups, "sim,3,2,25.0,2,0.0"); 
+#push(@matchups, "sim,3,2,25.0,2,0.1"); 
+#push(@matchups, "sim,3,2,25.0,2,0.5"); 
+#push(@matchups, "sim,3,2,25.0,2,0.65"); 
+#push(@matchups, "sim,3,2,25.0,2,0.8"); 
+#push(@matchups, "sim,3,2,25.0,2,0.95"); 
+#push(@matchups, "sim,3,2,25.0,2,1.0"); 
+
+push(@matchups, "sim,1,2,5.0,1,0.0"); 
+push(@matchups, "sim,1,2,5.0,1,0.1"); 
+push(@matchups, "sim,1,2,5.0,1,0.5"); 
+push(@matchups, "sim,1,2,5.0,1,0.65"); 
+push(@matchups, "sim,1,2,5.0,1,0.8"); 
+push(@matchups, "sim,1,2,5.0,1,0.95"); 
+push(@matchups, "sim,1,2,5.0,1,1.0"); 
+
 
 print "queuing jobs... \n";
 
 for (my $i = 0; $i < scalar(@matchups); $i++)
 {
-  my @algorithms = split(',', $matchups[$i]);
+  my @parts = split(',', $matchups[$i]);
 
   for (my $run = 1; $run <= $gamespermatch; $run++)
   {
@@ -168,21 +202,29 @@ for (my $i = 0; $i < scalar(@matchups); $i++)
     my $seed = int(rand(100000000)) + 1;
     chomp($seed);
 
-    my $alg1 = $algorithms[0];
-    my $alg2 = $algorithms[1];
-    my $runname = "$alg1-$alg2-$run";
+    my $simtype = $parts[0];
+    my $timelimit = $parts[3];
+    my $oosvariant = $parts[4];
+    my $delta = $parts[5];
+    
+    my $alg1 = $parts[1];
+    my $alg2 = $parts[2];
+    
+    my $runname = "$alg1-$alg2-$simtype-$timelimit-$oosvariant-$delta-$run";
 
-    my $cmd = get_cmd($alg1, $alg2, $seed); 
+    my $cmd = get_cmd($alg1, $alg2, $seed, $simtype, $timelimit, $oosvariant, $delta); 
     my $fullcmd = "$cmd >$scratchdir/$runname.log 2>&1";
     
     #print "queueing $fullcmd\n";
     push(@jobs, $fullcmd); 
 
     # now swap seats
-    $alg1 = $algorithms[1];
-    $alg2 = $algorithms[0];
-    $runname = "$alg1-$alg2-$run";
-    $cmd = get_cmd($alg1, $alg2, $seed); 
+    $alg1 = $parts[2];
+    $alg2 = $parts[1];
+
+    $runname = "$alg1-$alg2-$simtype-$timelimit-$oosvariant-$delta-$run";
+
+    $cmd = get_cmd($alg1, $alg2, $seed, $simtype, $timelimit, $oosvariant, $delta); 
     $fullcmd = "$cmd >$scratchdir/$runname.log 2>&1";
     
     #print "queueing $fullcmd\n";
