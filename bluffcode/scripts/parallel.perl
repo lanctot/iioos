@@ -133,7 +133,7 @@ sub get_cmd
     $arglist = "single 1 $timelimit $oosvariant $delta"; 
   }
   else {
-    $arglist = "agg 1 $timelimit $oosvariant $delta"; 
+    $arglist = "agg 500 $timelimit $oosvariant $delta"; 
   }
 
   if ($alg1 eq "3") {
