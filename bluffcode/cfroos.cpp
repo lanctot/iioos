@@ -506,12 +506,12 @@ int getMoveOOS(int match_player, GameState match_gs, unsigned long long match_bi
   iter = 0; 
 
   // load opponent models
-  if (match_player == 2 && oos_opp1mfile.length() > 0 && !opp1loaded) {
+  if (match_player == 2 && p1type == PLYR_MCTS && oos_opp1mfile.length() > 0 && !opp1loaded) {
     cout << "Loading opponement model for p1" << endl;
     opp1ISS.readFromDisk(oos_opp1mfile);
     opp1loaded = true;
   }
-  else if (match_player == 2 && oos_opp2mfile.length() > 0 && !opp2loaded) { 
+  else if (match_player == 1 && p2type == PLYR_MCTS && oos_opp2mfile.length() > 0 && !opp2loaded) { 
     cout << "Loading opponement model for p2" << endl;
     opp2ISS.readFromDisk(oos_opp2mfile);
     opp2loaded = true;

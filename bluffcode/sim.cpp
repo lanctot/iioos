@@ -37,6 +37,8 @@ void multi_match() {
   // used for 2,2
   for (int match = 1; match <= runMatches; match++) { 
 
+    cout << "Starting first half of match " << match << endl; 
+
     p1type = actualP1Type; 
     p2type = actualP2Type; 
     sgiss1.clear();
@@ -55,6 +57,8 @@ void multi_match() {
       cout << "Game over. P2 wins!" << endl;
       p2typeWins++;
     }
+
+    cout << "Starting second half of match " << match << endl; 
 
     // now swap
     p2type = actualP1Type; 
