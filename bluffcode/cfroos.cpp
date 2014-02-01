@@ -141,7 +141,7 @@ double policyProb(int player, Infoset & is, int action, unsigned long long infos
       den += oppis.totalMoveProbs[a];
 
     double ismcts_pr = (den == 0.0 ? (1.0 / actionshere) : (oppis.totalMoveProbs[action] / den));
-    return (r*ismcts_pr + (1.0-is.curMoveProbs[action]));
+    return (r*ismcts_pr + (1.0-r)*is.curMoveProbs[action]);
   }
   else {
     return is.curMoveProbs[action];

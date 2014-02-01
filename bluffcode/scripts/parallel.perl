@@ -181,13 +181,13 @@ my @matchups = ();
 #push(@matchups, "sim,3,2,25.0,2,0.95"); 
 #push(@matchups, "sim,3,2,25.0,2,1.0"); 
 
-push(@matchups, "sim,1,2,5.0,1,0.0"); 
-push(@matchups, "sim,1,2,5.0,1,0.1"); 
-push(@matchups, "sim,1,2,5.0,1,0.5"); 
-push(@matchups, "sim,1,2,5.0,1,0.65"); 
-push(@matchups, "sim,1,2,5.0,1,0.8"); 
-push(@matchups, "sim,1,2,5.0,1,0.95"); 
-push(@matchups, "sim,1,2,5.0,1,1.0"); 
+push(@matchups, "sim,1,2,5.0,2,0.0"); 
+push(@matchups, "sim,1,2,5.0,2,0.1"); 
+push(@matchups, "sim,1,2,5.0,2,0.5"); 
+push(@matchups, "sim,1,2,5.0,2,0.65"); 
+push(@matchups, "sim,1,2,5.0,2,0.8"); 
+push(@matchups, "sim,1,2,5.0,2,0.95"); 
+push(@matchups, "sim,1,2,5.0,2,1.0"); 
 
 
 print "queuing jobs... \n";
