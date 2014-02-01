@@ -16,8 +16,8 @@ static double oos_epsilon = 0.6;
 // for MCRNR
 //string oos_opp1mfile = "";
 //string oos_opp2mfile = "";
-string oos_opp1mfile = "scratch/iss.mcts1-1s.dat";
-string oos_opp2mfile = "scratch/iss.mcts2-1s.dat";
+string oos_opp1mfile = "";
+string oos_opp2mfile = "";
 static int opp1type = PLYR_MCTS;
 static int opp2type = PLYR_MCTS;
 static InfosetStore opp1ISS;
@@ -114,7 +114,7 @@ int getMatchAction(GameState & match_gs, unsigned long long match_bidseq, GameSt
   return action;
 }
 
-static double r = 0.75;
+static double r = 0.9;
 
 double policyProb(int player, Infoset & is, int action, unsigned long long infosetkey, int actionshere) { 
   if (   (player == 1 && opp1loaded && sg_curPlayer == 2)

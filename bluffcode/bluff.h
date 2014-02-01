@@ -197,6 +197,8 @@ extern int br_stitchingPlayer;
 extern int stitchedInfosets;
 extern double oos_delta; 
 extern int oos_variant;
+extern std::string oos_opp1mfile;
+extern std::string oos_opp2mfile;
 double simloop(InfosetStore * saveISS1, InfosetStore * saveISS2);
 
 int getMove(int player, GameState gs, unsigned long long bidseq, Infoset & is);

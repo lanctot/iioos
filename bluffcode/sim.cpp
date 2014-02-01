@@ -532,8 +532,18 @@ int main(int argc, char ** argv)
     if (argc >= 7)
       runMatches = to_int(argv[6]); 
 
-    if (argc >= 8)
+    if (argc >= 8) {
       timeLimit = to_double(argv[7]); 
+
+      if (argv[7] == "1.0") { 
+        oos_opp1mfile = "scratch/iss.mcts1-1s.dat";
+        oos_opp2mfile = "scratch/iss.mcts2-1s.dat";
+      }
+      else if (argv[7] == "5.0") { 
+        oos_opp1mfile = "scratch/iss.mcts1-5s.dat";
+        oos_opp2mfile = "scratch/iss.mcts2-5s.dat";
+      }
+    }
     
     if (argc >= 9)
       oos_variant = to_int(argv[8]); 

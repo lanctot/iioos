@@ -181,13 +181,23 @@ my @matchups = ();
 #push(@matchups, "sim,3,2,25.0,2,0.95"); 
 #push(@matchups, "sim,3,2,25.0,2,1.0"); 
 
-push(@matchups, "sim,1,2,5.0,2,0.0"); 
-push(@matchups, "sim,1,2,5.0,2,0.1"); 
-push(@matchups, "sim,1,2,5.0,2,0.5"); 
-push(@matchups, "sim,1,2,5.0,2,0.65"); 
-push(@matchups, "sim,1,2,5.0,2,0.8"); 
-push(@matchups, "sim,1,2,5.0,2,0.95"); 
-push(@matchups, "sim,1,2,5.0,2,1.0"); 
+my @times = ( "1.0", "5.0" );
+my @oosv = ( "1", "2" ); 
+my @deltas = ("0.00", "0.10", "0.50", "0.65", "0.80", "0.90", "0.95", "0.99", "1.00"); 
+
+#push(@matchups, "sim,1,2,5.0,1,0.00"); 
+
+for (my $i = 0; $i < scalar(@times); $i++) { 
+  for (my $j = 0; $j < scalar(@oosv); $j++) { 
+    for (my $k = 0; $k < scalar(@deltas); $k++) { 
+      my $time = $times[$i];
+      my $ov = $oosv[$j]; 
+      my $delta = $deltas[$k];
+      my $matchup = "sim,1,2,$time,$ov,$delta";
+      push(@matchups, "$matchup"); 
+    }
+  }
+}
 
 
 print "queuing jobs... \n";
