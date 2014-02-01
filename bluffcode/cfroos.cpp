@@ -13,6 +13,16 @@ static int expansions = 0;
 
 static double oos_epsilon = 0.6;
 
+// for MCRNR
+// string oos_opp1mfile = "";
+// string oos_opp2mfile = "";
+string oos_opp1mfile = "";
+string oos_opp2mfile = "";
+static int opp1type = PLYR_MCTS;
+static int opp2type = PLYR_MCTS;
+static InfosetStore opp1ISS;
+static InfosetStore opp2ISS;
+
 // 1 = IST
 // 2 = PST
 int oos_variant = 2; 

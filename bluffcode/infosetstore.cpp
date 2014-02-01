@@ -256,12 +256,12 @@ bool InfosetStore::get_priv(unsigned long long infoset_key, Infoset & infoset, i
     next(row, col, pos, curRowSize); 
     
     // ADA 
-    assert(row < rows);
-    assert(col < curRowSize); 
-    assert(pos < size); 
-    infoset.weight[m] = tablerows[row][col];
+    //assert(row < rows);
+    //assert(col < curRowSize); 
+    //assert(pos < size); 
+    //infoset.weight[m] = tablerows[row][col];
 
-    next(row, col, pos, curRowSize); 
+    //next(row, col, pos, curRowSize); 
   }
 
   // now do the usual regret matching to get the curMoveProbs
@@ -466,12 +466,12 @@ void InfosetStore::put_priv(unsigned long long infoset_key, Infoset & infoset, i
     next(row, col, pos, curRowSize); 
     
     // ADA
-    assert(row < rows);
-    assert(col < curRowSize); 
-    assert(pos < size); 
-    tablerows[row][col] = infoset.weight[m];
+    //assert(row < rows);
+    //assert(col < curRowSize); 
+    //assert(pos < size); 
+    //tablerows[row][col] = infoset.weight[m];
 
-    next(row, col, pos, curRowSize); 
+    //next(row, col, pos, curRowSize); 
     
   }
 
@@ -608,12 +608,12 @@ void InfosetStore::add_priv(unsigned long long infoset_key, Infoset & infoset, i
     next(row, col, pos, curRowSize); 
     
     // ADA
-    assert(row < rows);
-    assert(col < curRowSize); 
-    assert(pos < size); 
-    tablerows[row][col] += infoset.weight[m];
+    //assert(row < rows);
+    //assert(col < curRowSize); 
+    //assert(pos < size); 
+    //tablerows[row][col] += infoset.weight[m];
 
-    next(row, col, pos, curRowSize); 
+    //next(row, col, pos, curRowSize); 
     
   }
 
@@ -724,10 +724,10 @@ void InfosetStore::clear()
         next(row, col, pos, curRowSize);
         // next ADA
         
-        assert(row < rows); assert(col < curRowSize); assert(pos < size); 
-        tablerows[row][col] = 0.0;
+        //assert(row < rows); assert(col < curRowSize); assert(pos < size); 
+        //tablerows[row][col] = 0.0;
         
-        next(row, col, pos, curRowSize);
+        //next(row, col, pos, curRowSize);
         // next cfr
       }
     }
@@ -781,9 +781,9 @@ void InfosetStore::aggregate(InfosetStore & from, int agplayer) {
         next(row, col, pos, curRowSize);
         // next ADA
         
-        tablerows[row][col] += from.tablerows[row][col];
+        //tablerows[row][col] += from.tablerows[row][col];
         
-        next(row, col, pos, curRowSize);
+        //next(row, col, pos, curRowSize);
         // next cfr
       }
     }

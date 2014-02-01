@@ -28,6 +28,65 @@ void single_match() {
 }
 
 void multi_match() { 
+  
+  int actualP1Type = p1type; 
+  int actualP2Type = p2type; 
+  int p1typeWins = 0;
+  int p2typeWins = 0;
+
+  // used for 2,2
+  for (int match = 1; match <= runMatches; match++) { 
+
+    p1type = actualP1Type; 
+    p2type = actualP2Type; 
+    sgiss1.clear();
+    sgiss2.clear();
+
+    double payoff = simloop(NULL, NULL);
+
+    if (payoff > 0) {  
+      cout << "Game over. P1 wins!" << endl; 
+      p1typeWins++;
+    }
+    else if (payoff == 0) {
+      cout << "game over. draw" << endl;
+    }
+    else if (payoff < 0) {
+      cout << "Game over. P2 wins!" << endl;
+      p2typeWins++;
+    }
+
+    // now swap
+    p2type = actualP1Type; 
+    p1type = actualP2Type; 
+    sgiss1.clear();
+    sgiss2.clear();
+
+    payoff = simloop(NULL, NULL);
+    
+    if (payoff > 0) {  
+      cout << "Game over. P1 wins!" << endl; 
+      p2typeWins++;
+    }
+    else if (payoff == 0) {
+      cout << "game over. draw" << endl;
+    }
+    else if (payoff < 0) {
+      cout << "Game over. P2 wins!" << endl;
+      p1typeWins++;
+    }
+
+    cout << "PlayerType:" << actualP1Type << " (" << p1typeWins << " wins) "
+         << "PlayerType:" << actualP2Type << " (" << p2typeWins << " wins)" << endl;
+    cout << endl;
+    
+    //double exp1 = searchComputeHalfBR(1, &sgiss1, p1type == PLYR_MCTS);
+    //double exp2 = searchComputeHalfBR(2, &sgiss2, p1type == PLYR_MCTS); 
+    //cout << "expl1 = " << exp1 << ", exp2 = " << exp2 << endl;
+  }
+}
+
+void multi_match_old2() { 
 
   int matches = 1;
   double sumExpl1 = 0;
@@ -226,6 +285,12 @@ void multi_aggregate() {
   
   double expl1 = searchComputeHalfBR(1, &averageISS1, p1type == PLYR_MCTS);
   double expl2 = searchComputeHalfBR(2, &averageISS2, p2type == PLYR_MCTS);
+
+  string dumpfile1 = "scratch/iss.agg1.dat"; 
+  string dumpfile2 = "scratch/iss.agg2.dat"; 
+  cout << "Dumping aggregate files to disk: " << dumpfile1 << " " << dumpfile2 << endl;
+  averageISS1.dumpToDisk(dumpfile1);
+  averageISS2.dumpToDisk(dumpfile2);
   
   cout << "Exploitabilities: " << expl1 << " " << expl2 << " " << (expl1+expl2) << endl;
 }

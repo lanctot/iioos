@@ -146,9 +146,9 @@ Modern approaches to imperfect information search use different forms of {\it de
 searches rooted from these states, aggregating their results to choose an action to play. The most extreme forms, \eg Perfect Information 
 Monte Carlo~\cite{Long10Understanding} ``average over clairvoyance''~\cite{AIBook},
 % ML-Note Nov2: @Viliam, PIMC *is* "averaging over clairvoyance"
-ignoring the information structure completely. While this is sufficient in some games, it does not work well in games like simplified (Kuhn) poker and 
-Monte Carlo Tree Search (MCTS) applied to Kriegspiel~\cite{Ciancarini10Kriegspiel}. 
-Following the success in Kriegspiel, most recent algorithms try to fix the problem by accounting for the information structure during the 
+ignoring the information structure completely. While this is sufficient in some games, it tends to have trouble in games like poker 
+whereinformation is critical; similar problems have been reported using Monte Carlo Tree Search (MCTS) in Kriegspiel~\cite{Ciancarini10Kriegspiel}.
+Most recent algorithms try to fix the problem by accounting for the information structure during the 
 search in some way. These approaches seem to improve performance in Kriegspiel, Skat~\cite{Furtak13Recursive}, 
 Scotland Yard~\cite{Nijssen12SY}, Dou Di Zhu, Magic: The Gathering, and other card games~\cite{Cowling12MTG,Cowling12ISMCTS}.
 
@@ -216,8 +216,8 @@ recursively applied by computing and comparing values of subgames.
 
 Strategy fusion can be overcome by imposing the proper information constraints during search, as was done in 
 Kriegspiel~\cite{Ciancarini10Kriegspiel}, Kuhn Poker~\cite{Ponsen11Computing}, pursuit-evasion games~\cite{Lisy12peg}, 
-and examples given in~\cite{Cowling12ISMCTS}. 
-Non-locality, however, is a fundamental problem that prevents PIMC approaches from being consistent.
+card games and other phantom games~\cite{Cowling12ISMCTS}. 
+Non-locality, however, is a fundamental problem that prevents consistency.
 Consequently, the usual minimax formulation of payoffs defined over future states is not applicable.  
 The authors of \cite{Parker10iss,Parker06Overconfidence} showed that minimax-style backups at opponent information 
 sets can lead to overly paranoid search, and by switching to an overconfident formulation can performs better.
@@ -262,10 +262,10 @@ would give incentive to the maximizer to play left more often and change the min
 
 % other missing related works
 
-One particularly related work is the MMCTS algorithm~\cite{Auger11Multiple} that has been 
-applied to Phantom Tic-Tac-Toe. 
-MMCTS uses Exp3 at each information set in its search, and scales the payoff 
-received by the depth of each playout. 
+%One particularly related work is the MMCTS algorithm~\cite{Auger11Multiple} that has been 
+%applied to Phantom Tic-Tac-Toe. 
+%MMCTS uses Exp3 at each information set in its search, and scales the payoff 
+%received by the depth of each playout. 
 %While we have not implemented MMCTS, we have been able to test our 
 %algorithm against it thanks to the authors sharing their code. 
 
@@ -451,7 +451,7 @@ The main difficulty remaining is how to direct the search when it is invoked {\i
 Online Outcome Sampling builds on playout-based OS by proposing two different ways to direct the search when started from a particular
 match history, $\tth$. 
 
-\subsection{Information Set Targeting}
+\subsubsection{Information Set Targeting}
 
 Suppose the match history is $\tth$. Information set targeting OOS is playout-based OS that samples histories $(h,z) \in Z_{I(\tth)}$ 
 with higher probability than $(h',z') \in H \times Z - Z_{I(\tth)}$. The intuition is that these histories are particularly 
@@ -474,9 +474,9 @@ in the information set proportionally stronger if the samples are rare.
 %The equilibrium strategy for the opponent in this subgame plays as if the opponent knows the searching player's private information. Therefore,
 %we expect that the optimal value of $\delta_I$ will depend on the importance of the hidden information.
 
-\subsection{Public Subgame Targeting}
+\subsubsection{Public Subgame Targeting}
 
-A \defword{public action}, $a \in A(I)$, to be one where for all $h \in I$, $ha \in I'$. 
+Define a \defword{public action}, $a \in A(I)$, to be one where for all $h \in I$, $ha \in I'$. 
 Given a history $h$, let $p(h)$ be the sequence of public actions along $h$ in the same order that they were taken in $h$. 
 Define the \defword{public subgame induced by I} to be the one whose terminal history set is $Z_{p,I(h)} =$ 
 \[\{(h,z)~|~z \in Z, h \in I, h' \in H, p(h') = p(h), h' \sqsubset z \}.\]
@@ -493,7 +493,7 @@ Public subgame targeting samples $z \in Z_{p,I(\tth)}$ with higher probability t
 IST and PST are consistent.
 \end{theorem}
 
-\subsection{Algorithm}
+\subsubsection{Algorithm}
 
 \begin{algorithm2e}[t]
   OOS$(h, \pi_i, \pi_{-i}, s_1, s_2, i)$: \; 
@@ -657,15 +657,15 @@ The player with the highest score wins and receives a utility of 1. The losing p
 receives a utility of -1. In, II-Goofspiel only whether the player won or lost a bid is 
 revealed, not the cards that were used to bid.  
 
-Phantom Tic-Tac-Toe (PTTT) is played on a 3-by-3 board, 
-initially empty, where the goal is to claim three squares along the same row, column, or diagonal. 
-However, in PTTT, players' actions are private. 
-Each turn, a player attempts to take a square of their choice. 
-If they fail due to the opponent having taken that square on a previous turn, the same player 
-keeps trying to take an alternative square until they succeed. 
-Players are not informed about how many attempts the opponent made before succeeding. 
-The game ends immediately if there is ever a connecting line of squares belonging to the same player. 
-The winner receives a payoff of $+1$, while the losing player receives $-1$. 
+%Phantom Tic-Tac-Toe (PTTT) is played on a 3-by-3 board, 
+%initially empty, where the goal is to claim three squares along the same row, column, or diagonal. 
+%However, in PTTT, players' actions are private. 
+%Each turn, a player attempts to take a square of their choice. 
+%If they fail due to the opponent having taken that square on a previous turn, the same player 
+%keeps trying to take an alternative square until they succeed. 
+%Players are not informed about how many attempts the opponent made before succeeding. 
+%The game ends immediately if there is ever a connecting line of squares belonging to the same player. 
+%The winner receives a payoff of $+1$, while the losing player receives $-1$. 
 
 \subsection{Head-to-Head Performance versus Exploitability} 
 
