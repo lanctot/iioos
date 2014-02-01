@@ -14,14 +14,16 @@ static int expansions = 0;
 static double oos_epsilon = 0.6;
 
 // for MCRNR
-// string oos_opp1mfile = "";
-// string oos_opp2mfile = "";
-string oos_opp1mfile = "";
-string oos_opp2mfile = "";
+//string oos_opp1mfile = "";
+//string oos_opp2mfile = "";
+string oos_opp1mfile = "scratch/iss.mcts1-1s.dat";
+string oos_opp2mfile = "scratch/iss.mcts2-1s.dat";
 static int opp1type = PLYR_MCTS;
 static int opp2type = PLYR_MCTS;
 static InfosetStore opp1ISS;
 static InfosetStore opp2ISS;
+static bool opp1loaded = false;
+static bool opp2loaded = false;
 
 // 1 = IST
 // 2 = PST
@@ -111,6 +113,101 @@ int getMatchAction(GameState & match_gs, unsigned long long match_bidseq, GameSt
 
   return action;
 }
+
+double policyProb(int player, Infoset & is, int action, unsigned long long infosetkey, int actionshere) { 
+  if (   (player == 1 && opp1loaded && sg_curPlayer == 2)
+      || (player == 2 && opp2loaded && sg_curPlayer == 1) ) {
+
+    // get the restricted one
+    
+    Infoset oppis; 
+
+    if (player == 1) {
+      bool ret = opp1ISS.get(infosetkey, oppis, actionshere, 0);
+      assert(ret);
+    }
+    else if (player == 2) { 
+      bool ret = opp2ISS.get(infosetkey, oppis, actionshere, 0);
+      assert(ret);
+    }
+    else { 
+      assert(false); 
+    }
+
+    double den = 0;
+    for (int a = 0; a < actionshere; a++) 
+      den += oppis.totalMoveProbs[a];
+
+    return (den == 0.0 ? (1.0 / actionshere) : (oppis.totalMoveProbs[action] / den));
+  }
+  else {
+    return is.curMoveProbs[action];
+  }
+}
+
+int oosSampleAction(int player, int updatePlayer, Infoset & is, int actionshere, double & sampleprob, unsigned long long infosetkey) {
+  int takeAction = -1; 
+
+  if (   (player == 1 && opp1loaded && sg_curPlayer == 2)
+      || (player == 2 && opp2loaded && sg_curPlayer == 1) ) {
+
+    // play restricted strategy
+    double epsilon = (player == updatePlayer ? 0.6 : 0.0); 
+    double r = 0.75;
+    
+    Infoset oppis; 
+
+    if (player == 1) {
+      bool ret = opp1ISS.get(infosetkey, oppis, actionshere, 0);
+      assert(ret);
+    }
+    else if (player == 2) { 
+      bool ret = opp2ISS.get(infosetkey, oppis, actionshere, 0);
+      assert(ret);
+    }
+    else { 
+      assert(false); 
+    }
+
+    double den = 0;
+    for (int a = 0; a < actionshere; a++) 
+      den += oppis.totalMoveProbs[a];
+
+    //cout << "den = " << den << endl;
+
+    double sum = 0; 
+    double roll = drand48();
+
+    for (int a = 0; a < actionshere; a++) {
+
+      double fixed_policy_pr = (den == 0.0 ? (1.0/actionshere) : (oppis.totalMoveProbs[a]/den));
+      double policy_pr = 
+                r*fixed_policy_pr
+        + (1.0-r)*(epsilon*(1.0/actionshere) + (1.0-epsilon)*is.curMoveProbs[a]);
+
+      if (roll >= sum && roll < (sum+policy_pr)) { 
+        sampleprob = policy_pr; 
+        takeAction = a;
+        //break;
+      }
+
+      sum += policy_pr;
+    }
+  
+    //cout << sum << endl;
+    assert(sum >= (0.999999) && sum <= (1.000001)); 
+  }
+  else { 
+    if (player == updatePlayer)
+      takeAction = sampleAction(player, is, actionshere, sampleprob, 0.6, false); 
+    else
+      takeAction = sampleAction(player, is, actionshere, sampleprob, 0.0, false); 
+  }
+
+  return takeAction;
+}
+
+
 
 // mode = 1 -> along the match
 // mode = 2 -> post match
@@ -266,19 +363,20 @@ double cfroos(GameState & match_gs, unsigned long long match_bidseq, int match_p
 
     // new_us
     if (player == updatePlayer)
-      new_us *= (0.6*(1.0 / actionshere) + 0.4*is.curMoveProbs[takeAction]);   
+      //new_us *= (0.6*(1.0 / actionshere) + 0.4*is.curMoveProbs[takeAction]);   
+      new_us *= (  (0.6*(1.0 / actionshere))
+                 +  0.4*policyProb(player, is, takeAction, infosetkey, actionshere) );
     else
-      new_us *= is.curMoveProbs[takeAction]; // this will never be zero due to epsilon regret-matching
+      //new_us *= is.curMoveProbs[takeAction]; // this will never be zero due to epsilon regret-matching
+      new_us *= policyProb(player, is, takeAction, infosetkey, actionshere);
 
     CHKPROBNZ(new_us);
   }
   else { 
     // choose like os chooses
 
-    if (player == updatePlayer)
-      takeAction = sampleAction(player, is, actionshere, sampleprob, 0.6, false); 
-    else
-      takeAction = sampleAction(player, is, actionshere, sampleprob, 0.0, false); 
+    takeAction = oosSampleAction(player, updatePlayer, is, actionshere, sampleprob, infosetkey);
+    assert(takeAction >= 0 && takeAction < actionshere);
 
     // this is always the case
     new_us *= sampleprob;
@@ -407,6 +505,18 @@ int getMoveOOS(int match_player, GameState match_gs, unsigned long long match_bi
 
   iter = 0; 
 
+  // load opponent models
+  if (match_player == 2 && oos_opp1mfile.length() > 0 && !opp1loaded) {
+    cout << "Loading opponement model for p1" << endl;
+    opp1ISS.readFromDisk(oos_opp1mfile);
+    opp1loaded = true;
+  }
+  else if (match_player == 2 && oos_opp2mfile.length() > 0 && !opp2loaded) { 
+    cout << "Loading opponement model for p2" << endl;
+    opp2ISS.readFromDisk(oos_opp2mfile);
+    opp2loaded = true;
+  }
+
   cout << "Player " << match_player << ", my roll is: " << match_gs.p1roll << endl;
   cout << "Starting OOS iterations..." << endl;
 
@@ -483,115 +593,5 @@ int getMoveOOS(int match_player, GameState match_gs, unsigned long long match_bi
   return bid; 
 }
 
-#if 0
-int main(int argc, char ** argv)
-{
-  unsigned long long maxIters = 0; 
-  unsigned long long maxNodesTouched = 0; 
-  init();
-
-  if (argc < 2)
-  {
-    initInfosets();
-    cout << "Created infosets. Exiting." << endl;
-    exit(0);
-  }
-  else
-  {
-    cout << "Reading infosets from " << argv[1] << endl;
-    if (!iss.readFromDisk(argv[1]))
-    {
-      cerr << "Problem reading file. " << endl; 
-      exit(-1); 
-    }
-
-    if (argc >= 3) 
-      runname = argv[2];
-    else
-      runname = "bluff11";
-  }
-
-  // get the iteration
-  string filename = argv[1];
-  vector<string> parts; 
-  split(parts, filename, '.'); 
-  if (parts.size() != 3 || parts[1] == "initial")
-    iter = 1; 
-  else
-    iter = to_ull(parts[1]); 
-  cout << "Set iteration to " << iter << endl;
-  iter = MAX(1,iter);
-    
-  // try loading metadeta. files have form scratch/iss-runname.iter.dat
-  if (iter > 1) { 
-    string filename2 = filename;
-    replace(filename2, "iss", "metainfo"); 
-    cout << "Loading metadata from file " << filename2 << "..." << endl;
-    loadMetaData(filename2); 
-  }
-  
-
-  unsigned long long bidseq = 0; 
-    
-  double totaltime = 0; 
-  StopWatch stopwatch;
-
-  for (; true; iter++)
-  {
-    GameState gs1; bidseq = 0;
-    double suffixreach = 1.0; 
-    double rtlSampleProb = 1.0; 
-    cfroos(gs1, 1, 0, bidseq, 1.0, 1.0, 1.0, 1.0, 1, suffixreach, rtlSampleProb, true);
-    
-    GameState gs2; bidseq = 0;
-    suffixreach = 1.0; 
-    rtlSampleProb = 1.0; 
-    cfroos(gs1, 1, 0, bidseq, 1.0, 1.0, 1.0, 1.0, 2, suffixreach, rtlSampleProb, true);
-
-    if (   (maxNodesTouched > 0 && nodesTouched >= maxNodesTouched)
-        || (maxNodesTouched == 0 && nodesTouched >= ntNextReport))
-    {
-      totaltime += stopwatch.stop();
-
-      double nps = nodesTouched / totaltime; 
-      cout << endl;      
-      cout << "total time: " << totaltime << " seconds. " << endl;
-      cout << "nodes = " << nodesTouched << endl;
-      cout << "nodes per second = " << nps << endl; 
-      cout << "expansions = " << expansions << endl;
-      
-      // again the bound here is weird for sampling versions
-      double b1 = 0.0, b2 = 0.0;
-      iss.computeBound(b1, b2); 
-      cout << "b1 = " << b1 << ", b2 = " << b2 << ", sum = " << (b1+b2) << endl;
-
-      ntNextReport *= ntMultiplier; // need this here, before dumping metadata
-
-      double conv = 0;
-      conv = computeBestResponses(false, false);
-      
-      cout << "**alglne: iter = " << iter << " nodes = " << nodesTouched << " conv = " << conv << " time = " << totaltime << endl; 
-
-      string str = "cfroos." + runname + ".report.txt"; 
-      report(str, totaltime, 2.0*MAX(b1,b2), 0, 0, conv);
-      //dumpInfosets("iss-" + runname); 
-      //dumpMetaData("metainfo-" + runname, totaltime); 
-      
-      cout << "Report done at: " << getCurDateTime() << endl;
-
-      cout << endl;
-      
-      stopwatch.reset(); 
-    
-      if (maxNodesTouched > 0 && nodesTouched >= maxNodesTouched) 
-        break;
-    
-      if (iter == maxIters) break;
-    }
-  }
-  
-  return 0;
-}
-#endif
 
 
