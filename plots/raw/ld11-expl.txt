@@ -37,3 +37,23 @@ tl=5.0 ov=2 de=0.90 Exploitabilities: 0.111579 0.302307 0.413886
 tl=5.0 ov=2 de=0.95 Exploitabilities: 0.11147 0.384767 0.496237
 tl=5.0 ov=2 de=0.99 Exploitabilities: 0.111642 0.501862 0.613504
 tl=5.0 ov=2 de=1.00 Exploitabilities: 0.110657 0.101609 0.212266
+
+tl=25.0 ov=1 de=0.00 Exploitabilities: 0.0658261 0.0420639 0.10789
+tl=25.0 ov=1 de=0.10 Exploitabilities: 0.0664799 0.0539374 0.120417
+tl=25.0 ov=1 de=0.50 Exploitabilities: 0.0799163 0.0843986 0.164315
+tl=25.0 ov=1 de=0.65 Exploitabilities: 0.0891295 0.0991983 0.188328
+tl=25.0 ov=1 de=0.80 Exploitabilities: 0.103976 0.133895 0.237871
+tl=25.0 ov=1 de=0.90 Exploitabilities: 0.121875 0.180747 0.302622
+tl=25.0 ov=1 de=0.95 Exploitabilities: 0.144022 0.231244 0.375265
+tl=25.0 ov=1 de=0.99 Exploitabilities: 0.247729 0.345351 0.59308
+tl=25.0 ov=1 de=1.00 Exploitabilities: 0.222889 0.764382 0.987272
+
+tl=25.0 ov=2 de=0.00 Exploitabilities: 0.0647353 0.0412612 0.105996
+tl=25.0 ov=2 de=0.10 Exploitabilities: 0.0652057 0.0422027 0.107408
+tl=25.0 ov=2 de=0.50 Exploitabilities: 0.0651063 0.0598514 0.124958
+tl=25.0 ov=2 de=0.65 Exploitabilities: 0.0654396 0.071397 0.136837
+tl=25.0 ov=2 de=0.80 Exploitabilities: 0.0659259 0.104023 0.169949
+tl=25.0 ov=2 de=0.90 Exploitabilities: 0.0652599 0.148617 0.213877
+tl=25.0 ov=2 de=0.95 Exploitabilities: 0.0655176 0.213062 0.278579
+tl=25.0 ov=2 de=0.99 Exploitabilities: 0.0651182 0.372905 0.438023
+tl=25.0 ov=2 de=1.00 Exploitabilities: 0.0651657 0.0667527 0.131918
