@@ -200,10 +200,9 @@ my @matchups = ();
 #}
 
 #Expl
-my @times = ( "1.0", "5.0" );
+my @times = ( "1.0", "5.0", "25.0" );
 my @oosv = ( "1", "2" ); 
 my @deltas = ("0.00", "0.10", "0.50", "0.65", "0.80", "0.90", "0.95", "0.99", "1.00"); 
-push(@matchups, "sim,1,2,5.0,1,0.00"); 
 for (my $i = 0; $i < scalar(@times); $i++) { 
   for (my $j = 0; $j < scalar(@oosv); $j++) { 
     for (my $k = 0; $k < scalar(@deltas); $k++) { 
