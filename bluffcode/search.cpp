@@ -9,6 +9,7 @@ using namespace std;
 
 int p1type = 0;
 int p2type = 0;
+bool simloopBR = false; // are we simulating for a best response?
 
 // Declared in bluff.h, defined in bluff.cpp. Used in this file
 //extern bool simgame;
@@ -337,8 +338,8 @@ double simloop(InfosetStore * saveISS1, InfosetStore * saveISS2)
     assert(move >= gs.curbid+1 && move <= BLUFFBID); 
 
     // add to the collected infosets if necessary
-    if (sg_curPlayer == 1 && saveISS1 != NULL) {       
-      
+    if (sg_curPlayer == 1 && saveISS1 != NULL && simloopBR) {       
+     
       if (firstmove1) { 
         //saveISS1->add(infosetkey, is, actionshere, 0, 1.0);
         
@@ -356,7 +357,7 @@ double simloop(InfosetStore * saveISS1, InfosetStore * saveISS2)
 
       //saveISS1->add(infosetkey, is, actionshere, 0); 
     }
-    if (sg_curPlayer == 2 && saveISS2 != NULL) { 
+    if (sg_curPlayer == 2 && saveISS2 != NULL && simloopBR) { 
       
       if (firstmove2) { 
         //sgiss2.copy(*saveISS2, false); 
@@ -377,10 +378,12 @@ double simloop(InfosetStore * saveISS1, InfosetStore * saveISS2)
       //saveISS2->add(infosetkey, is, actionshere, 0); 
     }
 
-    // Explore the space; 
-    double roll = drand48(); 
-    if (roll < 0.5) { 
-      move = gs.curbid+1+static_cast<int>(drand48()*actionshere);
+    // Explore the space during BR!
+    if (simloopBR) { 
+      double roll = drand48(); 
+      if (roll < 0.5) { 
+        move = gs.curbid+1+static_cast<int>(drand48()*actionshere);
+      }
     }
 
     if (move < BLUFFBID) {

@@ -278,6 +278,10 @@ void multi_aggregate() {
   InfosetStore averageISS1; // iss for player type 1 
   InfosetStore averageISS2; // iss for player type 2
 
+  simloopBR = true;
+
+  cout << "Loading/allocating average strategy infoset stores ... " << endl;
+
   sgiss1.copy(averageISS1, true); // allocate
   sgiss2.copy(averageISS2, true); // allocate
 
@@ -293,8 +297,13 @@ void multi_aggregate() {
     double remTime = (runMatches - (sim+1)) / simsPerSec; 
     cout << "Remaining time: " << remTime << endl << endl;
   }
+
+  cout << "Done. Computing expoitabilities for p1..." << endl;
   
   double expl1 = searchComputeHalfBR(1, &averageISS1, p1type == PLYR_MCTS);
+
+  cout << "expl1 = " << expl1 << ", now p2..." << endl; 
+
   double expl2 = searchComputeHalfBR(2, &averageISS2, p2type == PLYR_MCTS);
 
   //string dumpfile1 = "scratch/iss.agg1.dat"; 
