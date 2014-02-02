@@ -34,6 +34,8 @@ void multi_match() {
   int p1typeWins = 0;
   int p2typeWins = 0;
 
+  StopWatch sw; 
+
   // used for 2,2
   for (int match = 1; match <= runMatches; match++) { 
 
@@ -82,6 +84,11 @@ void multi_match() {
 
     cout << "PlayerType:" << actualP1Type << " (" << p1typeWins << " wins) "
          << "PlayerType:" << actualP2Type << " (" << p2typeWins << " wins)" << endl;
+
+    double matchesPerSec = match/sw.stop(); 
+    double remainingTime = (runMatches - match) / matchesPerSec; 
+    cout << "End of match. Estimated remaining time = " << remainingTime << " seconds." << endl;
+
     cout << endl;
     
     //double exp1 = searchComputeHalfBR(1, &sgiss1, p1type == PLYR_MCTS);
@@ -290,11 +297,11 @@ void multi_aggregate() {
   double expl1 = searchComputeHalfBR(1, &averageISS1, p1type == PLYR_MCTS);
   double expl2 = searchComputeHalfBR(2, &averageISS2, p2type == PLYR_MCTS);
 
-  string dumpfile1 = "scratch/iss.agg1.dat"; 
-  string dumpfile2 = "scratch/iss.agg2.dat"; 
-  cout << "Dumping aggregate files to disk: " << dumpfile1 << " " << dumpfile2 << endl;
-  averageISS1.dumpToDisk(dumpfile1);
-  averageISS2.dumpToDisk(dumpfile2);
+  //string dumpfile1 = "scratch/iss.agg1.dat"; 
+  //string dumpfile2 = "scratch/iss.agg2.dat"; 
+  //cout << "Dumping aggregate files to disk: " << dumpfile1 << " " << dumpfile2 << endl;
+  //averageISS1.dumpToDisk(dumpfile1);
+  //averageISS2.dumpToDisk(dumpfile2);
   
   cout << "Exploitabilities: " << expl1 << " " << expl2 << " " << (expl1+expl2) << endl;
 }
