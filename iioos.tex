@@ -417,15 +417,17 @@ match history then changes using $\tth \leftarrow \tth \tta$. There is a single 
 as needed from $\sigma_c(\tth)$, and reveales $I(\tth)$ to $P(\tth)$ on their turn. The players play until the match is terminated, 
 giving each player $i$ a payoff of $u_i(\ttz)$.
 
-Every perfect information game can be broken down into subgames and solved independently. 
-An equilibrium is called subgame perfect if its portion used in every subgame is also an equilibrium in that subgame. 
-Every perfect information game has a pure subgame perfect equilibrium, which can be found by backward induction. 
-Search algorithms such as minimax and MCTS simply aim to identify the single optimal action at the search tree's root. 
+% Sort of reptitive from non-locality discussion from before
 
-Imperfect information games cannot be easily broken down into subgames. In general, the optimal strategies in an inner information set 
-could be mixed and depend on the probabilities that individual nodes in the information set are reached. These probabilities depend on the 
-strategies of the players in the tree above the information set, which in turn depend on the rewards obtained in other parts of the tree. 
-Hence, the ``subgames'' cannot be solved independently and the search problem is more complex. 
+Every perfect information game can be broken down into subgames and solved independently. 
+%An equilibrium is called subgame perfect if its portion used in every subgame is also an equilibrium in that subgame. 
+Every perfect information game has a pure subgame perfect equilibrium, which can be found by backward induction. 
+Search algorithms simply aim to identify the single optimal action at the search tree's root. 
+Imperfect information games cannot be easily broken down into subgames. In general, the optimal strategies in an inner 
+information set could be mixed and depend on the probabilities that individual nodes in the information set are 
+reached. These probabilities depend on the strategies of the players in the tree above the information set, which in 
+turn depend on the rewards obtained in other parts of the tree. Hence, the ``subgames'' cannot be solved independently 
+and the search problem is more complex. 
 
 \section{Online Outcome Sampling}
 
@@ -635,8 +637,8 @@ algorithm that does not modify $\sigma(I)$ at previous $I(h)$ such that $h \sqsu
 
 We now compare the head-to-head performance and observed exploitability 
 of OOS and ISMCTS on two games with different sources of imperfect information. 
-We show the effects of targeting methods and $\delta$ values. 
-We start by describing each game, whose utilities are in $\{-1, 0, 1\}$. 
+%We show the effects of targeting methods and $\delta$ values. 
+%We start by describing each game, whose utilities are in $\{-1, 0, 1\}$. 
 
 Liar's Dice, also known as Dudo, Perudo, and Bluff is a dice-bidding game. 
 In LD($D_1$,$D_2$), each die has six sides with faces \epsdice{1} to \epsdice{5} and a star $\star$. 
@@ -651,14 +653,14 @@ to have a valid bid. The players continue until one (the loser) has no more dice
 
 Imperfect Information II-Goofspiel($N$) is a two-player card game where each player is
 given a private hand of bid cards with values $1$ to $N$. A different
-deck of $N$ point cards is shuffled and the cards are placed face up
-in a stack. On their turn, each player bids for the top point card by 
-choosing a single card in their hand and revealing the chosen card simultaneously. 
+deck of $N$ point cards is placed face up in a stack 
+On their turn, each player bids for the top point card by 
+choosing a single card in their hand. 
 The highest bidder gets the point card and adds the point total to their score, discarding
 the points in the case of a tie. 
-Both players discard the card they used to bid.  
 This is repeated $N$ times and the winner is the player with the highest score.
 In, II-Goofspiel the players only discover who won or lost a bid but not the bid cards played.
+Also, we assume the point-stack is strictly increasing: 1, 2, $\ldots N$.
 
 %Phantom Tic-Tac-Toe (PTTT) is played on a 3-by-3 board, 
 %initially empty, where the goal is to claim three squares along the same row, column, or diagonal. 
@@ -679,15 +681,18 @@ In, II-Goofspiel the players only discover who won or lost a bid but not the bid
 %pure (and bad) strategy.}
 
 \begin{figure*}[t]
-\begin{tabular}{ccc}
-\includegraphics[scale=0.45]{plots/ismcts-oos-perf} & 
-\includegraphics[scale=0.45]{plots/eq-oos-perf} &
-\includegraphics[scale=0.45]{plots/oos-expl}
+\begin{center}
+\begin{tabular}{cc}
+\includegraphics[scale=0.6]{plots/ismcts-oos-perf} & 
+\includegraphics[scale=0.6]{plots/eq-oos-perf} \\
+\includegraphics[scale=0.6]{plots/oos-expl} &
+\includegraphics[scale=0.6]{plots/goof-expl}
 \end{tabular}
-\caption{Results for OOS in LD(1,1) for $\delta \in \{ 0, 0.1, 0.5, 0.65, 0.8, 0.9, 0.95, 0.99, 1 \}$. 
-Left: win rate (\%) of OOS vs. ISMCTS. Middle: Left: win rate (\%) of OOS vs. a 0.001-equilibrium. 
-Right: approximate $\epsilon_{\sigma}$ using aggregate method.}
+\caption{Results for OOS in LD(1,1), Top left: win rate (\%) of OOS vs. ISMCTS. Top right: win rate (\%) of 
+OOS vs. a 0.001-equilibrium. Approximate $\epsilon_{\sigma}$ using aggregate method in LD(1,1) (bottom left)
+and II-Goofpiel(6) (bottom-right).}
 \label{fig:ld11-results}
+\end{center}
 \end{figure*}
 
 
