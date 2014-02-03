@@ -1,0 +1,9 @@
+tl=5.0 ov=1 0.00 Exploitabilities: 0.112033 0.125634 0.237667
+tl=5.0 ov=1 0.10 Exploitabilities: 0.112348 0.146878 0.259226
+tl=5.0 ov=1 0.50 Exploitabilities: 0.128672 0.197016 0.325689
+tl=5.0 ov=1 0.65 Exploitabilities: 0.138054 0.225599 0.363654
+tl=5.0 ov=1 0.80 Exploitabilities: 0.16177 0.27094 0.43271
+tl=5.0 ov=1 0.90 Exploitabilities: 0.205032 0.329412 0.534443
+tl=5.0 ov=1 0.95 Exploitabilities: 0.257823 0.382059 0.639882
+tl=5.0 ov=1 0.99 Exploitabilities: 0.410962 0.52443 0.935393
+tl=5.0 ov=1 1.00 Exploitabilities: 0.224231 0.762075 0.986306
