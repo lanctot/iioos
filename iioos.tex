@@ -755,13 +755,13 @@ Against the 0.001-equilibrium strategy,
 $\delta = 0.5, 0.65$ seems the most robust across variants and time settings, with varied effects when $\delta > 0.9$.
 There are some clear trends for the exploitability of OOS strategies. First, exploitability of the global strategy 
 increases with $\delta$, except when $\delta = 1$ which we suspect is due to benefiting from the reuse of values 
-from previous search in the same match. PST is less affected than IST by the targetung and appears to have lower exploitability. 
+from previous search in the same match. PST is less affected than IST by the targeting and appears to have lower exploitability. 
 For each method and all values of $\delta$: increasing the search time decreases exploitability. 
 The exploitability values from Table~\ref{tbl:fullstitching} also show this trend, and exploitability values of 
 ISMCTS show locked in at at $\approx$ 0.8, which we have also confirmed via the aggregate method.
 
 Finally, we performed one last head-to-head experiment of 500 games, with 25 seconds of search time of 
-PST($\delta = 0.8$) against ISMCTS in LD(2,2). PST won 256 of these, showing a competitive promise
+PST($\delta = 0.8$) against ISMCTS in LD(2,2). PST won 256 of these, showing a competitive promise on
 this much larger game with roughly 352 million information sets. 
 
 
@@ -817,7 +817,19 @@ PST           & 5s   & 0.148  & 0.125  & 0.273 \\
 
 \section{Conclusion}
 
+In the paper, we have introduced Online Outcome Sampling, the first 
+imperfect information search algorithm that is guaranteed to produce 
+approximate equilibrium strategies as search time is increased. We 
+showed that in head-to-head performance, OOS is able to compete with 
+ISMCTS while producing strategies with lower exploitability
+at the same search time in Liar's Dice and II-Goofspiel.
 
+For future work, we aim to derive finite-time guarantees 
+for the resulting strategies and investigate the application to 
+larger such as no-limit Poker. 
+Finally, we plan to try OOS with MCRNR~\cite{Ponsen11Computing} as
+the base strategy to produce a search player that balance 
+exploitability and exploitation versus known opponents.
 
 \bibliographystyle{aaai}
 \bibliography{iioos}
