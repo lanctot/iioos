@@ -132,7 +132,7 @@ while producing strategies with lower exploitability given the same search time.
 %\item introduce the first one that does, and show that it can compete with the others in practice
 %\end{itemize}
 
-In many sequential multi-agent interactions, agents have some initial time to prepare for the interaction and then after each decision, have  additional thinking time to decide about their next move. When preparation time is abundant and the computational resources are sufficient, an equilibrium strategy for a smaller abstract game can be pre-computed and then used during the game play. This {\it offline approach} has been remarkably successful in Computer Poker \cite{Johanson07Msc}.
+In many sequential multi-agent interactions, agents have some initial time to prepare for the interaction and then after each decision, have  additional thinking time to decide about their next move. When preparation time is abundant and the computational resources are sufficient, an equilibrium strategy for a smaller abstract game can be pre-computed and then used during the game play. This {\it offline approach} has been remarkably successful in Computer Poker \cite{Johanson07Msc,Sandholm10The}.
 However, the preparation time is often very limited. The exact model of the game may become known only shortly before acting is necessary, such as in general game-playing, security enforcement in previously unknown environment, and general-purpose robotics. In a short time, only a very small abstract game could be solved in advance. Moreover, it might not even be possible to create a sufficiently small and still useful abstraction to be solved in time. In these cases, agents may need to {\it decide online}: make initial decisions quickly and then put additional effort to improving their strategy in the current situation while the interaction is taking place.
 
 %Search in game-playing has been a classic interest of artificial intelligence. 
@@ -232,7 +232,7 @@ at information sets for all determinized states among its samples.
 Consider the game in Figure~\ref{fig:coordGame}. 
 Suppose a search starts from information set $I$. Because utilities for actions taken from all states are combined, 
 ISMCTS will choose left and right equally as often for both players, which would correspond to the equilibrium 
-strategy in the coordination subgame. However, mixing equally at is not part of an equilibrium in this game, since
+strategy in the coordination subgame. However, mixing equally at $I$ is not part of an equilibrium in this game, since
 it would lead to an expected utility of $\frac{3}{4}$ to the maximizing player for playing right, which 
 would give incentive to the maximizer to play left more often and change the minimizer's optimal response.  
 
@@ -337,8 +337,9 @@ If every distribution in the range of this mapping assigns all of its weight on 
 then the strategy is called \defword{pure}. 
 A \defword{mixed} strategy is a single explicit distribution over pure strategies. 
 Given a profile $\sigma$, we denote the probability of reaching a terminal history $z$ under $\sigma$ as 
-$\pi^\sigma(z) = \prod_{i \in N} \pi_i(z)$, where each $\pi_i(z)$ is a product of probabilities of the actions taken 
-by player $i$ along $z$. We also use $\pi^{\sigma}_i(h,z)$ and $\pi^{\sigma}(h,z)$ to refer to the product 
+$\pi^\sigma(z) = \prod_{i \in N} \pi_i(z)$, where each $\pi_i(z) = \prod_{ha \sqsubset z, P(h) = i} \sigma_i(h,a)$ 
+is a product of probabilities of the actions taken by player $i$ along $z$. 
+We also use $\pi^{\sigma}_i(h,z)$ and $\pi^{\sigma}(h,z)$ to refer to the product 
 of only those probabilities along the sequence from $h$ to $z$, where $h \sqsubset z$.
 Define $\Sigma_i$ to be the set of behavioral strategies for player $i$. 
 As is convention, $\sigma_{-i}$ and $\pi_{-i}^\sigma$ refer to player $i's$ opponents' strategies and products (including chance's).
