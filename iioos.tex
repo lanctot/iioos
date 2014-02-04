@@ -147,10 +147,12 @@ searches rooted from these states, aggregating their results to choose an action
 Monte Carlo~\cite{Long10Understanding} ``average over clairvoyance''~\cite{AIBook},
 % ML-Note Nov2: @Viliam, PIMC *is* "averaging over clairvoyance"
 ignoring the information structure completely. While this is sufficient in some games, it tends to have trouble in games like poker 
-whereinformation is critical; similar problems have been reported using Monte Carlo Tree Search (MCTS) in Kriegspiel~\cite{Ciancarini10Kriegspiel}.
-Most recent algorithms try to fix the problem by accounting for the information structure during the 
-search in some way. These approaches seem to improve performance in Kriegspiel, Skat~\cite{Furtak13Recursive}, 
-Scotland Yard~\cite{Nijssen12SY}, Dou Di Zhu, Magic: The Gathering, and other card games~\cite{Cowling12MTG,Cowling12ISMCTS}.
+where information is critical. 
+
+%; similar problems have been reported using Monte Carlo Tree Search (MCTS) in Kriegspiel~\cite{Ciancarini10Kriegspiel}.
+%Most recent algorithms try to fix the problem by accounting for the information structure during the 
+%search in some way. These approaches seem to improve performance in Kriegspiel, Skat~\cite{Furtak13Recursive}, 
+%Scotland Yard~\cite{Nijssen12SY}, Dou Di Zhu, Magic: The Gathering, and other card games~\cite{Cowling12MTG,Cowling12ISMCTS}.
 
 %For example, the notion of a subgame is required for backward induction, 
 %which most perfect information search algorithms are based on, is not well-defined in imperfect information games. 
@@ -162,7 +164,8 @@ foundations upon which search in games is built to motivate the importance of Na
 We show that OOS converges to an equilibrium strategy as time increases, making it the first 
 known imperfect information search algorithm satisfying this property, which we call {\it consistency}. Furthermore, we analyze methods for incorporating the information obtained by the players in the game to the search process, so that the consistency property is preserved. We show the empirical convergence rates and performance of OOS, comparing them to benchmark players and to ISMCTS~\cite{Cowling12ISMCTS}, a 
 recent algorithm currently used in a popular mobile phone implementation of Spades~\cite{Whitehouse13Integrating}. 
-We present results in two domains: Liar's Dice and a variant of Goofspiel.
+
+%We present results in two domains: Liar's Dice and a variant of Goofspiel.
 
 %PIMC~\cite{Long10Understanding}, ISMCTS~\cite{Cowling12ISMCTS}, and MMCTS~\cite{Auger11Multiple}.
 
@@ -414,20 +417,22 @@ In a \defword{match} (online game), each player is allowed little or no preparat
 There is a current \defword{match history}, $\tth$, initially the empty history $\emptyset$ representing the start of the match. Each turn, 
 the agent controlling $P(\tth)$ is given $t$ time units to decide on an \defword{match action} $\tta \in A(\tth)$ and the 
 match history then changes using $\tth \leftarrow \tth \tta$. There is a single referee who knows $\tth$, samples chance outcomes 
-as needed from $\sigma_c(\tth)$, and reveales $I(\tth)$ to $P(\tth)$ on their turn. The players play until the match is terminated, 
+as needed from $\sigma_c(\tth)$, and reveals $I(\tth)$ to $P(\tth)$ on their turn. The players play until the match is terminated, 
 giving each player $i$ a payoff of $u_i(\ttz)$.
 
 % Sort of reptitive from non-locality discussion from before
 
-Every perfect information game can be broken down into subgames and solved independently. 
+A perfect information game can be broken down into subgames and solved independently. 
 %An equilibrium is called subgame perfect if its portion used in every subgame is also an equilibrium in that subgame. 
 Every perfect information game has a pure subgame perfect equilibrium, which can be found by backward induction. 
 Search algorithms simply aim to identify the single optimal action at the search tree's root. 
 Imperfect information games cannot be easily broken down into subgames. In general, the optimal strategies in an inner 
 information set could be mixed and depend on the probabilities that individual nodes in the information set are 
 reached. These probabilities depend on the strategies of the players in the tree above the information set, which in 
-turn depend on the rewards obtained in other parts of the tree. Hence, the ``subgames'' cannot be solved independently 
-and the search problem is more complex. 
+turn depend on the payoffs obtained from other parts of the tree. 
+
+%Hence, the ``subgames'' cannot be solved independently 
+%and the search problem is more complex. 
 
 \section{Online Outcome Sampling}
 
@@ -607,7 +612,7 @@ $(\rho(t))$-equilibrium strategy.
 \end{theorem}
 Since every terminal history has non-zero probability of being sampled, eventually every information 
 set will be contained in memory. Then, the algorithm becomes MCCFR with a non-uniform sampling scheme.
-Consequently by \cite[Theorem 5]{Lanctot09Sampling} OOS mininimizes external regret with high probability.
+Consequently by \cite[Theorem 5]{Lanctot09Sampling} OOS minimizes external regret with high probability.
 Note that due to non-locality, consistency cannot hold generally for any search 
 algorithm that does not modify $\sigma(I)$ at previous $I(h)$ such that $h \sqsubset \tth$.
 
@@ -680,50 +685,33 @@ Also, we assume the point-stack is strictly increasing: 1, 2, $\ldots N$.
 %\mlnote{I have played against the ISMCTS strategy and I believe it's converging to a particular 
 %pure (and bad) strategy.}
 
-\begin{figure*}[t]
-\begin{center}
-\begin{tabular}{cc}
-\includegraphics[scale=0.6]{plots/ismcts-oos-perf} & 
-\includegraphics[scale=0.6]{plots/eq-oos-perf} \\
-\includegraphics[scale=0.6]{plots/oos-expl} &
-\includegraphics[scale=0.6]{plots/goof-expl}
-\end{tabular}
-\caption{Results for OOS in LD(1,1), Top left: win rate (\%) of OOS vs. ISMCTS. Top right: win rate (\%) of 
-OOS vs. a 0.001-equilibrium. Approximate $\epsilon_{\sigma}$ using aggregate method in LD(1,1) (bottom left)
-and II-Goofpiel(6) (bottom-right).}
-\label{fig:ld11-results}
-\end{center}
-\end{figure*}
-
-
 The standard metric used to evaluate performance 
 is head-to-head win rates. We measure this by simulating several games of each algorithm against the other
 and counting wins and losses. 
-However, when playing a game with a 
-one where the size of the information sets do not shrink during the 
-game\footnote{Games with low {\it disambiguation factor}; see \cite{Long10Understanding}.} (such as Poker and Liar's Dice), 
+However, when playing a game where private information is hardly revealed, 
 it may be critical to play in such a way that the opponent cannot easily infer the private information. Therefore, 
 we also propose two methods to approximate the exploitability of the resulting strategies produced by OOS. 
 
 In the offline setting, measuring exploitability is straight-forward: since the opponent strategy is fixed, the best 
 response values are computed by a recursive walk of the tree using expectimax. In online search, the algorithm computes only 
 a partial strategy. 
-The first \defword{full stitching} method tries to capture as closely as possible the distributions that would be computed 
-for each $I$ if they were reached in a match: it enumerates each $I \in \cI_i$ in topologically-sorted order starting at the root, 
+The first \defword{full stitching} method 
+enumerates each $I \in \cI_i$ in topologically-sorted order starting at the root, 
+%tries to capture as closely as possible the distributions that would be computed 
+%for each $I$ if they were reached in a match: 
 running a search from $I$ re-using only those distributions computed in previous searches from ancestors of $I$, saving the 
 distribution computed at $I$, and passing down the state of memory only for children of $I$. 
 We do not save changes made to ancestors when searching $I$; this is necessary to ensure 
 a fair comparison between OOS and ISMCTS. 
 
-Full-stitching is computationally intensive, requiring $|\cI|$ searches and memory, which is impractical on large games. 
-Therefore, we also propose another method to approximate the exploitability for larger games: the multi-match 
-\defword{aggregate method}. 
-This method first resets a global (accumulating) strategy data structure for each player type and generates a batch of matches $M$.
-Then, each $m \in M$ is simulated as if it were a normal game being played (where each player starts with empty strategies)
-and invokes the appropriate search algorithm at each observed $I$ along $m$. 
-Since $m$ is predetermined, the choice made by the search algorithm is discarded, but the information computed is 
-{\it aggregated} into the global data structure for that player type $P(I)$. In the case of ISMCTS, visit counts for actions at 
-$I$ are incremented by the ones searches. For OOS, the values in the average strategy tables $s_I$ are incremented.
+Full-stitching requires $|\cI|$ searches and memory, which is impractical on large games. 
+Therefore, we also propose: the multi-match \defword{aggregate method}. 
+This method first creates a global (accumulating) strategy data structure for each player type and generates a 
+set of matches $M$. Then, each $m \in M$ is simulated invoking the appropriate search algorithm at each observed 
+$I$ along $m$. 
+Since $m$ is predetermined, the choice made by the search algorithm is discarded, but the information computed 
+(visit counts in ISMCTS, $s_I$ in OOS) is {\it aggregated} into the global data structure for that player type 
+$P(I)$. 
 For a fair comparison, the first $I$ reached along each $m$ aggregates all the information gained in the search 
 but for future $I'$, only the information collected in $I'' \in \mbox{reachable}(I')$ is aggregated.
 Note that it is safe to combine the information in this way: in ISMCTS the actions chosen and visits are independent of 
@@ -736,15 +724,36 @@ linearity of expected utility.
 %And the \defword{single-match} method: this simply runs several matches and saves all values from each $I$ searched (as well as all of its reachable
 %children information sets) search, overwriting previously saved values as necessary. 
  
+\begin{figure}[t!]
+\begin{center}
+\includegraphics[scale=0.5]{plots/ismcts-oos-perf} \\
+\includegraphics[scale=0.5]{plots/eq-oos-perf} \\
+\includegraphics[scale=0.5]{plots/oos-expl} \\
+\includegraphics[scale=0.5]{plots/goof-expl} \\
+\caption{Results for OOS in LD(1,1). From top: win rate (\%) of OOS vs. ISMCTS, win rate (\%) of 
+OOS vs. a 0.001-equilibrium, approximate $\epsilon_{\sigma}$ using aggregate method in LD(1,1) 
+and II-Goofpiel(6).}
+\label{fig:results}
+\end{center}
+\end{figure}
 
-In our experiments ISMCTS uses $C = 2$ and tuning shows that $C$ value does not 
-affect the performance of ISMCTS. 
-In Goofspiel we run searches for 1, 2, and 4 seconds.
+
+In our experiments ISMCTS uses $C = 2$; tuning shows that the $C$ value does not 
+affect the performance. 
+In II-Goofspiel(6) we run searches for 1, 2, and 4 seconds.
+As there are no public actions, we only compare IST in II-Goofspiel. 
+Over a range of values for $\delta$ and all time settings, there was no statistically significant
+winner in head-to-head matches between IST and ISMCTS. 
+Exploitability is shown in Figure~\ref{fig:results}. We observe that exploitability generally 
+decreases as search time increases and also as $\delta$ increases, with its lowest points at $\delta = 1$. 
+The positive result was surprising, and we suspect it is due to benefiting from the reuse of 
+values from previous searches from the same match.
+
 In LD(1,1), we try searches for 1, 5, and 25 seconds. 
-Among all values for delta and time settinfs, IST wins 79.2-86.7\% and PST wins 78.6-84.0\%, with a 
+Among all values for delta and time settings, IST wins 79.2-86.7\% and PST wins 78.6-84.0\%, with a 
 non-noticeable difference over different $\delta$ values. 
 In LD(1,1) when played against a uniform random player ISMCTS wins 79.8-82.4\% at 1, 5, and 25 seconds. 
-Upon further inspection, ISMCTS very quickly converges to the same strategy each time: as first player, 
+Upon further inspection, ISMCTS very quickly converges to the same strategy every time: as first player, 
 with a weak roll ($r = \epsdice{1}, \epsdice{2},$ or \epsdice{3}) it bids 2-$r$ in the hope that by chance the
 opponent has the same roll because if it did not, the second player would have a winning response most of the time.
 On a roll of $r = \epsdice{4}$ or $r = \epsdice{5}$ it always bids 1-$r$ because it wins most of time. Either way, as 
@@ -752,55 +761,35 @@ second player ISMCTS selects responses based on the same reasoning, inducing the
 first bid. This also explains the relative exploitability values in Table~\ref{tbl:fullstitching}: the first player
 plays overly safely and hence is hard to exploit, meanwhile the second player best-responds to an expected pure first 
 player strategy, which makes it highly exploitable. 
+Our exploitability experiments shows a similar skewed first vs. second player effect in II-Goofspiel. 
 
-Results OOS variants on LD(1,1) are shown in Figure~\ref{fig:ld11-results}. Firstly, in head-to-head performance 
+Results OOS variants on LD(1,1) are shown in Figure~\ref{fig:results}. Firstly, in head-to-head performance 
 we notice OOS wins 55-60\% of games against ISMCTS, results for $\delta \in \{ 0.1, 0.8, 0.9 \}$ seem somewhat 
 consistent across variants and time settings, with varied effects for $\delta > 0.9$. 
 Against the 0.001-equilibrium strategy, 
 $\delta = 0.5, 0.65$ seems the most robust across variants and time settings, with varied effects when $\delta > 0.9$.
 There are some clear trends for the exploitability of OOS strategies. First, exploitability of the global strategy 
-increases with $\delta$, except when $\delta = 1$ which we suspect is due to benefiting from the reuse of values 
-from previous search in the same match. PST is less affected than IST by the targeting and appears to have lower exploitability. 
+increases with $\delta$, and again $\delta = 1$ gives surprisingly good results. 
+The sudden drop could be caused by the fact that when $\delta = 0.99$, the 
+importance of the off-match samples are weighted heavily which compete with the targeted samples. 
+PST is less affected than IST by the targeting and appears to have lower exploitability. 
 For each method and all values of $\delta$: increasing the search time decreases exploitability. 
 The exploitability values from Table~\ref{tbl:fullstitching} also show this trend, and exploitability values of 
 ISMCTS show locked in at at $\approx$ 0.8, which we have also confirmed via the aggregate method.
 
-Finally, we performed one last head-to-head experiment of 500 games, with 25 seconds of search time of 
-PST($\delta = 0.8$) against ISMCTS in LD(2,2). PST won 256 of these, showing a competitive promise on
+We performed one head-to-head experiment consisting of 500 games of PST($\delta = 0.8$) vs. ISMCTS, in LD(2,2)
+with 25 seconds of search time. 
+PST won 256 games, showing a competitive promise on 
 this much larger game with roughly 352 million information sets. 
 
-
-% Full stitching 1 second ISMCTS
-% Done. v1 (br to fixed p2) = 0.573817
-% Done. v2 (br to fixed p1) = 0.234504
-%
-% IST
-% Done. v1 (br to fixed p2) = 0.310557
-% Done. v2 (br to fixed p1) = 0.33718
-%
-% PST
-% Done. v1 (br to fixed p2) = 0.202671
-% Done. v2 (br to fixed p1) = 0.210993
-% 
-
-% Full stitching 5 sec 
-%
-% IST
-% Done. v1 (br to fixed p2) = 0.228946
-% Done. v2 (br to fixed p1) = 0.295227
-%
-% PST 
-% Done. v1 (br to fixed p2) = 0.148224
-% Done. v2 (br to fixed p1) = 0.124856
-% 
-%
-% ISMCTS
-% Done. v1 (br to fixed p2) = 0.548373
-% Done. v2 (br to fixed p1) = 0.251125
-% 
-
+Finally, inspired by~\cite{Auger11Multiple}, we started an initial investigation of OOS and ISMCTS in Phantom Tic-Tac-Toe. 
+We noticed that the mixed distribution obtained by normalizing the visit counts of ISMCTS was producing a 
+similar distribution at the root as OOS. As in the Rock, Paper, Scissors example~\cite{Shafiei09}, 
+we designed a biased version that gave higher payoff if the final line included a side. This 
+led to OOS and ISMCTS producing two distinctly different distributions at the root. 
 
 \begin{table}
+{\small
 \begin{center}
 \begin{tabular}{ccccc}
 Algorithm     & Time & $\epsilon_1$ & $\epsilon_2$ & $\epsilon_\sigma$ \\
@@ -815,8 +804,9 @@ PST           & 5s   & 0.148  & 0.125  & 0.273 \\
 \hline
 \end{tabular}
 \caption{LD(1,1) exploitability using full-stitching, $\delta = 0.9$.} 
-\end{center}
 \label{tbl:fullstitching}
+\end{center}
+}
 \end{table}
 
 
@@ -829,12 +819,10 @@ showed that in head-to-head performance, OOS is able to compete with
 ISMCTS while producing strategies with lower exploitability
 at the same search time in Liar's Dice and II-Goofspiel.
 
-For future work, we aim to derive finite-time guarantees 
-for the resulting strategies and investigate the application to 
-larger such as no-limit Poker. 
-Finally, we plan to try OOS with MCRNR~\cite{Ponsen11Computing} as
-the base strategy to produce a search player that balance 
-exploitability and exploitation versus known opponents.
+For future work, we hope to derive finite-time convergence guarantees 
+and apply OOS to larger games such as no-limit Poker. 
+We also plan to try MCRNR~\cite{Ponsen11Computing} instead of MCCFR 
+to balance exploitability and exploitation versus known opponents.
 
 \bibliographystyle{aaai}
 \bibliography{iioos}
