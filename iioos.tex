@@ -147,7 +147,7 @@ searches rooted from these states, aggregating their results to choose an action
 Monte Carlo~\cite{Long10Understanding} ``average over clairvoyance''~\cite{AIBook},
 % ML-Note Nov2: @Viliam, PIMC *is* "averaging over clairvoyance"
 ignoring the information structure completely. While this is sufficient in some games, it tends to have trouble in games like poker 
-where information is critical. 
+where information is critical.
 
 %; similar problems have been reported using Monte Carlo Tree Search (MCTS) in Kriegspiel~\cite{Ciancarini10Kriegspiel}.
 %Most recent algorithms try to fix the problem by accounting for the information structure during the 
@@ -160,7 +160,7 @@ where information is critical.
 The main problem with current techniques is a lack of theoretical foundations of the algorithms. There are no guarantees that the algorithms will always find a good strategy in a game, given a sufficient thinking time. In fact, there is empirical evidence suggesting that some of these techniques will not converge to the optimal solution even in very small games like Biased Rock-Paper-Scissors and Kuhn poker~\cite{Shafiei09,Ponsen11Computing}.
 
 In this paper, we start by formalizing the problem of imperfect information search from the ground up. That is, we return to the game-theoretic 
-foundations upon which search in games is built to motivate the importance of Nash equilibrium as the optimal strategy in zero-sum games. We explain the subtleties introduced by imperfect information that cause the current approaches not to converge to the optimal strategy. We introduce Online Outcome Sampling (OOS), a simulation-based algorithm that builds its search tree incrementally, like MCTS.  
+foundations upon which search in games is built to motivate the importance of Nash equilibrium as the optimal strategy in zero-sum games. We explain the subtleties introduced by imperfect information that cause the current approaches not to converge to the optimal strategy. We introduce Online Outcome Sampling (OOS), a simulation-based algorithm that builds its search tree incrementally, like Monte Carlo Tree Search (MCTS).  
 We show that OOS converges to an equilibrium strategy as time increases, making it the first 
 known imperfect information search algorithm satisfying this property, which we call {\it consistency}. Furthermore, we analyze methods for incorporating the information obtained by the players in the game to the search process, so that the consistency property is preserved. We show the empirical convergence rates and performance of OOS, comparing them to benchmark players and to ISMCTS~\cite{Cowling12ISMCTS}, a 
 recent algorithm currently used in a popular mobile phone implementation of Spades~\cite{Whitehouse13Integrating}. 
@@ -210,7 +210,7 @@ games like Scrabble~\cite{Sheppard02World}, Hearts~\cite{Sturtevant08An}, and Sk
 
 % overview of problems with PIMC, proposed solutions
 
-There are several problems that have been identified with Perfect information Monte Carlo (PIMC) search techniques
+There are several problems that have been identified with Perfect Information Monte Carlo (PIMC) search techniques
 on determinized samples. The most common are {\it strategy fusion} and {\it non-locality}~\cite{Frank98Finding}.
 Strategy fusion occurs when an algorithm is allowed to choose two different actions from two different states in the same 
 information set, which is inconsistent with the constraints imposed by the game's information structure. 
@@ -224,7 +224,7 @@ Non-locality, however, is a fundamental problem.
 Consequently, the usual minimax formulation of payoffs defined over future states is not applicable.  
 The authors of \cite{Parker10iss,Parker06Overconfidence} showed that minimax-style backups at opponent information 
 sets can lead to overly paranoid search. 
-We also make similar observations for MCTS in Liar's Dice. 
+We also make similar observations for ISMCTS in Liar's Dice. 
 
 ISMCTS is similar to MCTS except that it places a bandit at each information set rather than at each 
 state~\cite{Cowling12ISMCTS}. ISMCTS builds an information set tree and aggregates utility estimates of actions 
@@ -302,11 +302,11 @@ At each terminal history $z$ there is a payoff $u_i(z)$ in $[-\Delta,\Delta]$
 to each player $i$. At each nonterminal history $h$, there is a single 
 current player to act, determined by $P: H \backslash Z \rightarrow N \cup \{ c \}$ where $c$ is a special player called \defword{chance}
 (sometimes also called nature) that plays with a fixed stochastic strategy. For example, chance is used to represent rolls of dice
-and card draws. The game starts in the empty history, and 
+and card draws. The game starts in the empty history $\emptyset$, and 
 at each step, given the current history $h$, the current player chooses an action $a \in A(h)$ leading to successor history $h' = ha$;
 in this case we call $h$ a \defword{prefix} of $h'$ and denote this relationship by $h \sqsubset h'$. Also, for all $h,h',h'' \in H$, 
-if $h \sqsubset h'$ and $h' \sqsubset h''$ then $h \sqsubset h''$. Each set $N$, $H$, $Z$, and $A(h)$ are finite and every 
-history has finite length.
+if $h \sqsubset h'$ and $h' \sqsubset h''$ then $h \sqsubset h''$. Each set $N$, $H$, $Z$, and $A(h)$ for every $h \in H$ are 
+finite and every history has finite length.
 
 Define $\cI = \{ \cI_i~|~i \in N \}$ the set of information partitions. 
 $\cI_i$ is a partition over $H_i = \{ h~|~P(h) = i \}$ where each part is call an \defword{information set}.
@@ -338,7 +338,7 @@ then the strategy is called \defword{pure}.
 A \defword{mixed} strategy is a single explicit distribution over pure strategies. 
 Given a profile $\sigma$, we denote the probability of reaching a terminal history $z$ under $\sigma$ as 
 $\pi^\sigma(z) = \prod_{i \in N} \pi_i(z)$, where each $\pi_i(z)$ is a product of probabilities of the actions taken 
-by player $i$ along $z$. We also refer to $\pi^{\sigma}_i(h,z)$ and $\pi^{\sigma}(h,z)$ to refer to the product 
+by player $i$ along $z$. We also use $\pi^{\sigma}_i(h,z)$ and $\pi^{\sigma}(h,z)$ to refer to the product 
 of only those probabilities along the sequence from $h$ to $z$, where $h \sqsubset z$.
 Define $\Sigma_i$ to be the set of behavioral strategies for player $i$. 
 As is convention, $\sigma_{-i}$ and $\pi_{-i}^\sigma$ refer to player $i's$ opponents' strategies and products (including chance's).
@@ -372,7 +372,8 @@ Define $\sigma^t_{I \rightarrow a}$ as identical to $\sigma^t$ except at $I$ act
 The counterfactual regret of not taking $a \in A(I)$ at time $t$ is $r^t(I,a) = v_i(I,\sigma^t_{I \rightarrow a}) - v_i(I,\sigma)$. 
 For every iteration, and each $I \in \cI_i$, the algorithm updates the cumulative regret $R^T(I,a) = \sum_{t=1}^T r^t(I,a)$, for every
 action at every information set of every player. 
-Then, the distribution at each information set is obtained individually using regret-matching~\cite{Hart00}, which normalizes over the 
+Then, the distribution at each information set $\sigma(I)$ is obtained individually using 
+regret-matching~\cite{Hart00}, which normalizes over the 
 positive regret, flushing probabilities to zero for those actions with negative regret:
 \begin{equation}
 \label{eq:rm}
@@ -397,7 +398,7 @@ where $q(z)$ is the probability of sampling $z$.
 As long every $z \in Z$ has non-zero probability of being sampled, $\tilde{v}_i(I,\sigma)$ is an unbiased estimate of $v(I,\sigma)$ 
 due to the importance-sampling correction. 
 In \defword{outcome sampling} (OS), $\cQ$ is a partition and each block contains a single terminal history. In every iteration of 
-OS, a single $z \in Z$ is sampled and the information sets along the path to $z$ are modified. 
+OS, a single $z \in Z$ is sampled and values at the information sets along the path to $z$ are modified. 
 
 \subsection{Subgames and Online Search}
 
@@ -415,7 +416,7 @@ approach has also been used in Liar's Dice~\cite{Lanctot12IR,Neller11}.
 %approximate equilibria on abstract poker games, which are then used to look up actions when a decision needs to be made during play. 
 In a \defword{match} (online game), each player is allowed little or no preparation time before playing.
 There is a current \defword{match history}, $\tth$, initially the empty history $\emptyset$ representing the start of the match. Each turn, 
-the agent controlling $P(\tth)$ is given $t$ time units to decide on an \defword{match action} $\tta \in A(\tth)$ and the 
+the agent controlling $P(\tth)$ is given $t$ time units to decide on a \defword{match action} $\tta \in A(\tth)$ and the 
 match history then changes using $\tth \leftarrow \tth \tta$. There is a single referee who knows $\tth$, samples chance outcomes 
 as needed from $\sigma_c(\tth)$, and reveals $I(\tth)$ to $P(\tth)$ on their turn. The players play until the match is terminated, 
 giving each player $i$ a payoff of $u_i(\ttz)$.
@@ -453,7 +454,7 @@ We call this modification \defword{playout-based outcome sampling}.
 Playout-based OS is not a search algorithm since it does not take into account he current match history $\tth$; 
 it acts like a memory-saving offline technique since it is always the case that $\tth = \emptyset$.
 However, it will form the basis of our search algorithm. 
-The main difficulty remaining is how to direct the search when it is invoked {\it during the match}, 
+The main difficulty remaining is how to direct the search when it is invoked {\it during a non-empty match history}, 
 \ie when the match history $\tth \not= \emptyset$. 
 
 Online Outcome Sampling builds on playout-based OS by proposing two different ways to direct the search when started from a particular
@@ -463,9 +464,10 @@ match history, $\tth$.
 
 Suppose the match history is $\tth$. IST is playout-based OS that samples histories $(h,z) \in Z_{I(\tth)}$ 
 with higher probability than $(h',z') \in H \times Z - Z_{I(\tth)}$. The intuition is that these histories are particularly 
-relevant since the searching player {\it knows} that one of these $z$ will describe the match at its completion. Let $\delta$ be 
-the probability that any terminal history $z \in Z_{I(\tth)}$ is sampled.
+relevant since the searching player {\it knows} that one of these $z$ will describe the match at its completion. 
 
+Let $\delta$ be 
+the probability that any terminal history $z \in Z_{I(\tth)}$ is sampled.
 Setting $\delta = 1$ is problematic, since convergence guarantees are lost.
 Consider again the game in Figure~\ref{fig:coordGame}. 
 If the minimizing player knows it is in the information set $I$, it cannot start focusing all its 
@@ -484,12 +486,12 @@ in the information set proportionally stronger if the samples are rare.
 
 \subsubsection{Public Subgame Targeting (PST)}
 
-Define a \defword{public action}, $a \in A(I)$, to be one where $P(I) \not= c$ and for all $h \in I$, $ha \in I'$.
+Define a \defword{public action}, $a \in A(I)$, to be one where and for all $h \in I$, $ha \in I'$.
 Given a history $h$, let $p(h)$ be the sequence of public actions along $h$ in the same order that they were taken in $h$. 
 Define the \defword{public subgame} induced by $I$ to be the one whose terminal history set is $Z_{p,I(h)} =$ 
 \[\{(h,z)~|~z \in Z, h \in I, h' \in H, p(h') = p(h), h' \sqsubset z \}.\]
 Now, suppose the match history is $\tth$.
-Public subgame targeting samples $z \in Z_{p,I(\tth)}$ with higher probability than terminal histories outside this set.
+Public subgame targeting samples $z \in Z_{p,I(\tth)}$ with higher probability than terminal histories outside this set.\\
 
 %Suppose $\delta_{p,\tth}$ is the probability that any $z$ in this set is sampled. 
 %Again, it is tempting to sample from this set with $\delta_{p,\tth} = 1$. 
@@ -590,7 +592,7 @@ strategy on line~\ref{alg:avgstrat}.
 %$P(h) = -i$.
 
 The playout on line~\ref{alg:playout} samples to the end of the game with some playout policy at each step; we use uniform random, 
-but in general one could use an informed (fully-mixed) policy as well. 
+but in general one could use a informed policy based on domain knowledge as well. 
 Unlike MCTS, the playout policy in OOS must compute $l$ when reaching a terminal and update the tail probability $x$ when returning
 as done on line~\ref{alg:suffix2}. The function NewReachProbs on line~\ref{alg:newreaches} simply modifies the $P(h)$'s reach 
 probability by multiplying it by $\sigma(I,a)$, keeping the value of the other one the same.
@@ -613,9 +615,11 @@ $(\rho(t))$-equilibrium strategy.
 Since every terminal history has non-zero probability of being sampled, eventually every information 
 set will be contained in memory. Then, the algorithm becomes MCCFR with a non-uniform sampling scheme.
 Consequently by \cite[Theorem 5]{Lanctot09Sampling} OOS minimizes external regret with high probability.
-Note that due to non-locality, consistency cannot hold generally for any search 
-algorithm that does not modify $\sigma(I)$ at previous $I(h)$ such that $h \sqsubset \tth$.
 
+Note that due to non-locality, this consistency property cannot hold generally for any search 
+algorithm that does not modify $\sigma(I)$ at previous $I(h)$ such that $h \sqsubset \tth$. However, 
+it is an open question as to whether any of the previous algorithms could be modified to ensure 
+consistency.
 
 \section{Empirical Evaluation}
 
@@ -651,7 +655,7 @@ Each player $i$ rolls $D_i$ of these dice and looks at them without showing them
 Each round, players alternate by bidding on the outcome of all dice in play until one player ``calls liar'', 
 \ie claims that their opponent's latest bid does not hold.
 A bid consists of a quantity of dice and a face value.  
-A face of $\star$ is considered ``wild'' and counts as matching any other face.
+A face of $\star$ is considered wild and counts as matching any other face.
 To place a new bid, the player must increase either the quantity or face value of the current 
 bid (or both). When a player loses, they lose a number of dice equal to how many dice were missing 
 to have a valid bid. The players continue until one (the loser) has no more dice.
@@ -685,12 +689,11 @@ Also, we assume the point-stack is strictly increasing: 1, 2, $\ldots N$.
 %\mlnote{I have played against the ISMCTS strategy and I believe it's converging to a particular 
 %pure (and bad) strategy.}
 
-The standard metric used to evaluate performance 
-is head-to-head win rates. We measure this by simulating several games of each algorithm against the other
+We evaluate head-to-head performance by simulating several games of each algorithm against the other
 and counting wins and losses. 
-However, when playing a game where private information is hardly revealed, 
-it may be critical to play in such a way that the opponent cannot easily infer the private information. Therefore, 
-we also propose two methods to approximate the exploitability of the resulting strategies produced by OOS. 
+However, %when playing a game where private information is hardly revealed, 
+it may be critical to play in such a way that the opponent cannot easily infer the private information.  
+We propose two methods to approximate the exploitability of the resulting strategies. 
 
 In the offline setting, measuring exploitability is straight-forward: since the opponent strategy is fixed, the best 
 response values are computed by a recursive walk of the tree using expectimax. In online search, the algorithm computes only 
@@ -819,10 +822,11 @@ showed that in head-to-head performance, OOS is able to compete with
 ISMCTS while producing strategies with lower exploitability
 at the same search time in Liar's Dice and II-Goofspiel.
 
-For future work, we hope to derive finite-time convergence guarantees 
-and apply OOS to larger games such as no-limit Poker. 
-We also plan to try MCRNR~\cite{Ponsen11Computing} instead of MCCFR 
-to balance exploitability and exploitation versus known opponents.
+For future work, we hope to derive finite-time convergence guarantees, 
+apply OOS to larger games such as no-limit poker, and try informed playout
+policies. 
+Also, using MCRNR~\cite{Ponsen11Computing} 
+may balance exploitability and exploitation versus known opponents.
 
 \bibliographystyle{aaai}
 \bibliography{iioos}
