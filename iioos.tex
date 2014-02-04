@@ -609,8 +609,8 @@ update player histories, while average strategy tables at opponent histories.
 Let $\bar{\sigma}^t_m(\delta,\tth)$ be an average strategy produced by OOS with scheme $m \in \{ \mbox{IST}, \mbox{PST} \}$ 
 using $\delta < 1$ started from $\tth$ run for $t$ iterations. 
 If the exploration probability $\epsilon > 0$ then with high probability 
-$\exists T < \infty, \exists \rho(t)$ decreasing $\forall t > T$ such that $\bar{\sigma}^t_m(\delta,\tth)$ is a 
-$(\rho(t))$-equilibrium strategy. 
+$\exists T < \infty, \exists \rho(t)$ decreasing and upper-bounded by $2\Delta$ for all $t \ge T$
+such that $\bar{\sigma}^t_m(\delta,\tth)$ is a $(\rho(t))$-equilibrium strategy. 
 \label{thm:consistency}
 \end{theorem}
 Since every terminal history has non-zero probability of being sampled, eventually every information 
@@ -780,7 +780,7 @@ importance of the off-match samples are weighted heavily which compete with the 
 PST is less affected than IST by the targeting and appears to have lower exploitability. 
 For each method and all values of $\delta$: increasing the search time decreases exploitability. 
 The exploitability values from Table~\ref{tbl:fullstitching} also show this trend, and exploitability values of 
-ISMCTS are locked in at $\approx$ 0.8, which we have also confirmed via the aggregate method.
+ISMCTS are locked in at $\approx$ 0.8, which we confirmed via the aggregate method.
 
 We performed one head-to-head experiment consisting of 500 games of PST($\delta = 0.8$) vs. ISMCTS, in LD(2,2)
 with 25 seconds of search time. 
