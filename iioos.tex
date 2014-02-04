@@ -133,7 +133,7 @@ while producing strategies with lower exploitability given the same search time.
 %\end{itemize}
 
 In many sequential multi-agent interactions, agents have some initial time to prepare for the interaction and then after each decision, have  additional thinking time to decide about their next move. When preparation time is abundant and the computational resources are sufficient, an equilibrium strategy for a smaller abstract game can be pre-computed and then used during the game play. This {\it offline approach} has been remarkably successful in Computer Poker \cite{Johanson07Msc}.
-However, the preparation time is often very limited. The exact model of the game may become known only shortly before acting is necessary, such as in general game-playing, security enforcement in previously unknown environment, and general-purpose robotics. In a short time, only a very small abstract game could be solved in advance. Moreover, it might not even be possible to create a sufficiently small and still useful abstraction to be solved in time. In these cases, agents may need to {\it decide online}: make initial decisions quickly and then put additional effort to improving their strategy in the current situation while the interaction is taking place.
+However, the preparation time is often very limited. The exact model of the game may become known only shortly before acting is necessary, such as in general game-playing, security enforcement in a previously unknown environment, and general-purpose robotics. In a short time, only a very small abstract game could be solved in advance. Moreover, it might not even be possible to create a sufficiently small and still useful abstraction to be solved in time. In these cases, agents may need to {\it decide online}: make initial decisions quickly and then put additional effort to improving their strategy in the current situation while the interaction is taking place.
 
 %Search in game-playing has been a classic interest of artificial intelligence. 
 %focused on perfect information games, 
@@ -146,7 +146,7 @@ Modern approaches to imperfect information search use different forms of {\it de
 searches rooted from these states, aggregating their results to choose an action to play. The most extreme forms, \eg Perfect Information 
 Monte Carlo~\cite{Long10Understanding} ``average over clairvoyance''~\cite{AIBook},
 % ML-Note Nov2: @Viliam, PIMC *is* "averaging over clairvoyance"
-ignoring the information structure completely. While this is sufficient in some games, it tends to have trouble in games like poker 
+ignore the information structure completely. While this is sufficient in some games, it tends to have trouble in games like poker 
 where information is critical.
 
 %; similar problems have been reported using Monte Carlo Tree Search (MCTS) in Kriegspiel~\cite{Ciancarini10Kriegspiel}.
@@ -287,8 +287,7 @@ abstractions~\cite{Johanson13Evaluating}, the memory resources may not be availa
 %Basic game theoretic definitions. Behavioral strategies. 
 %CFR~\cite{CFR} and MCCFR~\cite{Lanctot09Sampling}. Success in Poker.
 
-Here, we define the relevant game-theoretic terminology forms the basis
-of our analysis. The notation used here is based on~\cite{OsbRub94}. 
+Here, we define the relevant game-theoretic terminology for our analysis. The notation used here is based on \citeauthor{OsbRub94}~\shortcite{OsbRub94}. 
 
 %We then describe 
 %the fundamental concepts required to describe OOS.
@@ -312,7 +311,7 @@ Define $\cI = \{ \cI_i~|~i \in N \}$ the set of information partitions.
 $\cI_i$ is a partition over $H_i = \{ h~|~P(h) = i \}$ where each part is call an \defword{information set}.
 Intuitively, an information set
 $I \in \cI_i$ that belongs to player $i$ represents a state of the game with respect to what player $i$ knows. 
-Formally, $I$ is a set of histories that a player cannot tell apart (due information hidden from that player). For all
+Formally, $I$ is a set of histories that a player cannot tell apart (due to information hidden from that player). For all
 $h,h' \in I$, $A(h) = A(h')$ and $P(h) = P(h')$; hence, often we use $A(I)$, $P(I)$, and denote $I(h)$ the information set
 containing $h$. 
 
@@ -341,7 +340,7 @@ $\pi^\sigma(z) = \prod_{i \in N} \pi_i(z)$, where each $\pi_i(z)$ is a product o
 by player $i$ along $z$. We also use $\pi^{\sigma}_i(h,z)$ and $\pi^{\sigma}(h,z)$ to refer to the product 
 of only those probabilities along the sequence from $h$ to $z$, where $h \sqsubset z$.
 Define $\Sigma_i$ to be the set of behavioral strategies for player $i$. 
-As is convention, $\sigma_{-i}$ and $\pi_{-i}^\sigma$ refer to player $i's$ opponents' strategies and products (including chance's).
+As is convention, $\sigma_{-i}$ and $\pi_{-i}^\sigma$ refer to player $i$'s opponents' strategies and products (including chance's).
 An \defword{$\epsilon$-Nash equilibrium}, $\sigma$, is a set of $\sigma_i$ for $i \in N$ such that the benefit to switching to some 
 alternative $\sigma_i'$,
 \begin{equation}
@@ -359,8 +358,7 @@ $\epsilon_{\sigma} = \max_{\sigma_1' \in \Sigma_1} u_1(\sigma_1', \sigma_2) + \m
 
 Counterfactual Regret (CFR) is a notion of regret at the information set level for extensive-form games~\cite{CFR}. 
 The CFR algorithm is iterative, updating its strategies each time step in self-play, converging to an equilibrium. 
-The \defword{counterfactual value} of taking action 
-at information set $I$ is the expected payoff given that player $i$ played to reach $I$ and the opponents played 
+The \defword{counterfactual value} of reaching information set $I$ is the expected payoff given that player $i$ played to reach $I$ and the opponents played 
 $\sigma_{-i}$, 
 \begin{equation}
 \label{eq:cfv}
@@ -389,7 +387,7 @@ also minimizes overall average regret, and hence the average profile is a $2\eps
 as $T \rightarrow \infty$.
 
 Monte Carlo Counterfactual Regret Minimization (MCCFR) applies CFR to sampled portions of the games~\cite{Lanctot09Sampling}. 
-Define a block set $\cQ$ is defined whose elements 
+A block set $\cQ$ is defined whose elements 
 $\cQ_j \subseteq Z$ define portions of the game. In MCCFR, a block is sampled with probability $q_j$ and the algorithm updates the 
 regret in information sets visited in $Q_j$ using the 
 \defword{sampled counterfactual value}, 
@@ -400,6 +398,13 @@ due to the importance-sampling correction.
 In \defword{outcome sampling} (OS), $\cQ$ is a partition and each block contains a single terminal history. In every iteration of 
 OS, a single $z \in Z$ is sampled and values at the information sets along the path to $z$ are modified. 
 
+In Poker, CFR and MCCFR have been used with remarkable success as offline methods 
+for pre-computing approximate equilibria in abstract games~\cite{CFR,Johanson12CFRBR}; the same general 
+approach has also been used in Liar's Dice~\cite{Lanctot12IR,Neller11}. 
+%additional optimizations that can be applied in Liar's Dice~\cite{Neller11}.
+%Essentially, CFR takes time (weeks?) {\it pre-computing} 
+%approximate equilibria on abstract poker games, which are then used to look up actions when a decision needs to be made during play. 
+
 \subsection{Subgames and Online Search}
 
 %Complexities of online search vs. offline equilibrium computation. Notions of subgame perfection (sequential equilibrium). 
@@ -408,13 +413,7 @@ OS, a single $z \in Z$ is sampled and values at the information sets along the p
 %Explain why this is not the case in imperfect information search. 
 %Show what can go wrong if you use a perfect information search method.
 
-In Poker, CFR and MCCFR have been used with remarkable success as offline methods 
-for pre-computing approximate equilibria in abstract games~\cite{CFR,Johanson12CFRBR}; the same general 
-approach has also been used in Liar's Dice~\cite{Lanctot12IR,Neller11}. 
-%additional optimizations that can be applied in Liar's Dice~\cite{Neller11}.
-%Essentially, CFR takes time (weeks?) {\it pre-computing} 
-%approximate equilibria on abstract poker games, which are then used to look up actions when a decision needs to be made during play. 
-In a \defword{match} (online game), each player is allowed little or no preparation time before playing.
+In a \defword{match} (online game), each player is allowed little or no preparation time before playing (preventing the offline advance computation of approximate equilibria solutions).
 There is a current \defword{match history}, $\tth$, initially the empty history $\emptyset$ representing the start of the match. Each turn, 
 the agent controlling $P(\tth)$ is given $t$ time units to decide on a \defword{match action} $\tta \in A(\tth)$ and the 
 match history then changes using $\tth \leftarrow \tth \tta$. There is a single referee who knows $\tth$, samples chance outcomes 
