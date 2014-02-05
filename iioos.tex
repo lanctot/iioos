@@ -446,23 +446,23 @@ values, which are updated whenever $I$ is visited. Before presenting the online 
 
 Imagine that OS is executed much like simulation-based MCTS. That is, an information set tree is built incrementally over 
 time, where a single information set (at most) is added to the initially empty information set tree (memory) each iteration. In 
-particular, when an information set is reach is reached that is not in memory, it is added to memory and a default playout policy 
+particular, when an information set is reached that is not in memory, it is added to memory and a default playout policy 
 (\eg uniform random) then takes over for the remainder of the simulation. Along the playout portion (tail) of the simulation,  
 information sets are not added to memory nor updated. Along the tree portion (head) of simulation, information sets are updated as normal. 
 We call this modification \defword{playout-based outcome sampling}. 
-Playout-based OS is not a search algorithm since it does not take into account he current match history $\tth$; 
+Playout-based OS is not a search algorithm since it does not take into account the current match history $\tth$; 
 it acts like a memory-saving offline technique since it is always the case that $\tth = \emptyset$.
 However, it will form the basis of our search algorithm. 
 The main difficulty remaining is how to direct the search when it is invoked {\it during a non-empty match history}, 
 \ie when the match history $\tth \not= \emptyset$. 
 
-Online Outcome Sampling builds on playout-based OS by proposing two different ways to direct the search when started from a particular
+Online Outcome Sampling builds on playout-based OS by proposing two different ways to direct the search when starting from a particular
 match history, $\tth$. 
 
 \subsubsection{Information Set Targeting (IST)}
 
 Suppose the match history is $\tth$. IST is playout-based OS that samples histories $(h,z) \in Z_{I(\tth)}$ 
-with higher probability than $(h',z') \in H \times Z - Z_{I(\tth)}$. The intuition is that these histories are particularly 
+with higher probability than $(h',z') \in (H \times Z) - Z_{I(\tth)}$. The intuition is that these histories are particularly 
 relevant since the searching player {\it knows} that one of these $z$ will describe the match at its completion. 
 
 Let $\delta$ be 
@@ -605,10 +605,8 @@ update player histories, while average strategy tables at opponent histories.
 
 \begin{theorem}
 Let $\bar{\sigma}^t_m(\delta,\tth)$ be an average strategy produced by OOS with scheme $m \in \{ \mbox{IST}, \mbox{PST} \}$ 
-using $\delta < 1$ started from $\tth$ run for $t$ iterations. 
-If the exploration probability $\epsilon > 0$ then with high probability 
-$\exists T < \infty, \exists \rho(t)$ decreasing $\forall t > T$ such that $\bar{\sigma}^t_m(\delta,\tth)$ is a 
-$(\rho(t))$-equilibrium strategy. 
+using $\delta < 1$ started from $\tth$ run for $t$ iterations, with exploration $\epsilon > 0$.  
+For any $p \in (0, 1]$ and $\delta > 0$ there exists $t < \infty$ such that with probability $1-p$ the strategy  $\bar{\sigma}^t_m(\delta,\tth)$ is a $\delta$-equilibrium strategy. 
 \label{thm:consistency}
 \end{theorem}
 Since every terminal history has non-zero probability of being sampled, eventually every information 
