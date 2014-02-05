@@ -147,7 +147,7 @@ searches rooted from these states, aggregating their results to choose an action
 Monte Carlo~\cite{Long10Understanding} ``average over clairvoyance''~\cite{AIBook},
 % ML-Note Nov2: @Viliam, PIMC *is* "averaging over clairvoyance"
 ignoring the information structure completely. While this is sufficient in some games, it tends to have trouble in games like poker 
-where information is critical.
+where information structure is critical.
 
 %; similar problems have been reported using Monte Carlo Tree Search (MCTS) in Kriegspiel~\cite{Ciancarini10Kriegspiel}.
 %Most recent algorithms try to fix the problem by accounting for the information structure during the 
@@ -160,8 +160,8 @@ where information is critical.
 The main problem with current techniques is a lack of theoretical foundations of the algorithms. There are no guarantees that the algorithms will always find a good strategy in a game, given a sufficient thinking time. In fact, there is empirical evidence suggesting that some of these techniques will not converge to the optimal solution even in very small games like Biased Rock-Paper-Scissors and Kuhn poker~\cite{Shafiei09,Ponsen11Computing}.
 
 In this paper, we start by formalizing the problem of imperfect information search from the ground up. That is, we return to the game-theoretic 
-foundations upon which search in games is built to motivate the importance of Nash equilibrium as the optimal strategy in zero-sum games. We explain the subtleties introduced by imperfect information that cause the current approaches not to converge to the optimal strategy. We introduce Online Outcome Sampling (OOS), a simulation-based algorithm that builds its search tree incrementally, like Monte Carlo Tree Search (MCTS).  
-We show that OOS converges to an equilibrium strategy as time increases, making it the first 
+foundations upon which search in games is built to motivate the importance of Nash equilibrium as the optimal strategy in zero-sum games. We explain the subtleties introduced by imperfect information that cause the current approaches not to converge to the optimal strategy. We introduce Online Outcome Sampling (OOS), a simulation-based algorithm that builds its search tree incrementally, like Monte Carlo Tree Search (MCTS)~\cite{mctssurvey}.  
+We show that OOS converges to an equilibrium strategy as search time per move increases, making it the first 
 known imperfect information search algorithm satisfying this property, which we call {\it consistency}. Furthermore, we analyze methods for incorporating the information obtained by the players in the game to the search process, so that the consistency property is preserved. We show the empirical convergence rates and performance of OOS, comparing them to benchmark players and to ISMCTS~\cite{Cowling12ISMCTS}, a 
 recent algorithm currently used in a popular mobile phone implementation of Spades~\cite{Whitehouse13Integrating}. 
 
@@ -231,8 +231,8 @@ state~\cite{Cowling12ISMCTS}. ISMCTS builds an information set tree and aggregat
 at information sets for all determinized states among its samples. 
 Consider the game in Figure~\ref{fig:coordGame}. 
 Suppose a search starts from information set $I$. Because utilities for actions taken from all states are combined, 
-ISMCTS will choose left and right equally as often for both players, which would correspond to the equilibrium 
-strategy in the coordination subgame. However, mixing equally at $I$ is not part of an equilibrium in this game, since
+ISMCTS will choose left and right equally as often, which would correspond to the equilibrium 
+strategy in the coordination subgame. However, mixing uniformly at $I$ is not part of an equilibrium in this game, since
 it would lead to an expected utility of $\frac{3}{4}$ to the maximizing player for playing right, which 
 would give incentive to the maximizer to play left more often and change the minimizer's optimal response.  
 
@@ -287,7 +287,7 @@ abstractions~\cite{Johanson13Evaluating}, the memory resources may not be availa
 %Basic game theoretic definitions. Behavioral strategies. 
 %CFR~\cite{CFR} and MCCFR~\cite{Lanctot09Sampling}. Success in Poker.
 
-Here, we define the relevant game-theoretic terminology forms the basis
+Here, we define the relevant game-theoretic terminology that forms the basis
 of our analysis. The notation used here is based on~\cite{OsbRub94}. 
 
 %We then describe 
@@ -296,8 +296,8 @@ of our analysis. The notation used here is based on~\cite{OsbRub94}.
 %survey of the fundamental topics, see~\cite{ShoLB08}.
 
 An extensive-form game models sequential decision making. There are $n$ decision-making agents called \defword{players} 
-$i \in N = \{ 1, \ldots, n \}$. In turn, players choose \defword{actions} leading to sequences called \defword{histories} $h \in H$. 
-A history $z \in Z$, where $Z \subseteq H$, is called a \defword{terminal history} represents a full game from start to finish. 
+$i \in N = \{ 1, 2 \}$. In turn, players choose \defword{actions} leading to sequences called \defword{histories} $h \in H$. 
+A history $z \in Z$, where $Z \subseteq H$, is called a \defword{terminal history} represents a full game from start to end. 
 At each terminal history $z$ there is a payoff $u_i(z)$ in $[-\Delta,\Delta]$ 
 to each player $i$. At each nonterminal history $h$, there is a single 
 current player to act, determined by $P: H \backslash Z \rightarrow N \cup \{ c \}$ where $c$ is a special player called \defword{chance}
@@ -553,7 +553,7 @@ with probability $\delta$ the iteration targets the subgame and chooses $z \in Z
 and with probability $(1-\delta)$ the usual OS sampling determines $z \in Z$. 
 The first parameter of OOS is the current history. 
 The next two are strategy's reach probabilities for the update player $i$ and the opponent. 
-The third and fourth parameters are the sample reach probabilities, one for each scenario. 
+The third and fourth parameters are overall probabilities that the current sample is generated, one for each scenario. 
 The last is the update player. Initial calls have the form OOS$(\emptyset, 1, 1, 1, 1, i)$.  
 For the return values, $x$ is a suffix/tail reach probability for both players, 
 $l$ is the root-to-leaf sample probability, and $u$ is the payoff of the trajectory in view 
@@ -576,7 +576,7 @@ used and on how the game is modeled. When using information set targeting, the o
 must be consistent with match history the targeted scenario. 
 
 A critical part of the algorithm is the action chosen and sample reach updates on line~\ref{alg:sample}. 
-In the subgame-targeted scenario: if $h \sqsubset \tth$ then action $a$ is loaded from the match history, $s_1' = s_1$, 
+In the targeted scenario: if $h \sqsubset \tth$ then action $a$ is loaded from the match history, $s_1' = s_1$, 
 and $s_2' = \Phi(I,i,a) s_2$; otherwise $\tth \sqsubseteq h$ and $(s_1', s_2') = \Phi(I,i,a) (s_1, s_2)$. 
 In the OS scenario: the sampled action $a \sim \Phi(I,i)$ resulting in successor $h' = ha'$ and $s_2' = \Phi(I,i,a) s_2$; 
 then if $h' \sqsubset \tth$, $s_1' = s_1 = 1$, otherwise $s_1' = 0$. These sample reach probabilities are combined into 
@@ -645,7 +645,7 @@ consistency.
 % - with/without incremental tree-building
 % - with/without remembering between moves
 
-We now compare the head-to-head performance and observed exploitability 
+We now compare the head-to-head performance and exploitability 
 of OOS and ISMCTS on two games with different sources of imperfect information. 
 %We show the effects of targeting methods and $\delta$ values. 
 %We start by describing each game, whose utilities are in $\{-1, 0, 1\}$. 
@@ -703,9 +703,9 @@ The first \defword{full stitching} method
 enumerates each $I \in \cI_i$ in topologically-sorted order starting at the root, 
 %tries to capture as closely as possible the distributions that would be computed 
 %for each $I$ if they were reached in a match: 
-running a search from $I$ re-using only those distributions computed in previous searches from ancestors of $I$, saving the 
+running a search from $I$ re-using only the information computed in previous searches from ancestors of $I$, saving the 
 distribution computed at $I$, and passing down the state of memory only for children of $I$. 
-We do not save changes made to ancestors when searching $I$; this is necessary to ensure 
+We do not save changes made to ancestors when searching at $I$ to ensure 
 a fair comparison between OOS and ISMCTS. 
 
 Full-stitching requires $|\cI|$ searches and memory, which is impractical on large games. 
@@ -719,8 +719,8 @@ $P(I)$.
 For a fair comparison, the first $I$ reached along each $m$ aggregates all the information gained in the search 
 but for future $I'$, only the information collected in $I'' \in \mbox{reachable}(I')$ is aggregated.
 Note that it is safe to combine the information in this way: in ISMCTS the actions chosen and visits are independent of 
-how $I'$ was reached. In OOS, the values of two converging $\epsilon$-equilibrium average strategies can be combined due to 
-linearity of expected utility. 
+how $I'$ was reached. In OOS, the accumulating $s_I$ values of two converging $\epsilon$-equilibrium average 
+strategies can be combined due to linearity of expected utility. 
 
 %a the \defword{partial stitching} method which does the same as full stitching to a fixed depth from the root, except also 
 %retains values from children information sets reached by the searches started along the frontier of the depth limit.
