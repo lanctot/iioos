@@ -223,46 +223,11 @@ Kriegspiel~\cite{Ciancarini10Kriegspiel}, Kuhn Poker~\cite{Ponsen11Computing}, p
 card games and other phantom games~\cite{Cowling12ISMCTS}. 
 Non-locality, however, is a fundamental problem.
 Consequently, the usual minimax formulation of payoffs defined over future states is not applicable.  
-The authors of \cite{Parker10iss,Parker06Overconfidence} showed that minimax-style backups at opponent information 
-sets can lead to overly paranoid search. 
-We also make similar observations for ISMCTS in Liar's Dice. 
+%The authors of \cite{Parker10iss,Parker06Overconfidence} showed that minimax-style backups at opponent information sets can lead to overly paranoid search. 
+%We also make similar observations for ISMCTS in Liar's Dice. 
 
-ISMCTS is similar to MCTS except that it places a bandit at each information set rather than at each 
-state~\cite{Cowling12ISMCTS}. ISMCTS builds an information set tree and aggregates utility estimates of actions 
-at information sets for all determinized states among its samples. 
-Consider the game in Figure~\ref{fig:coordGame}. 
-Suppose a search starts from information set $I$. Because utilities for actions taken from all states are combined, 
-ISMCTS will choose left and right equally as often, which would correspond to the equilibrium 
-strategy in the coordination subgame. However, mixing uniformly at $I$ is not part of an equilibrium in this game, since
-it would lead to an expected utility of $\frac{3}{4}$ to the maximizing player for playing right, which 
-would give incentive to the maximizer to play left more often and change the minimizer's optimal response.  
 
-\begin{figure}
-\begin{center}
-\begin{tikzpicture}
-\node [ch] {}
-    child{ node [ma] (i1_1) {} 
-	    child{ node {1}}
-    	    child{ node {0}}
-    	    edge from parent node[left] {0.5}
-    }
-    child{ node [ma] (i1_2) {}
-	    child{ node [mi] (i2_1) {}
-			   child{ node {3}}
-	    		   child{ node {0}}
-			 }	    
-	    child{ node [mi] (i2_2) {}
-			   child{ node {0}}
-	    		   child{ node {3}}
-			 }
-		edge from parent node[right] {0.5}
-	};
-\draw [dashed] (i1_1) -- (i1_2);
-\draw [dashed] (i2_1) -- (i2_2) node[midway, above] {I};
-\end{tikzpicture}
-\end{center}
-\caption{An example game with maximizing $\bigtriangleup$, minimizing $\bigtriangledown$ and chance $\bigcirc$ players.}\label{fig:coordGame}
-\end{figure}
+
 
 % other missing related works
 
@@ -282,6 +247,7 @@ algorithms to compute a near-optimal equilibrium of an abstract game and subsequ
 when playing the full game~\cite{Sandholm10The}. This {\it offline} approach requires designing 
 abstractions and pre-computing Poker equilibria, which is often not possible. Also, due to the size of 
 abstractions~\cite{Johanson13Evaluating}, the memory resources may not be available or known in advance. 
+\vlnote{I do not understand the point of the last two sentences.}
 
 \subsection{Extensive-Form Games}
 
@@ -296,9 +262,9 @@ of our analysis. The notation used here is based on~\cite{OsbRub94}.
 %For a comprehensive introduction and
 %survey of the fundamental topics, see~\cite{ShoLB08}.
 
-An extensive-form game models sequential decision making. There are $n$ decision-making agents called \defword{players} 
+In this paper, we focus on two-player zero-sum extensive form games, wich model sequential decision making of agents called \defword{players} denoted
 $i \in N = \{ 1, 2 \}$. In turn, players choose \defword{actions} leading to sequences called \defword{histories} $h \in H$. 
-A history $z \in Z$, where $Z \subseteq H$, is called a \defword{terminal history} represents a full game from start to end. 
+A history $z \in Z$, where $Z \subseteq H$, is called a \defword{terminal history} and represents a full game from start to end. 
 At each terminal history $z$ there is a payoff $u_i(z)$ in $[-\Delta,\Delta]$ 
 to each player $i$. At each nonterminal history $h$, there is a single 
 current player to act, determined by $P: H \backslash Z \rightarrow N \cup \{ c \}$ where $c$ is a special player called \defword{chance}
@@ -306,15 +272,15 @@ current player to act, determined by $P: H \backslash Z \rightarrow N \cup \{ c 
 and card draws. The game starts in the empty history $\emptyset$, and 
 at each step, given the current history $h$, the current player chooses an action $a \in A(h)$ leading to successor history $h' = ha$;
 in this case we call $h$ a \defword{prefix} of $h'$ and denote this relationship by $h \sqsubset h'$. Also, for all $h,h',h'' \in H$, 
-if $h \sqsubset h'$ and $h' \sqsubset h''$ then $h \sqsubset h''$. Each set $N$, $H$, $Z$, and $A(h)$ for every $h \in H$ are 
+if $h \sqsubset h'$ and $h' \sqsubset h''$ then $h \sqsubset h''$, and $h \sqsubset h$. Each set $N$, $H$, $Z$, and $A(h)$ for every $h \in H$ are 
 finite and every history has finite length.
 
 Define $\cI = \{ \cI_i~|~i \in N \}$ the set of information partitions. 
 $\cI_i$ is a partition over $H_i = \{ h~|~P(h) = i \}$ where each part is call an \defword{information set}.
 Intuitively, an information set
-$I \in \cI_i$ that belongs to player $i$ represents a state of the game with respect to what player $i$ knows. 
+$I \in \cI_i$ that belongs to player $i$ represents a state of the game with respect to what player $i$ knows.
 Formally, $I$ is a set of histories that a player cannot tell apart (due to information hidden from that player). For all
-$h,h' \in I$, $A(h) = A(h')$ and $P(h) = P(h')$; hence, often we use $A(I)$, $P(I)$, and denote $I(h)$ the information set
+$h,h' \in I$, $A(h) = A(h')$ and $P(h) = P(h')$; hence, often we naturally extend the definition to $A(I)$, $P(I)$, and denote $I(h)$ the information set
 containing $h$. 
 
 % ML-Note Nov2:  I don't this we'll need this in this paper, but just in case...
@@ -334,35 +300,33 @@ containing $h$.
 %equilibrium definitions
 A \defword{behavioral strategy} for player $i$ is a function mapping each information set $I \in \cI_i$
 to a probability distribution over the actions $A(I)$, denoted by $\sigma_i(I)$. 
-If every distribution in the range of this mapping assigns all of its weight on a single action, 
-then the strategy is called \defword{pure}. 
-A \defword{mixed} strategy is a single explicit distribution over pure strategies. 
+%If every distribution in the range of this mapping assigns all of its weight on a single action, then the strategy is called \defword{pure}. 
+%A \defword{mixed} strategy is a single explicit distribution over pure strategies. 
 Given a profile $\sigma$, we denote the probability of reaching a terminal history $z$ under $\sigma$ as 
-$\pi^\sigma(z) = \prod_{i \in N} \pi_i(z)$, where each $\pi_i(z) = \prod_{ha \sqsubset z, P(h) = i} \sigma_i(h,a)$ 
+$\pi^\sigma(z) = \prod_{i \in N} \pi_i(z)$, where each $\pi_i(z) = \prod_{ha \sqsubset z, P(h) = i} \sigma_i(I(h),a)$ 
 is a product of probabilities of the actions taken by player $i$ along $z$. 
 We also use $\pi^{\sigma}_i(h,z)$ and $\pi^{\sigma}(h,z)$ to refer to the product 
-of only those probabilities along the sequence from $h$ to $z$, where $h \sqsubset z$.
+of only the probabilities of actions along the sequence from the end of $h$ to the end of $z$, where $h \sqsubset z$.
 Define $\Sigma_i$ to be the set of behavioral strategies for player $i$. 
-As is convention, $\sigma_{-i}$ and $\pi_{-i}^\sigma$ refer to player $i$'s opponents' strategies and products (including chance's).
-An \defword{$\epsilon$-Nash equilibrium}, $\sigma$, is a set of $\sigma_i$ for $i \in N$ such that the benefit to switching to some 
-alternative $\sigma_i'$,
+As is convention, $\sigma_{-i}$ and $\pi_{-i}^\sigma$ refer to player $i$'s opponent strategy and products of the opponent's and chance's actions.
+An \defword{$\epsilon$-Nash equilibrium}, $\sigma$, is a set of $\sigma_i$ for $i \in N$ such that the benefit of switching to some 
+alternative $\sigma_i'$ is limited by $\epsilon$, i.e.,
 \begin{equation}
   \label{eq:ne}
   \max_{\sigma_i' \in \Sigma_i} u_i(\sigma_i', \sigma_{-i}) - u_i(\sigma) \le \epsilon
 \end{equation}
 holds for each player $i \in N$. When $\epsilon = 0$, the profile is simply called a Nash equilibrium. 
-When $|N| = 2$ and $u_1(z) + u_2(z) = k$ for all $z \in Z$, then the game is a two-player $k$-sum game, where $k$ is a constant; these 
+When $|N| = 2$ and $u_1(z) + u_2(z) = k$ for all $z \in Z$, then the game is a two-player zero-sum game; these 
 games form an important subset of extensive-form games due to their worst-case guarantees: different equilibrium strategies result in 
-the same expected payoff against any arbitrary opponent equilibrium strategy. In this paper, we focus on two-player zero-sum games, 
-and define the \defword{exploitability} of a profile to be the sum of both distances from Eq.~\ref{eq:ne}, 
+the same expected payoff against any arbitrary opponent equilibrium strategy and at least the same payoff for any opponent strategy at all. In this paper, we  define the \defword{exploitability} of a profile to be the sum of both distances from Eq.~\ref{eq:ne}, 
 $\epsilon_{\sigma} = \max_{\sigma_1' \in \Sigma_1} u_1(\sigma_1', \sigma_2) + \max_{\sigma_2' \in \Sigma_1} u_2(\sigma_1, \sigma_2')$.
 
 \subsection{Counterfactual Regret Minimization}
 
 Counterfactual Regret (CFR) is a notion of regret at the information set level for extensive-form games~\cite{CFR}. 
-The CFR algorithm is iterative, updating its strategies each time step in self-play, converging to an equilibrium. 
-The \defword{counterfactual value} of reaching information set $I$ is the expected payoff given that player $i$ played to reach $I$ and the opponents played 
-$\sigma_{-i}$, 
+The CFR algorithm iteratively learns strategies in self-play, converging to an equilibrium. 
+The \defword{counterfactual value} of reaching information set $I$ is the expected payoff given that player $i$ played to reach $I$, the opponents played 
+$\sigma_{-i}$ and both players played $\sigma$ after $I$ was reached:
 \begin{equation}
 \label{eq:cfv}
 v_i(I,\sigma) = \sum_{(h,z) \in Z_I} \pi^{\sigma}_{-i}(h) \pi^{\sigma}_{i}(h,z) u_i(z), 
@@ -370,36 +334,37 @@ v_i(I,\sigma) = \sum_{(h,z) \in Z_I} \pi^{\sigma}_{-i}(h) \pi^{\sigma}_{i}(h,z) 
 where $Z_I = \{ (h,z)~|~z \in Z, h \in I, h \sqsubset z \}$.
 Suppose, at time $t$, player $i$ plays with strategy $\sigma^t_i$. 
 Define $\sigma^t_{I \rightarrow a}$ as identical to $\sigma^t$ except at $I$ action $a$ is taken with probability $1$. 
-The counterfactual regret of not taking $a \in A(I)$ at time $t$ is $r^t(I,a) = v_i(I,\sigma^t_{I \rightarrow a}) - v_i(I,\sigma)$. 
-For every iteration, and each $I \in \cI_i$, the algorithm updates the cumulative regret $R^T(I,a) = \sum_{t=1}^T r^t(I,a)$, for every
-action at every information set of every player. 
-Then, the distribution at each information set $\sigma(I)$ is obtained individually using 
-regret-matching~\cite{Hart00}, which normalizes over the 
-positive regret, flushing probabilities to zero for those actions with negative regret:
-\begin{equation}
+The counterfactual regret of not taking $a \in A(I)$ at time $t$ is $r^t(I,a) = v_i(I,\sigma^t_{I \rightarrow a}) - v_i(I,\sigma^t)$. 
+The algorithm maintains the cumulative regret $R^T(I,a) = \sum_{t=1}^T r^t(I,a)$, for every action at every information set of every player. 
+Then, the distribution at each information set for the next iteration $\sigma^{T+1}(I)$ is obtained individually using 
+regret-matching~\cite{Hart00}. The distribution is proportional to the positive portion of the individual actions' regret:
+\begin{equation*}
 \label{eq:rm}
 \sigma^{T+1}(I,a) = \left\{
 \begin{array}{ll}
-R^{T,+}(I,a) / R^{T,+}_{sum} & \mbox{if } R^{T,+}_{sum} > 0 \\ 
+R^{T,+}(I,a) / R^{T,+}_{sum}(I) & \mbox{if } R^{T,+}_{sum}(I) > 0 \\ 
 1 / |A(I)|                   & \mbox{otherwise,}
 \end{array} \right.
+\end{equation*}
+where $x^+ = \max(0,x)$ for any term $x$, and $R^{T,+}_{sum}(I) = \sum_{a' \in A(I)} R^{T,+}(I,a')$. Furthermore, the algorithm maintains for each information set the average strategy profile
+\begin{equation}
+\bar{\sigma}^T(I,a) = \frac{1}{T}\sum_{t=1}^T \sigma^t(I,a).
 \end{equation}
-where $x^+ = \max(0,x), R^{T,+}_{sum} = \sum_{a' \in A(I)} R^{T,+}(I,a')$. 
-The combination of individual regret minimizers
-also minimizes overall average regret, and hence the average profile is a $2\epsilon$-equilibrium, with $\epsilon \rightarrow 0$
+The combination of the conuterfactual regret minimizers in individual information sets also minimizes the overall average regret \cite{CFR}, and hence the average profile is a $2\epsilon$-equilibrium, with $\epsilon \rightarrow 0$
 as $T \rightarrow \infty$.
 
-Monte Carlo Counterfactual Regret Minimization (MCCFR) applies CFR to sampled portions of the games~\cite{Lanctot09Sampling}. 
-A block set $\cQ$ is defined whose elements 
-$\cQ_j \subseteq Z$ define portions of the game. In MCCFR, a block is sampled with probability $q_j$ and the algorithm updates the 
-regret in information sets visited in $Q_j$ using the 
+Monte Carlo Counterfactual Regret Minimization (MCCFR) applies CFR to sampled portions of the games~\cite{Lanctot09Sampling}. In the \defword{outcome sampling} (OS) variant of the algorithm a single terminal history $z\in Z$ is sampled in each iteration. The algorithm updates the regret in the information sets visited along $z$ using the 
 \defword{sampled counterfactual value}, 
-\[ \tilde{v}_i(I,\sigma) = \sum_{(h,z) \in (H \times Q_j) \cap Z_I} \frac{1}{q(z)} \pi^{\sigma}_{-i}(z) \pi^{\sigma}_{i}(h,z) u_i(z), \]
+\begin{equation*}
+\tilde{v}_i(I,\sigma) = \left\{
+\begin{array}{ll}
+\frac{1}{q(z)} \pi^{\sigma}_{-i}(z) \pi^{\sigma}_{i}(h,z) u_i(z) & \mbox{if } (h,z) \in Z_I\\
+0  & \mbox{otherwise,}
+\end{array} \right.
+\end{equation*}
 where $q(z)$ is the probability of sampling $z$. 
 As long every $z \in Z$ has non-zero probability of being sampled, $\tilde{v}_i(I,\sigma)$ is an unbiased estimate of $v(I,\sigma)$ 
-due to the importance-sampling correction. 
-In \defword{outcome sampling} (OS), $\cQ$ is a partition and each block contains a single terminal history. In every iteration of 
-OS, a single $z \in Z$ is sampled and values at the information sets along the path to $z$ are modified. 
+due to the importance-sampling correction ($1/q(z)$). For this reason, running the CFR algorithm using these sampled counterfactual values instead of the precise counterfactual values also eventually converges to the approximate equilibrium of the game. The number of iterations required for convergence is much larger, but each iteration is much faster.
 
 In Poker, CFR and MCCFR have been used with remarkable success as offline methods 
 for pre-computing approximate equilibria in abstract games~\cite{CFR,Johanson12CFRBR}; the same general 
@@ -436,6 +401,40 @@ turn depend on the payoffs obtained from other parts of the tree.
 
 %Hence, the ``subgames'' cannot be solved independently 
 %and the search problem is more complex. 
+
+\subsection{Informtion Set Monte-Carlo Tree Search}
+
+The implementation details of ISMCTS decribed in \cite{Cowling12ISMCTS} have impact on efficiency of the method for various games, but in essence, the MO variant of the algorithm incrementally builds the game tree similarly to MCTS, but it places a multi-armed bandit algorithm at each information set rather than at each state. After a non-root information set is reached during the match, further simulations are run from a random node in this information set with uniform probability. This prevents the algorithm from converging to the optimal solution in the game.
+Consider the game in Figure~\ref{fig:coordGame}.
+Suppose ISMCTS searches from information set $I$. Because utilities for actions taken from both states are combined, ISMCTS will choose left and right action equally often. However, mixing uniformly at $I$ is not part of an equilibrium in this game, since it would lead to an expected utility of $\frac{3}{4}$ to the maximizing player for playing right, which would give an incentive to the maximizer to always play left and in that case, the minimizer would be better of playing right, reaching expected reward of $0.5$.
+
+\begin{figure}
+\begin{center}
+\begin{tikzpicture}
+\node [ch] {}
+    child{ node [ma] (i1_1) {} 
+	    child{ node {1}}
+    	    child{ node {0}}
+    	    edge from parent node[left] {0.5}
+    }
+    child{ node [ma] (i1_2) {}
+	    child{ node [mi] (i2_1) {}
+			   child{ node {3}}
+	    		   child{ node {0}}
+			 }	    
+	    child{ node [mi] (i2_2) {}
+			   child{ node {0}}
+	    		   child{ node {3}}
+			 }
+		edge from parent node[right] {0.5}
+	};
+\draw [dashed] (i1_1) -- (i1_2);
+\draw [dashed] (i2_1) -- (i2_2) node[midway, above] {I};
+\end{tikzpicture}
+\end{center}
+\caption{An example game with maximizing $\bigtriangleup$, minimizing $\bigtriangledown$ and chance $\bigcirc$ players. The optimal (Nash equilibrium) strategy is for $\bigtriangleup$ to play (0.5,0.5) and for $\bigtriangledown$ to play (left,right) with probabilities ($\frac{1}{3}$,$\frac{2}{3}$). Its value is $1.0$.}\label{fig:coordGame}
+\end{figure}
+
 
 \section{Online Outcome Sampling}
 
