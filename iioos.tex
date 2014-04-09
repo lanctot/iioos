@@ -262,7 +262,7 @@ of our analysis. The notation used here is based on~\cite{OsbRub94}.
 %For a comprehensive introduction and
 %survey of the fundamental topics, see~\cite{ShoLB08}.
 
-In this paper, we focus on two-player zero-sum extensive form games, wich model sequential decision making of agents called \defword{players} denoted
+In this paper, we focus on two-player zero-sum extensive form games, which model sequential decision making of agents called \defword{players} denoted
 $i \in N = \{ 1, 2 \}$. In turn, players choose \defword{actions} leading to sequences called \defword{histories} $h \in H$. 
 A history $z \in Z$, where $Z \subseteq H$, is called a \defword{terminal history} and represents a full game from start to end. 
 At each terminal history $z$ there is a payoff $u_i(z)$ in $[-\Delta,\Delta]$ 
@@ -350,7 +350,7 @@ where $x^+ = \max(0,x)$ for any term $x$, and $R^{T,+}_{sum}(I) = \sum_{a' \in A
 \begin{equation}
 \bar{\sigma}^T(I,a) = \frac{1}{T}\sum_{t=1}^T \sigma^t(I,a).
 \end{equation}
-The combination of the conuterfactual regret minimizers in individual information sets also minimizes the overall average regret \cite{CFR}, and hence the average profile is a $2\epsilon$-equilibrium, with $\epsilon \rightarrow 0$
+The combination of the counterfactual regret minimizers in individual information sets also minimizes the overall average regret \cite{CFR}, and hence the average profile is a $2\epsilon$-equilibrium, with $\epsilon \rightarrow 0$
 as $T \rightarrow \infty$.
 
 Monte Carlo Counterfactual Regret Minimization (MCCFR) applies CFR to sampled portions of the games~\cite{Lanctot09Sampling}. In the \defword{outcome sampling} (OS) variant of the algorithm a single terminal history $z\in Z$ is sampled in each iteration. The algorithm updates the regret in the information sets visited along $z$ using the 
@@ -826,4 +826,6 @@ may balance exploitability and exploitation versus known opponents.
 \bibliography{iioos}
 
 \end{document}
+
+
 
