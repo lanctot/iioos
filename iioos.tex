@@ -443,37 +443,29 @@ turn depend on the payoffs obtained from other parts of the tree.
 %Convergence theorems. Algorithm description.
 %Recall outcome sampling (OS) from Section~\ref{sec:cfr}. 
 
-In MCCFR, all the information sets are preloaded and stored in main memory, and
-the strategies $\sigma^0(I)$ at all $I$ are assumed to be uniform random over $A(I)$. The information sets store regrets and average strategy 
-values, which are updated whenever $I$ is visited. Before presenting the online algorithm, we first describe an important modification to OS.
+In MCCFR, the data structures for all information sets are created before the first iteration starts and in each iteration the information sets along the whole tree depth are updated. In the online setting, this is not practical. The limited computation time often does not allow even a single visit of each information set in the game tree. Moreover, the information sets far from the tree root will likely have only very few visits, making the statistics stored in these information sets practically useless. For this reason, we suggest two modifications of MCCFR for its use in online setting. 
 
-Imagine that OS is executed much like simulation-based MCTS. That is, an information set tree is built incrementally over 
-time, where a single information set (at most) is added to the initially empty information set tree (memory) each iteration. In 
-particular, when an information set is reached that is not in memory, it is added to memory and a default playout policy 
-(\eg uniform random) then takes over for the remainder of the simulation. Along the playout portion (tail) of the simulation,  
-information sets are not added to memory nor updated. Along the tree portion (head) of simulation, information sets are updated as normal. 
-We call this modification \defword{playout-based outcome sampling}. 
-Playout-based OS is not a search algorithm since it does not take into account the current match history $\tth$; 
-it acts like a memory-saving offline technique since it is always the case that $\tth = \emptyset$.
-However, it will form the basis of our search algorithm. 
-The main difficulty remaining is how to direct the search when it is invoked {\it during a non-empty match history}, 
-\ie when $\tth \not= \emptyset$. 
+\subsubsection{Incremental Game Tree Building}
+The game tree is incrementally build from the root like in simulation-based MCTS. A single information set (at most) is added to the initially empty information set tree (memory) each iteration.
+In particular, when an information set is reached that is not in memory, it is added to memory and a default playout policy (\eg uniform random) then takes over for the remainder of the simulation.
+Along the playout portion (tail) of the simulation, information sets are not added to memory nor updated.
+Along the tree portion (head) of simulation, information sets are updated as normal. 
+This way, only the information sets with relevant statistics will be stored in the memory.
+We call this modification \defword{playout-based outcome sampling}.
 
-Online Outcome Sampling builds on playout-based OS by proposing two different ways to direct the search when starting from a particular
-match history, $\tth$. 
+\subsubsection{In-Match Search Targeting}
+When using the playout-based OS with short computation time per move, the match can after a few moves easily reach a history $\tth$ in an information set that was visited in only a few iterations or even not present in the memory at all.
+The strategy suggested by the algorithm in such an information set can be completely arbitrary.
+Hence, the second modification we propose is directing the search towards the histories that are more likely to occur during the match currently played.
+Online Outcome Sampling (OOS) builds on playout-based OS by proposing two different ways to direct the search when starting with a particular non-empty match history, $\tth$. Note that this history is typically unknown to the players, who know only their information sets it leads to. Furthermore, unlike in ISMCTS, OOS always runs samples form the root of the game tree, even with non-empty match history.
 
-\subsubsection{Information Set Targeting (IST)}
-
-Suppose the match history is $\tth$. IST is playout-based OS that samples histories $(h,z) \in Z_{I(\tth)}$ 
-with higher probability than $(h',z') \in (H \times Z) - Z_{I(\tth)}$. The intuition is that these histories are particularly 
+\textit{Information Set Targeting (IST)~~}
+Suppose the match history is $\tth$. IST is playout-based OS that samples histories reaching the current information set ($I(h)$), i.e., $(h,z) \in Z_{I(\tth)}$, with higher probability than other histories.
+The intuition is that these histories are particularly 
 relevant since the searching player {\it knows} that one of these $z$ will describe the match at its completion. 
-
-Let $\delta$ be 
-the probability that any terminal history $z \in Z_{I(\tth)}$ is sampled.
-Setting $\delta = 1$ is problematic, since convergence guarantees are lost.
+However, focusing fully only on these histories may cause problems, since convergence guarantees are lost.
 Consider again the game in Figure~\ref{fig:coordGame}. 
-If the minimizing player knows it is in the information set $I$, it cannot start focusing all its 
-search only to this information set. The maximizing player still computes the uniform strategy, which is optimal in the coordination game. 
+If the minimizing player knows it is in the information set $I$ and focusses all its search only to this information set for sufficiently long, she computes the uniform strategy, which is optimal in the right (coordination) part of the game.
 However, if the minimizing player plays uniformly, the maximizing player prefers to switch to always play the left action to increase its payoff in case of not playing the coordination game. Any fixed non-zero probability of sampling the left chance action will 
 eventually solve the problem. The regrets are multiplied by the reciprocal of the sampling probability; hence, they influence the strategy 
 in the information set proportionally stronger if the samples are rare. 
@@ -486,12 +478,15 @@ in the information set proportionally stronger if the samples are rare.
 %The equilibrium strategy for the opponent in this subgame plays as if the opponent knows the searching player's private information. Therefore,
 %we expect that the optimal value of $\delta_I$ will depend on the importance of the hidden information.
 
-\subsubsection{Public Subgame Targeting (PST)}
+\textit{Public Subgame Targeting (PST)~~}
+A \defword{public action} is an action in the ``public tree'' defined in \cite{johanson2012efficient}. Informally, an action is said to be public if it is observable by all players (e.g., a bid in Liar's Dice or Poker is public). Formally, an action $a$ is public, iff $\forall i\forall I \in \cI_i\forall h_1,h_2\in I \; a\in h_1 \Leftrightarrow a\in h_2$.
 
-Define a \defword{public action}, $a \in A(I)$, to be one where and for all $h \in I$, $ha \in I'$.
+
+%a sequence of legal actions from I to I', S(I,I'), is said to be a ``public action sequence'' if every two histories h,h' \in I: hL \in I' and h'L \in I' and S(I,I') describes a one-to-one correspondence between histories in I and histories in I'. A public action, a \in A(I), is one such that every sequence containing a as the first action, S(I,I') = a S(I'',I') where I' is a successor of I is a public action sequence. A public subgame then, for example in LD, contains all the terminal histories consistent with the bidding sequence played over the match and each combination of private chance events for both players.
+
 Given a history $h$, let $p(h)$ be the sequence of public actions along $h$ in the same order that they were taken in $h$. 
-Define the \defword{public subgame} induced by $I$ to be the one whose terminal history set is $Z_{p,I(h)} =$ 
-\[\{(h,z)~|~z \in Z, h \in I, h' \in H, p(h') = p(h), h' \sqsubset z \}.\]
+Define the \defword{public subgame} induced by $I$ to be the one whose terminal history set is
+\[Z_{p,I(h)} = \{(h',z)~|~z \in Z, h' \in H, p(h') = p(h), h' \sqsubset z \}.\]
 Now, suppose the match history is $\tth$.
 Public subgame targeting samples $z \in Z_{p,I(\tth)}$ with higher probability than terminal histories outside this set.
 
@@ -501,26 +496,27 @@ Public subgame targeting samples $z \in Z_{p,I(\tth)}$ with higher probability t
 %Nonetheless, the intuition is to spend more time in parts of the tree that are relevant given the progression of the match. Unlike 
 %information set targeting, public subgame targeting should not reveal anything about private information. 
 
-%\subsubsection{Algorithm}
+\subsubsection{Algorithm}
 
 \begin{algorithm2e}[t]
   OOS$(h, \pi_i, \pi_{-i}, s_1, s_2, i)$: \; 
   \pushline
-  \lIf{$h \in Z$}{\breturn $(1, \delta s_1 + (1-\delta)s_2, u_i(z))$} \label{alg:terminal}
+  \lIf{$h \in Z$}{\breturn $(1, \delta s_1 + (1-\delta)s_2, u_i(z))$}\; \label{alg:terminal}
   \If{$P(h) = c$}{
-    Sample an outcome $a$ with pr. $\rho$ \; \label{alg:chancesample}
-    \breturn OOS$(ha, \pi_i, \rho \pi_{-i}, \rho s_1 , \rho s_2, i)$ \;
+    Sample an outcome $a$ and let $\rho_1,\rho_2$ be its probability in targeted and untargeted setting \; \label{alg:chancesample}
+    \breturn OOS$(ha, \pi_i, \rho_2 \pi_{-i}, \rho_1 s_1 , \rho_2 s_2, i)$ \;
   }
   $I \gets $ getInfoset$(h, P(h))$ \;
-  Let $(a,s_1',s_2') \leftarrow $ LoadOrSample$(h, I, i, \epsilon)$ \; \label{alg:sample}
+  Let $(a,s_1',s_2') \leftarrow $ Sample$(h, I, i, \epsilon)$ \; \label{alg:sample}
   \If{$I$ is not in memory}{ 
     Add $I$ to memory \;
     $\sigma(I) \leftarrow \mbox{Unif}(A(I))$ \;
-    $(x, l, u) \gets $ Playout$(ha, s)$ \;         \label{alg:playout}
+    $(x, l, u) \gets $ Playout$(ha,\delta s_1 + (1-\delta)s_2)$ \;         \label{alg:playout}
   }
   \Else{
     $\sigma(I) \gets $ RegretMatching$(r_I)$ \;
-    $(\pi_i', \pi_{-i}') \leftarrow$ NewReachProbs$(h, \pi_i, \pi_{-i}, i)$ \;  \label{alg:newreaches}
+    $\pi_{P(h)}' = \sigma(I,a)\pi_{P(h)};\; \pi_{-P(h)}' = \pi_{-P(h)}$ \; \label{alg:newreaches}
+   % $(\pi_i', \pi_{-i}') \leftarrow$ NewReachProbs$(h, \pi_i, \pi_{-i}, i)$ \;  \label{alg:newreaches}
     $(x, l, u) \gets$ OOS$(ha, \pi_i', \pi_{-i}', s_1', s_2', i)$ \;  
   }
   $c \gets x$ \;                   \label{alg:suffix1} 
@@ -532,7 +528,7 @@ Public subgame targeting samples $z \in Z_{p,I(\tth)}$ with higher probability t
       \lElse{$r_I[a'] \gets r_I[a'] - xW$}
     }
     \Else{
-      $s_I[a] \gets s_I[a] + \frac{1}{\delta s_1 + (1-\delta)s_2} \pi_{-i} \sigma(I,a)$ \;  \label{alg:avgstrat}
+      $s_I[a'] \gets s_I[a'] + \frac{1}{\delta s_1 + (1-\delta)s_2} \pi_{-i} \sigma(I,a')$ \;  \label{alg:avgstrat}
     }
   } 
   \breturn $(x, l, u)$ \;   \label{alg:returnend} 
@@ -554,7 +550,7 @@ with probability $\delta$ the iteration targets the subgame and chooses $z \in Z
 and with probability $(1-\delta)$ the usual OS sampling determines $z \in Z$. 
 The first parameter of OOS is the current history. 
 The next two are strategy's reach probabilities for the update player $i$ and the opponent. 
-The third and fourth parameters are overall probabilities that the current sample is generated, one for each scenario. 
+The third and fourth parameters are overall probabilities that the current sample is generated, one for each scenario: first the targeted and then the untargeted.
 The last is the update player. Initial calls have the form OOS$(\emptyset, 1, 1, 1, 1, i)$.  
 For the return values, $x$ is a suffix/tail reach probability for both players, 
 $l$ is the root-to-leaf sample probability, and $u$ is the payoff of the trajectory in view 
@@ -572,16 +568,11 @@ is defined as
 \end{equation*}
 and denote $\Phi(I,i,a)$ the probability of sampling $a \in A(I)$. 
 
-The sampling at chance's choices on line~\ref{alg:chancesample} depends on the method being 
-used and on how the game is modeled. When using information set targeting, the outcome that is sampled 
-must be consistent with match history the targeted scenario. 
+The sampling at chance's choices on line~\ref{alg:chancesample} depends on the method and the scenario being used. For example, when using information set targeting, the outcome that is sampled must be consistent with match history.
 
-A critical part of the algorithm is the action chosen and sample reach updates on line~\ref{alg:sample}. 
-In the targeted scenario: if $h \sqsubset \tth$ then action $a$ is loaded from the match history, $s_1' = s_1$, 
-and $s_2' = \Phi(I,i,a) s_2$; otherwise $\tth \sqsubseteq h$ and $(s_1', s_2') = \Phi(I,i,a) (s_1, s_2)$. 
-In the OS scenario: the sampled action $a \sim \Phi(I,i)$ resulting in successor $h' = ha'$ and $s_2' = \Phi(I,i,a) s_2$; 
-then if $h' \sqsubset \tth$, $s_1' = s_1 = 1$, otherwise $s_1' = 0$. These sample reach probabilities are combined into 
-one true reach probability at a terminal history on line~\ref{alg:terminal} and when updating the average 
+A critical part of the algorithm is the action chosen and sample reach updates on line~\ref{alg:sample}. In the targeted scenario, the current history $h$ is always in the targeted part of the game and an action from ${a~|~\exists z\in Z \; (ha,z)\in Z_{sub}}$ is selected using the distribution $\Phi(I(h),i)$ normalized to one on this subset of actions. If we define $sum=\sum_{(ha,z)\in Z_{sub}}\Phi(I,i,a)$ then $s_1' = s_1\Phi(I,i,a)/sum$. In the untargeted scenario, any action $a \sim \Phi(I,i)$ can be sampled. If the action is not leaving the targted part of the game (i.e., $(ha,z)\in Z_{sub}$) then $s_1' = s_1\Phi(I,i,a)/sum$ otherwise $s_1'=0$. In all cases $s_2' = \Phi(I,i,a) s_2$.
+
+These sample reach probabilities are combined into one true reach probability at a terminal history on line~\ref{alg:terminal}, starting the playout on line~\ref{alg:playout} and when updating the average 
 strategy on line~\ref{alg:avgstrat}. 
 
 %In practice, the algorithm does not sample $z \in Z_{sub}$ directly, but rather on a per-action basis. 
@@ -596,8 +587,7 @@ strategy on line~\ref{alg:avgstrat}.
 The playout on line~\ref{alg:playout} samples to the end of the game with some playout policy at each step; we use uniform random, 
 but in general one could use a informed policy based on domain knowledge as well. 
 Unlike MCTS, the playout policy in OOS must compute $l$ when reaching a terminal and update the tail probability $x$ when returning
-as done on line~\ref{alg:suffix2}. The function NewReachProbs on line~\ref{alg:newreaches} simply modifies the $P(h)$'s reach 
-probability by multiplying it by $\sigma(I,a)$, keeping the value of the other one the same.
+as done on line~\ref{alg:suffix2}. Line~\ref{alg:newreaches} simply modifies the $P(h)$'s reach probability by multiplying it by $\sigma(I,a)$, keeping the value of the other one the same.
 
 %Lines~\ref{alg:suffix1} to \ref{alg:returnend} % second ref does not seem to work
 Lines~\ref{alg:suffix1} to 24
@@ -837,3 +827,4 @@ may balance exploitability and exploitation versus known opponents.
 \bibliography{iioos}
 
 \end{document}
+
