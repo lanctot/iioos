@@ -254,8 +254,8 @@ equilibria or designing of domain-specific abstractions.
 Also, due to the size of the abstractions required for strong play~\cite{Johanson13Evaluating}, there may not be enough space to 
 store the precomputed strategy, such as in gaming apps on mobile devices.
 
-In this paper, we focus on the {\it online} setting. In essence, we propose a Monte Carlo Tree Search algorithm that 
-uses Monte Carlo Counterfactual Regret Minimization as a basis rather than UCT.
+In this paper, we focus on the {\it online} setting. We propose an MCTS algorithm that 
+uses Monte Carlo Counterfactual Regret Minimization as its basis rather than Upper Confidence Bounds~\cite{UCB,UCT}.
 
 
 %\vlnote{I do not understand the point of the last two sentences.}
@@ -521,7 +521,7 @@ to ensure eventual convergence to an equilibrium.
 
 \subsection{Public Subgame Targeting (PST)}
 
-A \defword{public action} is an action in the ``public tree'' defined in \cite{johanson2012efficient}. Informally, an action is said to be public if it is observable by all players (e.g., a bid in Liar's Dice or Poker is public). Formally, an action $a$ is public, iff 
+A \defword{public action} is an action in the ``public tree'' defined in \cite{12aamas-pcs}. Informally, an action is said to be public if it is observable by all players (e.g., a bid in Liar's Dice or Poker is public). Formally, an action $a$ is public, iff 
 $\forall i, \forall I \in \cI_i, \forall h_1,h_2\in I: a\in h_1 \Leftrightarrow a\in h_2$.
 For example, the extensive-form version of Rock, Paper, Scissors has two information 
 sets $I_1 = \emptyset$ and $I_2 = \{ r, p, s \}$; it has no public actions, because each history in 
