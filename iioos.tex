@@ -88,19 +88,24 @@
 \setlength{\pdfpagewidth}{8.5in}
 \setlength{\pdfpageheight}{11in}
 \pdfinfo{
-/Title (Searching Imperfect Information Games using Online Counterfactual Regret Minimization)
-/Author (Authors)}
-\setcounter{secnumdepth}{0}  
- \begin{document}
+#/Title (Searching Imperfect Information Games using Online Counterfactual Regret Minimization)
+/Author (Marc Lanctot, Viliam Lis\'{y}, and Michael Bowling)}
+%\setcounter{secnumdept}{0}
+
+\begin{document}
+
 % The file aaai.sty is the style file for AAAI Press 
 % proceedings, working notes, and technical reports.
 %
 \title{Search in Imperfect Information Games using Online\\Monte Carlo Counterfactual Regret Minimization}
-\author{Authors}
-%\author{Author info\\
-%Association for the Advancement of Artificial Intelligence\\
-%2275 East Bayshore Road, Suite 160\\
-%Palo Alto, California 94303\\
+
+\author{Marc Lanctot$^1$, Viliam Lis\'{y}$^2$, and Michael Bowling$^3$\\
+~~~~\\
+$^1$Department of Knowledge Engineering, Maastricht University, The Netherlands\\
+$^2$Department of Computer Science, Czech Technical University in Prague\\
+$^3$Department of Computing Science, University of Alberta, Canada\\
+{\small marc.lanctot@maastrichtunviersity.nl,~viliam.lisy@agents.fel.cvut.cz,~bowling@cs.ualberta.ca}
+}
 
 
 \maketitle
@@ -138,17 +143,19 @@ However, the preparation time is often very limited. The exact model of the game
 
 %Search in game-playing has been a classic interest of artificial intelligence. 
 %focused on perfect information games, 
-When restricted to perfect information settings, the field of online search has benefited from decades of research in game-playing. 
+%When restricted to perfect information settings, the field of online search has benefited from decades of research in game-playing. 
 %as evidenced by events such as defeat of human chess champions, 
 %solving of checkers, and the growing strength of computer Go programs~\cite{Campbell02deepblue,Schaeffer07gameover,Gelly12}.
-Due to the complexity and problems introduced by hidden information, search in imperfect information settings has received comparatively much less attention.
+%Due to the complexity and problems introduced by hidden information, search in imperfect information settings has received comparatively much less attention.
 %This is unfortunate as many sequential decision-making problems have some element of hidden information. 
-Modern approaches to imperfect information search use different forms of {\it determinization} to sample possible states, then run 
-searches rooted from these states, aggregating their results to choose an action to play. The most extreme forms, \eg Perfect Information 
-Monte Carlo~\cite{Long10Understanding} ``average over clairvoyance''~\cite{AIBook},
+%Modern approaches to imperfect information search to sample possible ``world'' states, then run 
+%searches rooted from these states, aggregating their results to choose an action to play. The most extreme forms
+%\eg Perfect Information 
+%Monte Carlo~\cite{Long10Understanding} 
+%``average over clairvoyance''~\cite{AIBook},
 % ML-Note Nov2: @Viliam, PIMC *is* "averaging over clairvoyance"
-ignoring the information structure completely. While this is sufficient in some games, it tends to have trouble in games like poker 
-where the information structure is critical.
+%ignoring the information structure completely. While this is sufficient in some games, it tends to have trouble in games like poker 
+%where the information structure is critical.
 
 %; similar problems have been reported using Monte Carlo Tree Search (MCTS) in Kriegspiel~\cite{Ciancarini10Kriegspiel}.
 %Most recent algorithms try to fix the problem by accounting for the information structure during the 
@@ -158,13 +165,7 @@ where the information structure is critical.
 %For example, the notion of a subgame is required for backward induction, 
 %which most perfect information search algorithms are based on, is not well-defined in imperfect information games. 
 
-The main problem with current techniques is a lack of theoretical foundations of the algorithms. There are no guarantees that the algorithms will always find a good strategy in a game, given a sufficient thinking time. In fact, there is empirical evidence suggesting that some of these techniques will not converge to the optimal solution even in very small games like Biased Rock-Paper-Scissors and Kuhn poker~\cite{Shafiei09,Ponsen11Computing}.
 
-In this paper, we start by formalizing the problem of imperfect information search from the ground up. That is, we return to the game-theoretic 
-foundations upon which search in games is built to motivate the importance of Nash equilibrium as the optimal strategy in zero-sum games. We explain the subtleties introduced by imperfect information that cause the current approaches not to converge to the optimal strategy. We introduce Online Outcome Sampling (OOS), a simulation-based algorithm that builds its search tree incrementally, like Monte Carlo Tree Search (MCTS)~\cite{mctssurvey}.  
-We show that OOS converges to an equilibrium strategy as search time per move increases, making it the first 
-known imperfect information search algorithm satisfying this property, which we call {\it consistency}. Furthermore, we analyze methods for incorporating the information obtained by the players in the game to the search process, so that the consistency property is preserved. We show the empirical convergence rates and performance of OOS, comparing them to benchmark players and to ISMCTS~\cite{Cowling12ISMCTS}, a 
-recent algorithm currently used in a popular mobile phone implementation of Spades~\cite{Whitehouse13Integrating}. 
 
 %We present results in two domains: Liar's Dice and a variant of Goofspiel.
 
@@ -172,7 +173,7 @@ recent algorithm currently used in a popular mobile phone implementation of Spad
 
 %\vlnote{Current intro targets particularly the search community.}
 
-\section{Background and Related Work}
+%\section{Background and Related Work}
 
 %Overview of past algorithms and the current state-of-the-art (we have to ``weave'' the related work below into a nice overview).
 %Define determinization, strategy fusion, non-locality, disambiguation factor. 
@@ -202,6 +203,8 @@ recent algorithm currently used in a popular mobile phone implementation of Spad
 
 % classic work: PIMC and its successes
 
+
+
 Some of the first imperfect information search algorithms were inspired by the application to 
 Bridge~\cite{Frank98Finding,Ginsberg96Partition}, and notably by the success of GIB~\cite{Ginsberg01}.
 In GIB, perfect information search is performed on a {\it determinized} 
@@ -221,13 +224,14 @@ recursively applied by computing and comparing values of subgames.
 Strategy fusion can be overcome by imposing the proper information constraints during search, as was done in 
 Kriegspiel~\cite{Ciancarini10Kriegspiel}, Kuhn Poker~\cite{Ponsen11Computing}, pursuit-evasion games~\cite{Lisy12peg}, 
 card games and other phantom games~\cite{Cowling12ISMCTS}. 
-Non-locality, however, is a fundamental problem.
-Consequently, the usual minimax formulation of payoffs defined over future states is not applicable.  
+Non-locality, however, is a fundamental problem that prevents the usual minimax formulation of optimal payoffs defined strictly over 
+children subtrees. 
+There is empirical evidence suggesting that some of these techniques will not converge to the optimal solution even in very
+small games like Biased Rock-Paper-Scissors and Kuhn poker~\cite{Shafiei09,Ponsen11Computing}.
+
+
 %The authors of \cite{Parker10iss,Parker06Overconfidence} showed that minimax-style backups at opponent information sets can lead to overly paranoid search. 
 %We also make similar observations for ISMCTS in Liar's Dice. 
-
-
-
 
 % other missing related works
 
@@ -244,9 +248,9 @@ Consequently, the usual minimax formulation of payoffs defined over future state
 Game-tree search techniques have also been applied to Poker~\cite{Billings04Game}. In recent years, however, 
 the most common approach to producing strong Poker AI has been use advances in equilibrium approximation 
 algorithms to compute a near-optimal equilibrium of an abstract game and subsequently use the abstract strategies 
-when playing the full game~\cite{Sandholm10The}. In this paper, we refer to this as the {\it offline approach} because it 
+when playing the full game~\cite{Sandholm10The}. We refer to this as the {\it offline approach} because it 
 requires designing domain-specific abstractions and precomputing approximate equilibria offline in advance, which could take 
-several days or weeks. In the offline approach, during actual play an agent simply looks up its precomputed strategy 
+several weeks or even months. In the offline approach, during actual play an agent simply looks up its precomputed strategy 
 stored in a large table. 
 This offline approach is often not possible. For example, an agent may be required to 
 act shortly after discovering the rules, such as in general game playing, which leaves very little time for precomputation of 
@@ -254,9 +258,19 @@ equilibria or designing of domain-specific abstractions.
 Also, due to the size of the abstractions required for strong play~\cite{Johanson13Evaluating}, there may not be enough space to 
 store the precomputed strategy, such as in gaming apps on mobile devices.
 
-In this paper, we focus on the {\it online} setting. We propose an MCTS algorithm that 
-uses Monte Carlo Counterfactual Regret Minimization as its basis rather than Upper Confidence Bounds~\cite{UCB,UCT}.
+%The main problem with current techniques is a lack of theoretical foundations of the algorithms. There are no guarantees that the algorithms will always find a good strategy in a game, given a sufficient thinking time. In fact, 
 
+In this paper, we focus on the {\it online} setting. We propose a  Monte Carlo Tree Search (MCTS)~\cite{mctssurvey} algorithm that 
+uses Monte Carlo Counterfactual Regret Minimization as its basis rather than Upper Confidence Bounds~\cite{UCB,UCT}.
+%We start by formalizing the problem of imperfect information search from the ground up. That is, we return to the game-theoretic 
+%foundations upon which search in games is built to motivate the importance of Nash equilibrium as the optimal strategy in zero-sum games. We explain the subtleties introduced by imperfect information that cause the current approaches not to converge to the optimal strategy. 
+We introduce Online Outcome Sampling (OOS), a simulation-based algorithm that builds its search tree incrementally, 
+like MCTS.  
+We show that OOS converges to an equilibrium strategy as search time per move increases, making it the first 
+known imperfect information search algorithm satisfying this property, which we call {\it consistency}. 
+%thermore, we analyze methods for incorporating the information obtained by the players in the game to the search process, so that the consistency property is preserved. 
+We show the empirical convergence rates and performance of OOS, comparing them to benchmark players and to ISMCTS~\cite{Cowling12ISMCTS}, a 
+recent algorithm currently used in a popular mobile phone implementation of Spades~\cite{Whitehouse13Integrating}. 
 
 %\vlnote{I do not understand the point of the last two sentences.}
 % MarcL: I'm not really sure why you didn't understand, but I clarified the argument by expanding the entire paragrap. Email me if it's still a problem. 
@@ -386,7 +400,7 @@ The required number of iterations for convergence is much larger, but each itera
 
 In Poker, CFR and MCCFR have been used with remarkable success as offline methods 
 for pre-computing approximate equilibria in abstract games~\cite{CFR,Johanson12CFRBR}; the same general 
-approach has also been used in Liar's Dice~\cite{Lanctot12IR,Neller11}. 
+approach has also been used in Liar's Dice~\cite{Neller11,Lanctot12IR}. 
 %additional optimizations that can be applied in Liar's Dice~\cite{Neller11}.
 %Essentially, CFR takes time (weeks?) {\it pre-computing} 
 %approximate equilibria on abstract poker games, which are then used to look up actions when a decision needs to be made during play. 
@@ -419,6 +433,11 @@ turn depend on the payoffs obtained from other parts of the tree.
 
 %Hence, the ``subgames'' cannot be solved independently 
 %and the search problem is more complex. 
+Some previous work has been done for accelerating equilibrium computation by solving or approximately solving subgames, particularly 
+in end-game situations~\cite{Gilpin06Competitive,Gilpin07Better,Ganzfried13Endgame}. These techniques tend to help in practice, 
+but as shown in \cite{Ganzfried13Endgame}, non-locality prevents these methods from producing equilibrium strategies in general. 
+Using CFR to solve decomposed subgames has also recently been investigated~\cite{Burch14Solving}. Whether this decomposition 
+could be used in Monte Carlo simulations is an interesting topic of future work.
 
 \subsection{Information Set Monte Carlo Tree Search}
 
@@ -901,10 +920,18 @@ effect is stronger in LD(1,1), with PST seeming better overall.
 
 In future work, we hope to investigate more and larger games such as 
 no-limit poker, and the effect of informed playout policies. 
-We hope to make practical comparisons to other baseline algorithms such as 
+One interesting question is whether the subgame decomposition ideas of~\cite{Burch14Solving} could be 
+adapted to the online search setting. 
+Ultimately, we would like to make practical comparisons to other baseline algorithms such as 
 PIMC~\cite{Long10Understanding}, MMCTS~\cite{Auger11Multiple}, and IIMC~\cite{Furtak13Recursive}.
-Also, we hope to use MCRNR~\cite{Ponsen11Computing} as the base algorithm, which 
-may balance exploitability and exploitation against known opponents.
+Finally, using MCRNR~\cite{Ponsen11Computing} as the base algorithm could provide a balance between 
+exploitability and exploitation against known opponents.
+
+\vspace{0.2cm}
+
+{\small \noindent {\bf Acknowledgments.} This work is partially funded by the Netherlands Organisation for Scientific 
+Research (NWO) in the framework of the project Go4Nature, grant number 612.000.938 and the Czech 
+Science Foundation, grant no. P202/12/2054.}
 
 \bibliographystyle{aaai}
 \bibliography{iioos}
