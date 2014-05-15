@@ -2,7 +2,7 @@
 
 dir=/tmp/Lanctot
 
-mkdir -f $dir
+mkdir -p $dir
 cp * $dir
 cp -r figs plots $dir
 

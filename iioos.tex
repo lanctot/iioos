@@ -102,11 +102,12 @@
 \author{Marc Lanctot$^1$, Viliam Lis\'{y}$^2$, and Michael Bowling$^3$\\
 ~~~~\\
 $^1$Department of Knowledge Engineering, Maastricht University, The Netherlands\\
-$^2$Department of Computer Science, Czech Technical University in Prague\\
+$^2$Department of Computer Science, FEE, Czech Technical University in Prague\\
 $^3$Department of Computing Science, University of Alberta, Canada\\
 {\small marc.lanctot@maastrichtunviersity.nl,~viliam.lisy@agents.fel.cvut.cz,~bowling@cs.ualberta.ca}
 }
 
+%$^2$Department of Computer Science, Czech Technical University in Prague\\
 
 \maketitle
 
@@ -714,7 +715,7 @@ consistency.
 % - with/without remembering between moves
 
 We now compare the head-to-head performance and exploitability 
-of OOS and ISMCTS on two games with different sources of imperfect information. 
+of OOS and ISMCTS on two games. % with different sources of imperfect information. 
 %We show the effects of targeting methods and $\delta$ values. 
 %We start by describing each game, whose utilities are in $\{-1, 0, 1\}$. 
 
@@ -755,6 +756,11 @@ search algorithm standards, it is still possible to compute best response strate
 allowing us to show the observed convergence of the strategies
 produced by OOS. We include preliminary results in LD(2,2). 
 
+To improve performance against irrational play, we use a more explorative regret matching, 
+$\sigma^{T+1}_\gamma(I,a) = \gamma/|A(I)| + (1-\gamma) \sigma^{T+1}(I,a)$, with $\gamma = 0.01$. 
+While this could effect convergence, we observe in our experiments that exploitability 
+decreases as search time increases.  
+
 \subsection{Head-to-Head Performance versus Exploitability} 
 
 \begin{figure}[t!]
@@ -776,10 +782,11 @@ and II-Goofpiel(6).  }
 %\mlnote{I have played against the ISMCTS strategy and I believe it's converging to a particular 
 %pure (and bad) strategy.}
 
-We evaluate head-to-head performance by simulating several games of each algorithm against the other
-and counting wins and losses. 
+%We evaluate head-to-head performance by simulating several games of each algorithm against the other
+%and counting wins and losses. 
+
 In games like Poker and Liar's Dice, it is often critical to play in such a way that the opponent 
-cannot easily infer the private information. This explain partly why CFR-based methods have 
+cannot easily infer the private information. This explains partly why CFR-based methods have 
 enjoyed so much success in the offline approach. 
 In the online setting, however, since the tree is built incrementally, only partial strategies
 are produced. 
