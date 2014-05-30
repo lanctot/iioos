@@ -394,7 +394,7 @@ The algorithm updates the regret in the information sets visited along $z$ using
 \end{array} \right.
 \end{equation*}
 where $q(z)$ is the probability of sampling $z$. 
-As long every $z \in Z$ has non-zero probability of being sampled, $\tilde{v}_i(I,\sigma)$ is an unbiased estimate of $v(I,\sigma)$ 
+As long as every $z \in Z$ has non-zero probability of being sampled, $\tilde{v}_i(I,\sigma)$ is an unbiased estimate of $v(I,\sigma)$ 
 due to the importance sampling correction ($1/q(z)$). For this reason, applying CFR updates using these sampled counterfactual values 
 on the sampled information sets values also eventually converges to the approximate equilibrium of the game with high probability. 
 The required number of iterations for convergence is much larger, but each iteration is much faster.
@@ -444,7 +444,7 @@ could be used in Monte Carlo simulations is an interesting topic of future work.
 
 The implementation details of ISMCTS described in \cite{Cowling12ISMCTS} have impact on efficiency of the method for various games, but in essence, the multi-observer variant of the algorithm incrementally builds the game tree similarly to MCTS, but it places a multi-armed bandit algorithm at each information set rather than at each state. After a non-root information set is reached during the match, further simulations are run from a random node in this information set with uniform probability. This prevents the algorithm from converging to the optimal solution in the game.
 Consider the game in Figure~\ref{fig:coordGame}.
-Suppose ISMCTS searches from information set $I$. Because utilities for actions taken from both states are combined, ISMCTS will choose left and right action equally often. However, mixing uniformly at $I$ is not part of an equilibrium in this game, since it would lead to an expected utility of $\frac{3}{4}$ to the maximizing player for playing right, which would give an incentive to the maximizer to always play left and in that case, the minimizer would be better of playing right, reaching expected reward of $0.5$.
+Suppose ISMCTS searches from information set $I$. Because utilities for actions taken from both states are combined, ISMCTS will choose left and right action equally often. However, mixing uniformly at $I$ is not part of an equilibrium in this game, since it would lead to an expected utility of $\frac{3}{4}$ to the maximizing player for playing right, which would give an incentive to the maximizer to always play left and in that case, the minimizer would be better off playing right, reaching expected reward of $0.5$.
 
 \begin{figure}
 \begin{center}
@@ -541,7 +541,7 @@ to ensure eventual convergence to an equilibrium.
 
 \subsection{Public Subgame Targeting (PST)}
 
-A \defword{public action} is an action in the ``public tree'' defined in \cite{12aamas-pcs}. Informally, an action is said to be public if it is observable by all players (e.g., a bid in Liar's Dice or Poker is public). Formally, an action $a$ is public, iff 
+A \defword{public action} is an action in the ``public tree'' defined in \cite{12aamas-pcs}. Informally, an action is said to be public if it is observable by all players (e.g., bids in Liar's Dice and bets in Poker are public). Formally, an action $a$ is public, iff 
 $\forall i, \forall I \in \cI_i, \forall h_1,h_2\in I: a\in h_1 \Leftrightarrow a\in h_2$.
 For example, the extensive-form version of Rock, Paper, Scissors has two information 
 sets $I_1 = \emptyset$ and $I_2 = \{ r, p, s \}$; it has no public actions, because each history in 
