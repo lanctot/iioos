@@ -584,7 +584,7 @@ outcomes for all players) with at least two public actions, whose first two publ
   \If{$I$ is not in memory}{ 
     Add $I$ to memory \;
     $\sigma(I) \leftarrow \mbox{Unif}(A(I))$ \;
-    $(x, l, u) \gets $ Playout$(ha,\delta s_1 + (1-\delta)s_2)$ \;         \label{alg:playout}
+    $(x, l, u) \gets $ Playout$(ha, \frac{\delta s_1 + (1-\delta)s_2}{|A(I)|})$ \; \label{alg:playout}
   }
   \Else{
     $\sigma(I) \gets $ RegretMatching$(r_I)$ \;
@@ -648,9 +648,10 @@ and denote $\Phi(I,i,a)$ the probability of sampling $a \in A(I)$.
 
 The sampling at chance's choices on line~\ref{alg:chancesample} depends on the method and the scenario being used. For example, when using information set targeting, the outcome that is sampled must be consistent with match history.
 
-A critical part of the algorithm is the action chosen and sample reach updates on line~\ref{alg:sample}. In the targeted scenario, the current history $h$ is always in the targeted part of the game and an action from $\{a~|~\exists z\in Z \; (ha,z)\in Z_{sub}\}$ is selected using the distribution $\Phi(I(h),i)$ normalized to one on this subset of actions. If we define $sum=\sum_{(ha,z)\in Z_{sub}}\Phi(I,i,a)$ then $s_1' = s_1\Phi(I,i,a)/sum$. In the untargeted scenario, any action $a \sim \Phi(I,i)$ can be sampled. If the action is not leaving the targeted part of the game (i.e., $(ha,z)\in Z_{sub}$) then $s_1' = s_1\Phi(I,i,a)/sum$ otherwise $s_1'=0$. In all cases $s_2' = \Phi(I,i,a) s_2$.
+A critical part of the algorithm is the action chosen and sample reach updates on line~\ref{alg:sample}. If $I$ is not in memory, then an action is sampled uniformly. Otherwise, in the targeted scenario, the current history $h$ is always in the targeted part of the game and an action from $\{a~|~\exists z\in Z \; (ha,z)\in Z_{sub}\}$ is selected using the distribution $\Phi(I(h),i)$ normalized to one on this subset of actions. If we define $sum=\sum_{(ha,z)\in Z_{sub}}\Phi(I,i,a)$ then $s_1' = s_1\Phi(I,i,a)/sum$. In the untargeted scenario, any action $a \sim \Phi(I,i)$ can be sampled. If the action is not leaving the targeted part of the game (i.e., $(ha,z)\in Z_{sub}$) then $s_1' = s_1\Phi(I,i,a)/sum$ otherwise $s_1'=0$. In all cases $s_2' = \Phi(I,i,a) s_2$.
 
-These sample reach probabilities are combined into one true reach probability at a terminal history on line~\ref{alg:terminal}, starting the playout on line~\ref{alg:playout} and when updating the average 
+These sample reach probabilities are combined into one at a terminal history on line~\ref{alg:terminal}, 
+start of the playout on line~\ref{alg:playout}, and when updating the average 
 strategy on line~\ref{alg:avgstrat}. 
 
 %In practice, the algorithm does not sample $z \in Z_{sub}$ directly, but rather on a per-action basis. 
@@ -665,8 +666,8 @@ strategy on line~\ref{alg:avgstrat}.
 The playout on line~\ref{alg:playout} samples to the end of the game with some playout policy at each step; we use uniform random, 
 but in general one could use a informed policy based on domain knowledge as well. 
 Unlike MCTS, the playout policy in OOS must compute $l$ when reaching a terminal and update the tail probability $x$ when returning
-as done on line~\ref{alg:suffix2}. Lines~\ref{alg:newreaches1} and \ref{alg:newreaches2} simply modify the $P(h)$'s reach probability 
-by multiplying it by $\sigma(I,a)$, keeping the value of the other one the same.
+as done on line~\ref{alg:suffix2}. Lines~\ref{alg:newreaches1} and \ref{alg:newreaches2} modify $P(h)$'s reach probability 
+by multiplying it by $\sigma(I,a)$, keeping the other value the same.
 
 %Lines~\ref{alg:suffix1} to \ref{alg:returnend} % second ref does not seem to work
 Lines~\ref{alg:suffix1} to 24
