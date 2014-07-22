@@ -575,7 +575,7 @@ outcomes for all players) with at least two public actions, whose first two publ
   \If{$h \in Z$}{
     \breturn $(1, \delta s_1 + (1-\delta)s_2, u_i(z))$\; \label{alg:terminal}
   }
-  \ElseIf{$P(h) = c$}{
+  \ElsIf{$P(h) = c$}{
     Sample an outcome $a$ and let $\rho_1,\rho_2$ be its probability in targeted and untargeted setting \; \label{alg:chancesample}
     \breturn OOS$(ha, \pi_i, \rho_2 \pi_{-i}, \rho_1 s_1 , \rho_2 s_2, i)$ \;
   }
@@ -839,7 +839,7 @@ winner in head-to-head matches between IST and ISMCTS.
 Exploitability is shown in Figure~\ref{fig:results}. 
 For reference, the exploitability values of ISMCTS was 0.95, 0.96, 0.91 for search times of 
 1, 2, and 4 seconds. We observe that exploitability generally 
-decreases as search time increases and and changes little as $\delta$ increases, with its 
+decreases as search time increases and changes little as $\delta$ increases, with its 
 lowest points at $\delta = 1$. 
 This result was surprising, and we suspect it is due OOS benefiting from the reuse of 
 values from previous searches in the same match. 
