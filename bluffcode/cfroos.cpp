@@ -27,7 +27,7 @@ static bool opp2loaded = false;
 
 // 1 = IST
 // 2 = PST
-int oos_variant = 2; 
+int oos_variant = 1; 
 double oos_delta = 0.9; 
 
 bool isMatchPrefix(GameState & match_gs, unsigned long long match_bidseq, GameState & gs, unsigned long long bidseq, 
@@ -241,18 +241,21 @@ double cfroos(GameState & match_gs, unsigned long long match_bidseq, int match_p
     GameState ngs = gs; 
     double new_bs = sprob_bs;
     double new_us = sprob_us;
+    double chanceProb = 0;
     
     // IST: force roll
     if (oos_variant == 1 && biasedSample && match_player == 1) {
       // biased. force roll
       ngs.p1roll = match_gs.p1roll; 
-      new_us *= getChanceProb(1, match_gs.p1roll); 
+      chanceProb = getChanceProb(1, match_gs.p1roll); 
+      new_us *= chanceProb;
     }
     else { 
       // regular os
       double sampleProb = 0;
-      sampleChanceEvent(1, ngs.p1roll, sampleProb);
+      sampleChanceEvent(1, ngs.p1roll, sampleProb);      
       CHKPROBNZ(sampleProb);
+      chanceProb = sampleProb;
       
       // IST: need to keep track when we go off the match path
       if (oos_variant == 1 && match_player == 1 && ngs.p1roll != match_gs.p1roll) {
@@ -267,6 +270,10 @@ double cfroos(GameState & match_gs, unsigned long long match_bidseq, int match_p
     }
 
     assert(ngs.p1roll > 0);
+    assert(chanceProb > 0 && chanceProb < 1);
+
+    double & oppReach = (updatePlayer == 1 ? reach2 : reach1);
+    oppReach *= chanceProb;
 
     return cfroos(match_gs, match_bidseq, match_player, ngs, player, depth+1, bidseq, reach1, reach2, 
                   new_bs, new_us, biasedSample, mode, updatePlayer, suffixreach, rtlSampleProb, treePhase); 
@@ -276,18 +283,21 @@ double cfroos(GameState & match_gs, unsigned long long match_bidseq, int match_p
     GameState ngs = gs; 
     double new_bs = sprob_bs;
     double new_us = sprob_us;
+    double chanceProb = 0;
 
     // IST: force roll
     if (oos_variant == 1 && biasedSample && match_player == 2) {
       // biased. force roll
       ngs.p2roll = match_gs.p2roll; 
-      new_us *= getChanceProb(2, match_gs.p2roll); 
+      chanceProb = getChanceProb(2, match_gs.p2roll);
+      new_us *= chanceProb;
     }
     else { 
       // regular os
       double sampleProb = 0;
       sampleChanceEvent(2, ngs.p2roll, sampleProb);
       CHKPROBNZ(sampleProb);
+      chanceProb = sampleProb;
      
       // need to keep track when we go off the match path
       if (oos_variant == 1 && match_player == 2 && ngs.p2roll != match_gs.p2roll) {        
@@ -302,6 +312,10 @@ double cfroos(GameState & match_gs, unsigned long long match_bidseq, int match_p
     }
 
     assert(ngs.p2roll > 0);
+    assert(chanceProb > 0 && chanceProb < 1);
+    
+    double & oppReach = (updatePlayer == 1 ? reach2 : reach1);
+    oppReach *= chanceProb;
     
     // don't need to worry about keeping track of sampled chance probs for outcome sampling
     return cfroos(match_gs, match_bidseq, match_player, ngs, player, depth+1, bidseq, reach1, reach2, 
