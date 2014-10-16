@@ -49,7 +49,8 @@
 \usepackage{color}
 \usepackage{url}
 \usepackage{xspace}
-\usepackage[caption=false]{subfig}
+%\usepackage[caption=false]{subfig}
+\usepackage{subfigure}
 \usepackage{graphicx}
 \usepackage{xcolor}
 \usepackage{comment}
@@ -784,7 +785,7 @@ outcomes for all players) with at least two public actions, whose first two publ
   \If{$h \in Z$}{
     \breturn $(1, \delta s_1 + (1-\delta)s_2, u_i(z))$\; \label{alg:terminal}
   }
-  \ElseIf{$P(h) = c$}{
+  \ElsIf{$P(h) = c$}{
     Sample an outcome $a$ and let $\rho_1,\rho_2$ be its probability in targeted and untargeted setting \; \label{alg:chancesample}
     \breturn OOS$(ha, \pi_i, \rho_2 \pi_{-i}, \rho_1 s_1 , \rho_2 s_2, i)$ \;
   }
@@ -1121,6 +1122,7 @@ PST           & 5s   & 0.148  & 0.125  & 0.273 \\
 }
 \end{table}
 
+\input{experiments.tex}
 
 \section{Conclusion}
 
