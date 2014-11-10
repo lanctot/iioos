@@ -166,10 +166,10 @@ RND&17.8&19.2&17.5&47.5\\
 \begin{small}
 \begin{tabular}{@{}|@{}r@{}|@{\hspace{1pt}}c@{~}c@{~}c@{~}c@{}|}\hline
 0.1s&OOS&UCT&RM&RND\\\hline
-OOS&-0.37&-0.72&-0.43&2.63\\
-UCT&0.25&0.10&-0.23&1.95\\
-RM&0.50&0.17&-0.07&2.27\\
-RND&-2.14&-1.62&-2.27&1.06\\
+OOS&-0.26&-0.61&-0.32&2.74\\
+UCT&0.36&0.22&-0.12&2.06\\
+RM&0.61&0.29&0.04&2.38\\
+RND&-2.03&-1.51&-2.16&1.18\\
 \hline
 \end{tabular}
 \end{small}
@@ -224,13 +224,18 @@ RND&17.2(3.0)&15.3(2.9)&16.0(2.9)&49.3(4.0)\\
 \begin{small}
 \begin{tabular}{@{}|@{}r@{}|@{~}c@{~}c@{~}c@{~}c@{}|}\hline
 1s&OOS&UCT&RM&RND\\\hline
-OOS&-2.60(2.45)&-2.66(1.61)&-3.04(1.48)&9.94(2.33)\\
-UCT&0.45(1.74)&-1.10(1.17)&-1.05(0.90)&8.02(1.89)\\
-RM&0.90(1.76)&-1.35(1.24)&-0.32(0.92)&8.94(1.87)\\
-RND&-5.61(2.08)&-4.44(1.40)&-4.67(1.35)&0.46(2.19)\\
+
+OOS&-2.49(2.45)&-2.55(1.61)&-2.93(1.48)&10.05(2.33)\\
+UCT&0.56(1.74)&-0.99(1.17)&-0.94(0.90)&8.13(1.89)\\
+RM&1.01(1.76)&-1.24(1.24)&-0.21(0.92)&9.05(1.87)\\
+RAND&-5.50(2.08)&-4.33(1.40)&-4.56(1.35)&0.57(2.19)\\
 \hline
 \end{tabular}
 \end{small}
 }
 \caption{Head-to-head matches in large variants of the games with 1s of computation per move and half of 95\% confidence intervals in the brackets.}
 \end{figure}
+
+\begin{itemize}
+\item Without enough time for convergence, OOS has a lot of  (uniform) noise in the results. Focussing on top 3 actions with the corresponding probabilities may work better. In contrast ISMCTS with much more samples can easily get zeros at really bad actions. This could be solved by playing according to the current strategy!!! The expected strategy is optimal, but we do not even have to store the mean strategy!!! However, this may require some correct weighting (i.e., belief) that may not be available.
+\end{itemize}
