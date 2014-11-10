@@ -896,7 +896,7 @@ update player histories, while average strategy tables at opponent histories.
 %earlier sections so that this last part is not too confusing.}
 
 \begin{theorem}
-Let $\bar{\sigma}^t_m(\delta,\tth)$ be a strategy produced by OOS with scheme $m \in \{ \mbox{IST}, \mbox{PST} \}$ 
+Let $\bar{\sigma}^t_m(\delta,\tth)$ be a strategy produced by OOS with scheme 1$m \in \{ \mbox{IST}, \mbox{PST} \}$ 
 using $\delta < 1$ started from $\tth$ run for $t$ iterations, with exploration $\epsilon > 0$.  
 For any $p \in (0, 1], \varepsilon > 0$ there exists $t < \infty$ such that with 
 probability $1-p$ the strategy  $\bar{\sigma}^t_m(\delta,\tth)$ is a $\varepsilon$-equilibrium strategy. 
@@ -915,6 +915,7 @@ consistency.
 
 % Please avoid this, it makes it unnecessarily difficult to find stuff
 %\input{experiments.tex}
+% it depends... but it make much easier to merge differences when more people are editing at once
 
 \section{Empirical Evaluation}
 
@@ -1152,6 +1153,10 @@ RND&-5.61(2.08)&-4.44(1.40)&-4.67(1.35)&0.46(2.19)\\
 }
 \caption{Head-to-head matches in large variants of the games with 1s of computation per move and half of 95\% confidence intervals in the brackets.}
 \end{figure}
+
+\begin{itemize}
+\item Without enough time for convergence, OOS has a lot of  (uniform) noise in the results. Focussing on top 3 actions with the corresponding probabilities may work better. In contrast ISMCTS with much more samples can easily get zeros at really bad actions. This could be solved by playing according to the current strategy!!! The expected strategy is optimal, but we do not even have to store the mean strategy!!! However, this may require some correct weighting (i.e., belief) that may not be available.
+\end{itemize}
 
 \section{Conclusion}
 
