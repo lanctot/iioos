@@ -1320,15 +1320,15 @@ effect is stronger in LD(1,1), with PST seeming better overall.
 
 In future work, we hope to investigate more and larger games such as 
 no-limit poker, and the effect of informed playout policies. 
-Ultimately, we want to make practical comparisons to other 
+We hope to compare practical performance agains other 
 baseline algorithms such as 
-PIMC~\cite{Long10Understanding}, MMCTS~\cite{Auger11Multiple}, and IIMC~\cite{Furtak13Recursive}.
-One interesting question is whether the subgame decomposition ideas of~\cite{Burch14Solving} could be 
+PIMC~\cite{Long10Understanding}, MMCTS~\cite{Auger11Multiple}, IIMC~\cite{Furtak13Recursive}, and Smooth UCT~\cite{Heinrich14}.
+One interesting question is whether the subgame decomposition ideas of~\cite{Burch14Solving,Jackson14} could be 
 adapted to the online search setting. 
-Finally, using MCRNR~\cite{Ponsen11Computing} as the base algorithm could provide a balance between 
-exploitability and exploitation against known opponents.
+Finally, since ISMCTS often plays within the support of an equilibrium, it is difficult to exploit by an equilibrium opponent; 
+using MCRNR~\cite{Ponsen11Computing} as the base algorithm would provide a controllable balance between exploitability and exploitation.
 
-\vlnote{ISMCTS often plays in support and it is hard to exploit it with NE play, even though the strategy can be completely exploitable. RNR may be a solution}
+%\vlnote{ISMCTS often plays in support and it is hard to exploit it with NE play, even though the strategy can be completely exploitable. RNR may be a solution}
 
 %ACKNOWLEDGMENTS are optional
 %\section{Acknowledgments}
