@@ -496,7 +496,7 @@ Current approaches, when given information set $I$, will repeatedly sample and s
 
 Note that sampling uniformly at $I$ corresponds to the proper belief distribution over states in $I$ given optimal play. Therefore, the problem occurs even if subtrees are sampled from the proper belief distribution. 
 
-To the best of our knowledge, none of the previous imperfect information search algorithms have been able to solve the problem of non-locality. OOS solves the problem of non-locality due to the convergence guarantees of MCCFR. 
+To the best of our knowledge, OOS is the first online search algorithm that solves this problem. As suggested by the analysis in~\cite{Long10Understanding}, the effect may be critical in games with low {\it disambiguation factor}, where private information is very slowly (or never) revealed throughout a match.
 
 \subsection{Offline Equilibrium Approximation}
 
