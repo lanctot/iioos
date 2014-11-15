@@ -431,7 +431,7 @@ as needed from $\sigma_c(\tth)$, and reveals $I(\tth)$ to $P(\tth)$ on their tur
 giving each player $i$ a payoff of $u_i(\ttz)$.
 
 \subsection{The Problem of Non-Locality}
-\label{sec:non-locality}
+\label{sec:nonlocality}
 
 %Complexities of online search vs. offline equilibrium computation. Notions of subgame perfection (sequential equilibrium). 
 %Perfect infromation games. Subject perfection
@@ -577,7 +577,7 @@ In particular, when an information set is reached that is not in memory, it is a
 playout policy (\eg uniform random) takes over for the remainder of the simulation.
 Along the playout portion (tail) of the simulation, information sets are not added to memory nor updated.
 Along the tree portion (head) of simulation, information sets are updated as normal. 
-This way, only the information sets with relevant statistics will be stored in the memory.
+This way, only the relevant information sets will be stored in the memory.
 %We call this modification \defword{playout-based outcome sampling}
 
 {\bf In-Match Search Targeting.}
@@ -697,7 +697,7 @@ outcomes for all players) with at least two public actions, whose first two publ
   \caption{Online Outcome Sampling. \label{alg}}
 \end{algorithm2e}
 
-The algorithm is iterative and samples a single trajectory from the root $\emptyset$ to some 
+The algorithm is iterative and samples a single trajectory from the root $\emptyset$ to a 
 terminal history. At each information set in memory, $I$, there are two tables maintained: $r_I$ stores cumulative 
 regret for each action $a \in A(I)$, and $s_I$ stores the cumulative average strategy probability of each 
 action. 
@@ -750,13 +750,14 @@ but in general one could use a informed policy based on domain knowledge as well
 Unlike MCTS, the playout policy in OOS must compute $l$ when reaching a terminal and update the tail probability $x$ when returning
 as done on line~\ref{alg:suffix2}. Lines~\ref{alg:newreaches1} and \ref{alg:newreaches2} modify $P(h)$'s reach probability 
 by multiplying it by $\sigma(I,a)$, keeping the other value the same.
-
 %Lines~\ref{alg:suffix1} to \ref{alg:returnend} % second ref does not seem to work
 Lines~\ref{alg:suffix1} to 24
 contain the usual outcome sampling updates. Note that regrets are updated at the 
 update player histories, while average strategy tables at opponent histories. 
 %\mlnote{Still need to add some more detail to 
 %earlier sections so that this last part is not too confusing.}
+
+\subsubsection{Consistency}
 
 \begin{theorem}
 Let $\bar{\sigma}^t_m(\delta,\tth)$ be a strategy produced by OOS with scheme 1$m \in \{ \mbox{IST}, \mbox{PST} \}$ 
@@ -782,7 +783,7 @@ consistency.
 
 \section{Empirical Evaluation}
 
-\mlnote{This is Vilo's replacement (..?).}
+%\mlnote{This is Vilo's replacement (..?).}
 
 We now compare the exploitability  and head-to-head performance
 of OOS and ISMCTS on three fundamentally different imperfect games. % with different sources of imperfect information. 
@@ -822,8 +823,7 @@ If no further raise is made by any of the players, the betting round ends, the N
 After the second betting round ends, the outcome of the game is determined --- a player wins if: (1) her private card matches the table card and the opponent's card does not match, or (2) none of the players' cards matches the table card and her private card is higher than the private card of the opponent. If no player wins, the game is a draw and the pot is split.
 
 The parameters of the game are the number of types of the cards ($T$; there are $3$ types of cards in Leduc), the number of cards of each type ($C$; set to $2$ in Leduc), the maximum length of sequence of raises in a betting round ($R$; set to $1$ in Leduc), and the number of different sizes of bets (i.e., amount of chips added to the pot) for \emph{bet}/\emph{raise} actions ($B$; set to $1$ in Leduc).
-This game is similar to Liar's Dice in having only public actions. However, it includes additional chance nodes later in the game, which reveal part of the information not available before. Moreover, it is the only game with integer results and not just win/draw/loss.\\
-
+This game is similar to Liar's Dice in having only public actions. However, it includes additional chance nodes later in the game, which reveal part of the information not available before. Moreover, it is the only game with integer results and not just win/draw/loss.
 
 We will first focus our experiments on LD(1,1), II-GS(6), and GP(3,3,2,2). While these games are considered small by search algorithm standards, it is still possible to compute best response strategies to measure exploitability, allowing us to show the observed convergence of the strategies produced by OOS. In head-to-head matches in these small games, we allow the algorithms only 0.1s of computation per move. Afterwards, we also run head-to-head matches also on larger variant of the games. 
 
@@ -945,7 +945,7 @@ We first focus on smaller versions of the games, in which we can estimate the ex
 \caption{Exploitability and head-to-head performance in small variants of the evaluated games. The values after $\pm$ at the matches are the maximum size of the 95\% confidence intervals over all values in the table. (d) and (h) are win rates, while (l) is the difference of the  expected outcome of a pair of strategies and the value of the game.}\label{fig:small}
 \end{figure*}
 
-\subsection{Convergence to Nash equilibrium}
+%\subsection{Convergence to Nash equilibrium}
 
 \subsubsection{Convergence at the root}
 \vlnote{divide by 2 or use sum instead of mean in the aggregated exp.}
@@ -964,14 +964,13 @@ In the other two games, full targeting produces the least exploitable strategies
 
 With short computation times, IST converges closer to the equilibrium, but with more computation, PST eventually dominates, with the exception of $delta=1$ in Poker. In LD, PST is much less sensitive to the choice of parameters. The public subgame includes most of the relevant informations. However, the sudden drop of the convergence speed of full targeting around 1s per move indicates that the public subgame does not contain all the relevant information.
 
+% Removed to estimate space
+%\begin{itemize}
+%\item the game playing performance in large game with limited time is bad. This is likely because the targeting costs a lot of computational resources and the untargeted portions of the tree are not visited/updated enough to fix the strategies anyway.
+%\end{itemize}
 
+\subsubsection{Head-to-head performance}
 
-\begin{itemize}
-
-\item the game playing performance in large game with limited time is bad. This is likely because the targeting costs a lot of computational resources and the untargeted portions of the tree are not visited/updated enough to fix the strategies anyway.
-\end{itemize}
-
-\subsection{Head-to-head performance}
  The previous experiments confirmed that we achieved the goal of creating an online game playing algorithm that converges close to Nash equilibrium. Now we evaluate the incluence of keeping this guarantee to the actual game playing performance in head-to-head matches with ISMCTS.
 
 
@@ -1143,12 +1142,10 @@ The results on Liar's Dice are even more promissing for OOS. In the smaller game
 As indicated by the exploitability results, OOS performs the worst against ISMCTS on the Poker domain...
 
 
-
-
-
-\begin{itemize}
-\item Without enough time for convergence, OOS has a lot of  (uniform) noise in the results. Focussing on top 3 actions with the corresponding probabilities may work better. In contrast ISMCTS with much more samples can easily get zeros at really bad actions. This could be solved by playing according to the current strategy!!! The expected strategy is optimal, but we do not even have to store the mean strategy!!! However, this may require some correct weighting (i.e., belief) that may not be available.
-\end{itemize}
+% Removing this so I know how much trimming needs to be done.
+%\begin{itemize}
+%\item Without enough time for convergence, OOS has a lot of  (uniform) noise in the results. Focussing on top 3 actions with the corresponding probabilities may work better. In contrast ISMCTS with much more samples can easily get zeros at really bad actions. This could be solved by playing according to the current strategy!!! The expected strategy is optimal, but we do not even have to store the mean strategy!!! However, this may require some correct weighting (i.e., belief) that may not be available.
+%\end{itemize}
 
 \section{Conclusion}
 
