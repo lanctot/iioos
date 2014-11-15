@@ -942,6 +942,7 @@ We now compare the exploitability  and head-to-head performance
 of OOS and ISMCTS on three fundamentally different imperfect games. % with different sources of imperfect information. 
 
 \subsection{Domains}
+\vlnote{comment on domain sizes}
 
 \textbf{Imperfect Information Goofspiel II-GS($N$)} is a two-player card game where each player is
 given a private hand of bid cards with values $1$ to $N$. A different
@@ -1121,18 +1122,17 @@ With short computation times, IST converges closer to the equilibrium, but with 
 
 \begin{itemize}
 
-\item head-to-head results in small games are mostly consistent with aggregated exploitability, OOS wins over IS-MCTS in II-GS and LD, while it looses in GP. In II-GS, OOS was the only algorithm that was not significantly loosing from the second position.
-\item the performance form each position significantly differs for all algorithms, including OOS, which looses 
-\item the amount of exploration in OOS has relatively small effect on exploitability in LD and GP, while it is significant in II-GS. It would be good to explain why.
 \item the game playing performance in large game with limited time is bad. This is likely because the targeting costs a lot of computational resources and the untargeted portions of the tree are not visited/updated enough to fix the strategies anyway.
 \end{itemize}
 
+\subsection{Head-to-head performance}
+ The previous experiments confirmed that we achieved the goal of creating an online game playing algorithm that converges close to Nash equilibrium. Now we evaluate the incluence of keeping this guarantee to the actual game playing performance in head-to-head matches with ISMCTS.
 
 
 \begin{figure}
 \centering
 
-\subfigure[II Goofspiel (6)]{\label{fig:GS-matches}
+\subfigure[II Goofspiel (6)]{\label{fig:GS-matches-small}
 \begin{small}
 \begin{tabular}{@{}|@{}r@{}|@{~}c@{~}c@{~}c@{~}c@{}|}\hline
 0.1s&OOS&UCT&RM&RND\\\hline
@@ -1145,7 +1145,7 @@ RND&17.1(2.2)&15.7(2.2)&10.3(1.8)&49.7(3.0)\\
 \end{small}
 }
 
-\subfigure[II Goofspiel (13)]{
+\subfigure[II Goofspiel (13)]{\label{fig:GS-matches-large}
 \begin{small}
 \begin{tabular}{@{}|@{}r@{}|@{~}c@{~}c@{~}c@{~}c@{}|}\hline
 1s&OOS&UCT&RM&RND\\\hline
@@ -1175,21 +1175,21 @@ OOS_MCTS-RUCT_yIST-WC_IIGS_1_13_bFALSE_t5000 34.8(5.8)
 \end{verbatim}
 
 
-\subfigure[Liar's Dice (1,1)]{\label{fig:LD-matches}
+\subfigure[Liar's Dice (1,1)]{\label{fig:LD-matches-small}
 \begin{small}
 \begin{tabular}{@{}|@{}r@{}|@{}c@{~}c@{~}c@{~}c@{}|}\hline
 0.1s&OOS-PST&UCT&RM&RND\\\hline
 OOS-PST&48.5(2.0)&51.7(2.0)&56.8(2.8)&83.3(1.5)\\
 UCT&45.7(2.0)&49.7(2.0)&52.9(2.8)&87.2(1.3)\\
 RM&47.9(2.8)&49.0(2.8)&54.3(2.8)&84.8(2.0)\\
-RAND&16.9(1.5)&19.5(1.6)&18.1(2.2)&47.7(2.0)\\
+RND&16.9(1.5)&19.5(1.6)&18.1(2.2)&47.7(2.0)\\
 \hline
 \end{tabular}
 \end{small}
 }
 
 
-\subfigure[Liar's Dice (2,2)]{
+\subfigure[Liar's Dice (2,2)]{\label{fig:LD-matches-large}
 \begin{small}
 \begin{tabular}{@{}|@{}r@{}|@{~}c@{~}c@{~}c@{~}c@{}|}\hline
 1s&OOS&UCT&RM&RND\\\hline
@@ -1210,7 +1210,7 @@ RND&9.3(1.8)&15.3(2.9)&16.0(2.9)&49.3(4.0)\\
 OOS-PST($\gamma$=0.8)&49.9(3.7)&55.4(2.3)&53.3(3.7)&91.3(1.7)\\
 UCT&49.8(2.2)&56.2(3.1)&49.8(3.1)&93.7(1.5)\\
 RM&53.3(3.5)&51.7(4.0)&51.0(4.0)&88.7(2.0)\\
-RAND&7.3(1.6)&12.9(2.1)&12.7(2.1)&47.3(3.0)\\
+RND&7.3(1.6)&12.9(2.1)&12.7(2.1)&47.3(3.0)\\
 \hline
 \end{tabular}
 \end{small}
@@ -1265,8 +1265,40 @@ RND&-4.64(1.28)&-4.44(1.40)&-4.67(1.35)&0.46(2.19)\\
 \end{tabular}
 \end{small}
 }
-\caption{Head-to-head matches in large variants of the games with 1s of computation per move and half of 95\% confidence intervals in the brackets.}
+\caption{Head-to-head matches in large variants of the games with 1s of computation per move and half of 95\% confidence intervals in the brackets.}\label{fig:matches}
 \end{figure}
+
+For each game, we focus on two sizes. The smaller variant, for which we analyzed the exploitability in the previous section and a substantially larger variant that are closer to the size of the domains where online search algorithms are typically applied. 
+
+%Game values
+%LD611 -0.02713178294573644
+
+%GP 2 2 3 3 -0.11135308803867544
+%GP 4 4 4 6 -0.11123854182232012
+
+
+
+The results are summarized in Figure~\ref{fig:matches}.
+For Goofspiel and Liar's Dice, we present the win-rate, where a tie is considered half win half loss. Goofspiel is perfectly balanced for both players. In LD, the first player has a slight disadvantage corresponding to approximately 1% in the win rate and we do not compensate for that.
+In Poker, the result of a single match is the specific amount of money won or lost by the players.
+The game is not balanced. If both players play the optimal strategy, the first player looses 0.11 on average.
+This value is practically the same for both evaluated sizes of the Poker games.
+For clarity, we present the difference between this game value and the mean reward obtained by the players in the matches. A value 0.1 in the tables means that the row player on average wins 0.1 more than the game value.
+Each entry in the tables presents the result of at least 500 mutual matches between two algorithms from the perspective of the one in the row header. The values in the brackets are the size of half of the 95\% confidence interavals centered in the presented mean. If it is not specified othewise, OOS was run with targeting $\delta=0.9$ and exploration $\gamma=0.4$.
+
+Table~\ref{GS-matches-small} presents the results for the smaller Goofspiel and $0.1$ second of computation per move. Even though the game is balances, the results of ISMCTS are strongly biased towards the first player. The secons player has generally larger infomration sets and needs to better approximate the correct beliefs to choose a good move. OOS does not have this problem in the smaller game. It is the only algorithm that managed to prevent ISMCTS from exploiting it.
+In both positions, the algorithm won approximately 50\% of matches, which corresponds to the value of the game.
+On the other hand, the first line in the table shows that OOS did not exploit the weaker play of ISMCTS, even though it is possible. This is a common disadvantage of Nash equilibrium play \cite{} and can be overcome for the cost of partially loosing the guarantees \cite{RNR}.
+
+In the large variant of Goofspiel (see Table~\cite{GS-matches-small}) with one second of computation per move, the situation is different. OOS dost not manage to converge sufficienly close to the equlibrium and ISMCTS isl able to exploit from both positions to a similar extent. Increasing the computation time to 5 seconds per move helps OOS to win 35\% matches against ISMCTS(UCT), but it would likely need a substantially longer time to reach the actual equilibrium.
+
+The results on Liar's Dice are even more promissing for OOS. In the smaller game with $0.1$ second of computation per move (see Table~\cite{LD-matches-small}), OOS statistically significantly wins over both variants of ISMCTS form at least one position. This is not the case for the larger variant of the game and 1 second of computation per move, where OOS already looses. However, with 5 seconds per move and the exploration parameter set to $\gamma=0.8$ to balance the need for exploring a large number of actions in this game, OOS again wins over ISMCTS(UCT) and ties with ISMCTS(RM).
+
+As indicated by the exploitability results, OOS performs the worst against ISMCTS on the Poker domain...
+
+
+
+
 
 \begin{itemize}
 \item Without enough time for convergence, OOS has a lot of  (uniform) noise in the results. Focussing on top 3 actions with the corresponding probabilities may work better. In contrast ISMCTS with much more samples can easily get zeros at really bad actions. This could be solved by playing according to the current strategy!!! The expected strategy is optimal, but we do not even have to store the mean strategy!!! However, this may require some correct weighting (i.e., belief) that may not be available.
@@ -1295,6 +1327,7 @@ adapted to the online search setting.
 Finally, using MCRNR~\cite{Ponsen11Computing} as the base algorithm could provide a balance between 
 exploitability and exploitation against known opponents.
 
+\vlnote{ISMCTS often plays in support and it is hard to exploit it with NE play, even though the strategy can be completely exploitable. RNR may be a solution}
 
 %ACKNOWLEDGMENTS are optional
 %\section{Acknowledgments}
