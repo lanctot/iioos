@@ -703,8 +703,9 @@ Now we explain the role of the weighting factor $w_T$. Note that on lines 22 and
 Consider the updates in the current information set of the game $I_\mathtt{h}$. In the initial samples of the algorithm with empty match history, this information set was on average sampled with a very low probability $s_0$. Let's say that out of $10^6$ samples started from the root, 1000 samples reached this particular information set. In that case, $s_0=0.001$ and the regret updates caused by each of these samples were multiplied by $\frac{1}{s_0}=1000$.
 Now the game has actually reached the history $\mathtt{h}$ and due to targeting, half of the next $10^6$ samples reach $I_\mathtt{h}$. It means that  $s'_0=0.5$ and the regrets will be multiplied only by 2.
 As a results, the updated of the first (generally less precise) 1000 samples are all togeather weighted the same as the $5\times 10^5$ later samples, which makes it almost impossible to compensate for the initial errors.
-In order to prevent this effect, we add the weighting factor $w_T$ to compensate the change of targeting and make each of the samples have similar weight. In our example, $w_T=\frac{s'_0}{s_0}$. More formally, when running the iterations from match history $\mathtt{h}$, we define the weighting factor as:
-\[w_T(\mathtt{h}) = (1-\delta) + \delta\frac{A}{B}\]
+In order to prevent this effect, we add the weighting factor $w_T$ to compensate the change of targeting and make each of the samples have similar weight. 
+In our example, $w_T=\frac{s'_0}{s_0}$. More formally, when running the iterations from match history $\mathtt{h}$, we define the weighting factor as the probability of reaching $I(\mathtt{h})$ without any targeting devided by the probability of reaching $I(\mathtt{h})$ with the current targeting, assuming the players play according to the current mean strategy profile $\bar{\pi}$:
+\[\frac{1}{w_T(\mathtt{h})} =  (1-\delta) + \delta\frac{\sum_{(h,z)\in I(\mathtt{h})} \bar{\pi}(h)}{\sum_{z\in Z_{sub(\mathtt{h})}} \bar{\pi}(z)}.\]
 
 \subsubsection{Consistency}
 
