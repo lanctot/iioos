@@ -88,9 +88,11 @@
 \newcommand{\vlnote}[1]{{\scriptsize \color{blue} $\blacksquare$ \refstepcounter{vlNoteCounter}\textsf{[VL]$_{\arabic{vlNoteCounter}}$:{#1}}}}
 \newcommand{\mlnote}[1]{{\scriptsize \color{darkgreen} $\blacksquare$ \refstepcounter{mlNoteCounter}\textsf{[ML]$_{\arabic{mlNoteCounter}}$:{#1}}}}
 \newcommand{\asnote}[1]{{\scriptsize \color{red} $\blacktriangle$ \refstepcounter{mbNoteCounter}\textsf{[MB]$_{\arabic{asNoteCounter}}$:{#1}}}}
-%\newcounter{NoteCounter}
-%\newcommand{\vlnote}[1]{{\scriptsize \color{blue} \refstepcounter{vlNoteCounter}\textsf{[VL]$_{\arabic{vlNoteCounter}}$:{#1}}}}
-%\renewcommand{\vlnote}[1]{}
+
+\renewcommand{\vlnote}[1]{}
+\renewcommand{\mlnote}[1]{}
+\renewcommand{\asnote}[1]{}
+
 
 \newcommand{\argmin}{\operatornamewithlimits{argmin}}
 \newcommand{\argmax}{\operatornamewithlimits{argmax}}
@@ -732,6 +734,48 @@ consistency.
 We now compare the exploitability  and head-to-head performance
 of OOS and ISMCTS on three fundamentally different imperfect games. % with different sources of imperfect information. 
 
+
+\subsection{Information Set Monte Carlo Tree Search}
+In the evaluation, we compare to Information Set Monte Carlo tree search implemented in the same framework with similar data representations as OOS. ISMCTS is to runs MCTS samples as in a perfect informaiton game, but uses common statistics computed for the whole information set and not individual states to select the next move. We use two selection functions in our experiments. First, the commonly used UCT as suggested in \cite{Cowling12ISMCTS}. We use two time the maximal game value as the exploration parameter $C$. In matches, we select the action with the highest number of iterations. For evaluating convergence, this would always have the maximum possible exploitability in the evaluated games. Therefore, we use the distribution given by the empirical frequences for this part of evaluation. Second, we use Regret Matching (RM) as the selection strategy, because it has been shown to empirically perform better in many games \cite{Lisy14selection} and because it is based on the same principles that are behind CFR. For this selection function, we use the mean strategy for evaluating exploitability and the samples form this strategy in head to head matches.
+
+\subsection{Evaluating Performance}\label{sec:evaluating}
+
+In games like Poker and Liar's Dice, it is often critical to play in such a way that the opponent 
+cannot easily infer the private information. This explains partly why CFR-based methods have 
+enjoyed so much success in the offline approach. 
+In the online setting, however, since the tree is built incrementally, only partial strategies
+are produced. 
+We are unaware of any methods for assessing the worst-case exploitability of strategies 
+produced by an online search algorithm. 
+We therefore propose two new methods to approximate the exploitability of the produced strategies. 
+
+\mlnote{The full stitching experiments are gone; remove?}
+In the offline setting, measuring exploitability can be done by a recursive walk of the game 
+tree using expectimax. In online search, the algorithm computes only 
+a partial strategy. 
+The first \defword{full stitching} method 
+enumerates each $I \in \cI_i$ in topologically-sorted order starting at the root, 
+running a search from $I$ re-using only the information computed in previous searches from ancestors of $I$, saving the 
+distribution computed at $I$, and passing down the state of memory only for children of $I$. 
+We do not save changes made to ancestors when searching at $I$ to ensure 
+a fair comparison between OOS and ISMCTS. Full stitching provides the best representation of a full strategy
+that would eventually be produced by OOS since it builds distributions at each information set in the 
+same way as OOS would if they were reached during play.
+However, full-stitching requires $|\cI|$ searches and memory, which is impractical on large games. 
+
+We also propose a the multi-match \defword{aggregate method}. 
+This method first creates a global (accumulating) strategy data structure for each player type and generates a 
+set of matches $M$. Then, each $m \in M$ is simulated invoking the appropriate search algorithm at each observed 
+$I$ along $m$. 
+Since $m$ is predetermined, the choice made by the search algorithm is discarded, but the information computed 
+(visit counts in ISMCTS, $s_I$ in OOS) is added into the global strategy data structure belonging to the player
+who searched. 
+For a fair comparison, the first $I$ reached along each $m$ aggregates all the information gained in the search 
+but for future $I'$, only the information collected in each $I''$ reachable by $I'$ is aggregated.
+Note that it is safe to combine the information in this way: in ISMCTS the actions chosen and visits are independent of 
+how $I'$ was reached. In OOS, the accumulating $s_I$ values of two converging $\epsilon$-equilibrium average 
+strategies can be combined due to linearity of expected utility. 
+
 \subsection{Domains}
 \vlnote{comment on domain sizes}
 
@@ -776,48 +820,6 @@ $\sigma^{T+1}_\gamma(I,a) = \gamma/|A(I)| + (1-\gamma) \sigma^{T+1}(I,a)$, with 
 While this could effect convergence, we observe in our experiments that exploitability 
 decreases as search time increases. 
 
-\subsection{Information Set Monte Carlo Tree Search}
-\vlnote{Describe ISMCTS, related work, use of empirical frequencies and default parameters}
-
-
-\subsection{Evaluating Performance}\label{sec:evaluating}
-
-In games like Poker and Liar's Dice, it is often critical to play in such a way that the opponent 
-cannot easily infer the private information. This explains partly why CFR-based methods have 
-enjoyed so much success in the offline approach. 
-In the online setting, however, since the tree is built incrementally, only partial strategies
-are produced. 
-We are unaware of any methods for assessing the worst-case exploitability of strategies 
-produced by an online search algorithm. 
-We therefore propose two new methods to approximate the exploitability of the produced strategies. 
-
-\mlnote{The full stitching experiments are gone; remove?}
-In the offline setting, measuring exploitability can be done by a recursive walk of the game 
-tree using expectimax. In online search, the algorithm computes only 
-a partial strategy. 
-The first \defword{full stitching} method 
-enumerates each $I \in \cI_i$ in topologically-sorted order starting at the root, 
-running a search from $I$ re-using only the information computed in previous searches from ancestors of $I$, saving the 
-distribution computed at $I$, and passing down the state of memory only for children of $I$. 
-We do not save changes made to ancestors when searching at $I$ to ensure 
-a fair comparison between OOS and ISMCTS. Full stitching provides the best representation of a full strategy
-that would eventually be produced by OOS since it builds distributions at each information set in the 
-same way as OOS would if they were reached during play.
-However, full-stitching requires $|\cI|$ searches and memory, which is impractical on large games. 
-
-We also propose a the multi-match \defword{aggregate method}. 
-This method first creates a global (accumulating) strategy data structure for each player type and generates a 
-set of matches $M$. Then, each $m \in M$ is simulated invoking the appropriate search algorithm at each observed 
-$I$ along $m$. 
-Since $m$ is predetermined, the choice made by the search algorithm is discarded, but the information computed 
-(visit counts in ISMCTS, $s_I$ in OOS) is added into the global strategy data structure belonging to the player
-who searched. 
-For a fair comparison, the first $I$ reached along each $m$ aggregates all the information gained in the search 
-but for future $I'$, only the information collected in each $I''$ reachable by $I'$ is aggregated.
-Note that it is safe to combine the information in this way: in ISMCTS the actions chosen and visits are independent of 
-how $I'$ was reached. In OOS, the accumulating $s_I$ values of two converging $\epsilon$-equilibrium average 
-strategies can be combined due to linearity of expected utility. 
-
 \subsection{Results}
 
 We first focus on smaller versions of the games, in which we can estimate the exploitability of the strategies produces by the search algorithms. After analysing the convergence, we proceed to performance in head-to-head matches with ISMCTS.
@@ -828,7 +830,7 @@ We first focus on smaller versions of the games, in which we can estimate the ex
 \includegraphics[height=3.5mm]{fig/legend_algs}
 \hfill 
 \includegraphics[height=3.5mm]{fig/legend_oos}
-\hspace{1.3cm}
+\hspace{0.8cm}
 
 \rotatebox{90}{\hskip-1.5cm II Goofspiel (6)}
 \subfigure[Root]{\label{fig:GS-root}
@@ -843,10 +845,10 @@ We first focus on smaller versions of the games, in which we can estimate the ex
 \begin{minipage}{0.235\textwidth}
 \includegraphics[width=\textwidth]{fig/agg_OSS-IST-WC_convergence-IIGS_1_6}
 \end{minipage}}
-\subfigure[OOS noW Params.]{\label{fig:GS-oos}
 \begin{minipage}{0.235\textwidth}
-%\includegraphics[width=\textwidth]{fig/agg_OSS_convergence-IIGS_1_6}
-\end{minipage}}
+\center
+No public subgame
+\end{minipage}
 
 \rotatebox{90}{\hskip-1.5cm Liar's Dice (6,1,1)}
 \subfigure[Root]{\label{fig:LD-root}
@@ -891,18 +893,17 @@ We first focus on smaller versions of the games, in which we can estimate the ex
 %\subsection{Convergence to Nash equilibrium}
 
 \subsubsection{Convergence at the root}
-\vlnote{divide by 2 or use sum instead of mean in the aggregated exp.}
 
-First we evaluate the speed of convergence of the proposed algorithm when run in the root of the games. The strategy in the information sets which are not included in the tree yet is assumed to be a fixed random action identical for all algorithms. The impact of the exploration parameters of the algorithms is not very strong here. The exploration for OOS was set to $0.6$. The results are in Figures~\ref{fig:small}(a,e,i). OOS clearly converges the fastest in all games, eventually converging to the exact equilibrium. The exact convergence is not surprising, because the algorithm run from the root is MCCFR with incremental tree building.
+First we evaluate the speed of convergence of the proposed algorithm when run in the root of the games. The strategy in the information sets which are not included in the tree yet is assumed to be a fixed random action identical for all algorithms. The impact of the exploration parameters of the algorithms is not very strong here. The exploration for OOS was set to $0.6$. The results are in Figures~\ref{fig:small}(a,d,h). OOS clearly converges the fastest in all games, eventually converging to the exact equilibrium. The exact convergence is not surprising, because the algorithm run from the root is MCCFR with incremental tree building.
 
 In all three games, the empirical action frequencies in ISMCTS(UCT) first converge rather quickly towards less exploitable strategies, but they always start to become more exploitable at some point. This does not happen with ISMCTS(RM), but the initial convergence rate is smaller.
 
 \subsubsection{Aggregated strategy exploitability}
 
-Figures~\ref{fig:small}(b,f,j) present the average exploitability of the strategies computed by different algorithms estimated by the aggregate method explained in Section~\ref{sec:evaluating}. The OOS in this graphs is run with the information set targeting and the parameters $\gamma=0.4$ for exploration and $\delta=0.5$ for targeting.
+Figures~\ref{fig:small}(b,e,i) present the average exploitability of the strategies computed by different algorithms estimated by the aggregate method explained in Section~\ref{sec:evaluating}. The OOS in this graphs is run with the information set targeting and the parameters $\gamma=0.4$ for exploration and $\delta=0.5$ for targeting.
 The x-axis denotes the amount of computation per move. In Goofspiel, both variants of ISMCTS produce a more exploitable strategy with more computation time per move. For any of the evaluated time settings, OOS is substantially less exploitable than ISMCTS variants. In Liar's Dice, ISMCTS does not seem to get worse with additional computation time, but it improves only with more than $0.4$ second per move. OOS steadily approaches the equilibrium. In Poker, the aggregated strategy exploitability is lower for ISMCTS variants than for  OOS with the default settings. With the limited computation time, having more iterations to avoid bad moves seems to be more important than guessing and hiding the private information of the players.\vlnote{explain above that this is what the correct algorithms does and ISMCTS ignores}
 
-The remaining plots in Figures~\ref{fig:small} present how the exploitability of the strategies produced by OOS depends on the selected targeting scheme and the two main parameters of the algorithm: the amount of targeting shown by color and the amount of exploration shown by point shapes. Figures \ref{fig:small}(c,g,k) show the information set targeting and \ref{fig:small}(h,l) show the public subgame targeting. Overall, the graphs confirm that OOS produces strategies closer to the equilibirum as the computation time per move increases. This is true for all parameter settings, with the exception of full targeting ($\delta=1$) in Liar's Dice. This confirms that sampling the histories that will certainly not occur in the game anymore is necessary to converge to the optimal strategy in LD.
+The remaining plots in Figures~\ref{fig:small} present how the exploitability of the strategies produced by OOS depends on the selected targeting scheme and the two main parameters of the algorithm: the amount of targeting shown by color and the amount of exploration shown by point shapes. Figures \ref{fig:small}(c,f,j) show the information set targeting and \ref{fig:small}(g,k) show the public subgame targeting. Overall, the graphs confirm that OOS produces strategies closer to the equilibirum as the computation time per move increases. This is true for all parameter settings, with the exception of full targeting ($\delta=1$) in Liar's Dice. This confirms that sampling the histories that will certainly not occur in the game anymore is necessary to converge to the optimal strategy in LD.
 In the other two games, full targeting produces the least exploitable strategies with very short computation times. This indicates that sophisticated modelling of hidden information can be counterproductive with very short computation times. With more time per move, weaker targeting performs as good as the stronger targeting or even better in case of PST.
 
 With short computation times, IST converges closer to the equilibrium, but with more computation, PST eventually dominates, with the exception of $delta=1$ in Poker. In LD, PST is much less sensitive to the choice of parameters. The public subgame includes most of the relevant informations. However, the sudden drop of the convergence speed of full targeting around 1s per move indicates that the public subgame does not contain all the relevant information.
@@ -912,41 +913,81 @@ With short computation times, IST converges closer to the equilibrium, but with 
 %\item the game playing performance in large game with limited time is bad. This is likely because the targeting costs a lot of computational resources and the untargeted portions of the tree are not visited/updated enough to fix the strategies anyway.
 %\end{itemize}
 
-\subsubsection{Head-to-head performance}
 
- The previous experiments confirmed that we achieved the goal of creating an online game playing algorithm that converges close to Nash equilibrium. Now we evaluate the incluence of keeping this guarantee to the actual game playing performance in head-to-head matches with ISMCTS.
-
-
-\begin{figure}
-\centering
-
+\begin{figure*}[t]
 \subfigure[II Goofspiel (6)]{\label{fig:GS-matches-small}
-\begin{small}
+\begin{scriptsize}
 \begin{tabular}{@{}|@{}r@{}|@{~}c@{~}c@{~}c@{~}c@{}|}\hline
 0.1s&OOS&UCT&RM&RND\\\hline
-OOS-IST&&50.0(1.3)&50.5(1.3)&83.1(1.5)\\
-RUCT&51.2(2.2)&62.9(2.6)&62.7(2.5)&84.0(2.1)\\
+OOS&&50.0(1.3)&50.5(1.3)&83.1(1.5)\\
+UCT&51.2(2.2)&62.9(2.6)&62.7(2.5)&84.0(2.1)\\
 RM&52.3(1.4)&70.6(1.7)&73.1(2.1)&87.8(1.4)\\
 RND&17.1(2.2)&15.7(2.2)&10.3(1.8)&49.7(3.0)\\
 \hline
 \end{tabular}
-\end{small}
-}
+\end{scriptsize}}
+\subfigure[Liar's Dice (1,1)]{\label{fig:LD-matches-small}
+\begin{scriptsize}
+\begin{tabular}{@{}|@{}r@{}|@{~}c@{~}c@{~}c@{~}c@{}|}\hline
+0.1s&OOS&UCT&RM&RND\\\hline
+OOS&48.5(2.0)&51.7(2.0)&56.8(2.8)&83.3(1.5)\\
+UCT&45.7(2.0)&49.7(2.0)&52.9(2.8)&87.2(1.3)\\
+RM&47.9(2.8)&49.0(2.8)&54.3(2.8)&84.8(2.0)\\
+RND&16.9(1.5)&19.5(1.6)&18.1(2.2)&47.7(2.0)\\
+\hline
+\end{tabular}
+\end{scriptsize}}
+\subfigure[Generic Poker (3,3,2,2)]{\label{fig:GP-matches-small}
+\begin{scriptsize}
+\begin{tabular}{@{}|@{}r@{}|@{\hspace{1pt}}c@{~}c@{~}c@{~}c@{}|}\hline
+0.1s&OOS&UCT&RM&RND\\\hline
+OOS&0.25(0.53)&-0.68(0.35)&-0.39(0.33)&2.00(0.54)\\
+UCT&0.64(0.37)&0.21(0.15)&0.20(0.15)&1.35(0.36)\\
+RM&0.43(0.54)&0.21(0.40)&-0.12(0.32)&1.75(0.44)\\
+RND&-2.05(0.70)&-2.22(0.54)&-3.24(0.55)&1.07(0.61)\\
+\hline
+\end{tabular}
+\end{scriptsize}}
 
 \subfigure[II Goofspiel (13)]{\label{fig:GS-matches-large}
-\begin{small}
+\begin{scriptsize}
 \begin{tabular}{@{}|@{}r@{}|@{~}c@{~}c@{~}c@{~}c@{}|}\hline
 1s&OOS&UCT&RM&RND\\\hline
 %OOS&49.5(3.1)&25.4(2.7)&21.2(2.5)&72.8(2.7)\\
-OOS-IST&&28.3(3.9)&35.1(4.2)&83.0(3.2)\\
+OOS&&28.3(3.9)&35.1(4.2)&83.0(3.2)\\
 UCT&69.2(4.0)&70.0(2.8)&61.0(3.0)&90.6(1.8)\\
 RM&67.5(4.0)&73.8(2.7)&67.5(2.9)&92.8(1.5)\\
 RND&19.6(3.4)&6.2(1.5)&4.9(1.3)&49.0(3.0)\\
 \hline
 \end{tabular}
-\end{small}
-}
+\end{scriptsize}}
+\subfigure[Liar's Dice (2,2)]{\label{fig:LD-matches-large}
+\begin{scriptsize}
+\begin{tabular}{@{}|@{}r@{}|@{~}c@{~}c@{~}c@{~}c@{}|}\hline
+5s&OOS&UCT&RM&RND\\\hline
+OOS&49.9(3.7)&55.4(2.3)&53.3(3.7)&91.3(1.7)\\
+UCT&49.8(2.2)&56.2(3.1)&49.8(3.1)&93.7(1.5)\\
+RM&53.3(3.5)&51.7(4.0)&51.0(4.0)&88.7(2.0)\\
+RND&7.3(1.6)&12.9(2.1)&12.7(2.1)&47.3(3.0)\\
+\hline
+\end{tabular}
+\end{scriptsize}}
+\subfigure[Generic Poker (4,6,4,4)]{\label{fig:GP-matches-large}
+\begin{scriptsize}
+\begin{tabular}{@{}|@{}r@{}|@{~}c@{~}c@{~}c@{~}c@{}|}\hline
+1s&OOS&UCT&RM&RND\\\hline
+OOS&-0.54(0.47)&-1.79(0.27)&-2.19(0.32)&8.36(0.54)\\
+UCT&-0.07(0.35)&0.22(0.10)&-0.76(0.18)&9.48(0.40)\\
+RM&-0.12(0.38)&-0.28(0.17)&-0.97(0.22)&9.09(0.44)\\
+RND&-3.25(0.43)&-3.91(0.27)&-4.12(0.31)&2.51(0.51)\\
+\hline
+\end{tabular}
+\end{scriptsize}}
+\caption{Head-to-head matches in small (a-c) and large (d-f) variants of the games. Computation time per move is indicated in top left corner and half of 95\% confidence intervals in the brackets.}\label{fig:matches}
+\end{figure*}
 
+\iffalse
+\begin{figure}
 \small
 \begin{verbatim}
 MCTS-RM_OOS_yIST-W_IIGS_1_6_t100 51.3(1.3)
@@ -960,22 +1001,12 @@ MCTS-RUCT_OOS_yIST-WC_IIGS_1_10_t3000 66.7(3.9)
 OOS_MCTS-RUCT_yIST-WC_IIGS_1_10_t3000 41.1(4.2)
 MCTS-RUCT_OOS_yIST-WC_IIGS_1_13_bFALSE_t5000 63.9(5.6)
 OOS_MCTS-RUCT_yIST-WC_IIGS_1_13_bFALSE_t5000 34.8(5.8)
+
+MCTS-RUCT_OOS_yPST-W_GP_2_2_3_3_t1000 0.41(0.24)
+OOS_MCTS-RUCT_yPST-W_GP_2_2_3_3_t1000 -0.45(0.24)
+MCTS-RUCT_OOS_yPST-WC_GP_2_2_3_3_t1000 0.47(0.25)
+OOS_MCTS-RUCT_yPST-WC_GP_2_2_3_3_t1000 -0.23(0.24)
 \end{verbatim}
-
-
-\subfigure[Liar's Dice (1,1)]{\label{fig:LD-matches-small}
-\begin{small}
-\begin{tabular}{@{}|@{}r@{}|@{}c@{~}c@{~}c@{~}c@{}|}\hline
-0.1s&OOS-PST&UCT&RM&RND\\\hline
-OOS-PST&48.5(2.0)&51.7(2.0)&56.8(2.8)&83.3(1.5)\\
-UCT&45.7(2.0)&49.7(2.0)&52.9(2.8)&87.2(1.3)\\
-RM&47.9(2.8)&49.0(2.8)&54.3(2.8)&84.8(2.0)\\
-RND&16.9(1.5)&19.5(1.6)&18.1(2.2)&47.7(2.0)\\
-\hline
-\end{tabular}
-\end{small}
-}
-
 
 \subfigure[Liar's Dice (2,2)]{\label{fig:LD-matches-large}
 \begin{small}
@@ -990,72 +1021,12 @@ RND&9.3(1.8)&15.3(2.9)&16.0(2.9)&49.3(4.0)\\
 \end{tabular}
 \end{small}
 }
-
-\subfigure[Liar's Dice (2,2)]{
-\begin{small}
-\begin{tabular}{@{}|@{}r@{}|@{~}c@{~}c@{~}c@{~}c@{}|}\hline
-5s&OOS-PST&UCT&RM&RND\\\hline
-OOS-PST($\gamma$=0.8)&49.9(3.7)&55.4(2.3)&53.3(3.7)&91.3(1.7)\\
-UCT&49.8(2.2)&56.2(3.1)&49.8(3.1)&93.7(1.5)\\
-RM&53.3(3.5)&51.7(4.0)&51.0(4.0)&88.7(2.0)\\
-RND&7.3(1.6)&12.9(2.1)&12.7(2.1)&47.3(3.0)\\
-\hline
-\end{tabular}
-\end{small}
-}
-
-
-%\subfigure[Generic Poker (3,3,2,2) $\pm$0.84]{\label{fig:GP-matches}
-%\begin{small}
-%\begin{tabular}{@{}|@{}r@{}|@{\hspace{1pt}}c@{~}c@{~}c@{~}c@{}|}\hline
-%0.1s&OOS&UCT&RM&RND\\\hline
-%OOS&-0.37&-0.72&-0.43&2.63\\
-%UCT&0.25&0.10&-0.23&1.95\\
-%RM&0.50&0.17&-0.07&2.27\\
-%RND&-2.14&-1.62&-2.27&1.06\\
-%\hline
-%\end{tabular}
-%\end{small}
-%}
-
-\subfigure[Generic Poker (3,3,2,2)]{\label{fig:GP-matches}
-\begin{small}
-\begin{tabular}{@{}|@{}r@{}|@{\hspace{1pt}}c@{~}c@{~}c@{~}c@{}|}\hline
-0.1s&OOS-PST&UCT&RM&RND\\\hline
-OOS-PST&0.25(0.53)&-0.68(0.35)&-0.39(0.33)&2.00(0.54)\\
-UCT&0.64(0.37)&0.21(0.15)&0.20(0.15)&1.35(0.36)\\
-RM&0.43(0.54)&0.21(0.40)&-0.12(0.32)&1.75(0.44)\\
-RND&-2.05(0.70)&-2.22(0.54)&-3.24(0.55)&1.07(0.61)\\
-\hline
-\end{tabular}
-\end{small}
-}
-
-\small
-\begin{verbatim}
-MCTS-RUCT_OOS_yPST-W_GP_2_2_3_3_t1000 0.41(0.24)
-OOS_MCTS-RUCT_yPST-W_GP_2_2_3_3_t1000 -0.45(0.24)
-MCTS-RUCT_OOS_yPST-WC_GP_2_2_3_3_t1000 0.47(0.25)
-OOS_MCTS-RUCT_yPST-WC_GP_2_2_3_3_t1000 -0.23(0.24)
-\end{verbatim}
-
-
-\subfigure[Generic Poker (4,6,4,4)]{
-\begin{small}
-\begin{tabular}{@{}|@{}r@{}|@{~}c@{~}c@{~}c@{~}c@{}|}\hline
-1s&OOS&UCT&RM&RND\\\hline
-%OOS(5s)&&-0.85(0.46)&&\\ %UCT-OOS 0.40(0.60)
-OOS-IST&&0.03(0.62)&-0.57(0.66)&5.83(1.41)\\
-UCT&0.61(0.89)&-1.10(1.17)&-1.05(0.90)&8.02(1.89)\\
-RM&-0.63(0.97)&-1.35(1.24)&-0.32(0.92)&8.94(1.87)\\
-RND&-4.64(1.28)&-4.44(1.40)&-4.67(1.35)&0.46(2.19)\\
-\hline
-\end{tabular}
-\end{small}
-}
-\caption{Head-to-head matches in large variants of the games with 1s of computation per move and half of 95\% confidence intervals in the brackets.}\label{fig:matches}
 \end{figure}
+\fi
 
+\subsubsection{Head-to-head performance}
+
+ The previous experiments confirmed that we achieved the goal of creating an online game playing algorithm that converges close to Nash equilibrium. Now we evaluate the incluence of keeping this guarantee to the actual game playing performance in head-to-head matches with ISMCTS.
 For each game, we focus on two sizes. The smaller variant, for which we analyzed the exploitability in the previous section and a substantially larger variant that are closer to the size of the domains where online search algorithms are typically applied. 
 
 %Game values
@@ -1064,26 +1035,23 @@ For each game, we focus on two sizes. The smaller variant, for which we analyzed
 %GP 2 2 3 3 -0.11135308803867544
 %GP 4 4 4 6 -0.11123854182232012
 
-
-
 The results are summarized in Figure~\ref{fig:matches}.
 For Goofspiel and Liar's Dice, we present the win-rate, where a tie is considered half win half loss. Goofspiel is perfectly balanced for both players. In LD, the first player has a slight disadvantage corresponding to approximately 1% in the win rate and we do not compensate for that.
 In Poker, the result of a single match is the specific amount of money won or lost by the players.
 The game is not balanced. If both players play the optimal strategy, the first player looses 0.11 on average.
 This value is practically the same for both evaluated sizes of the Poker games.
 For clarity, we present the difference between this game value and the mean reward obtained by the players in the matches. A value 0.1 in the tables means that the row player on average wins 0.1 more than the game value.
-Each entry in the tables presents the result of at least 500 mutual matches between two algorithms from the perspective of the one in the row header. The values in the brackets are the size of half of the 95\% confidence interavals centered in the presented mean. If it is not specified othewise, OOS was run with targeting $\delta=0.9$ and exploration $\gamma=0.4$.
+Each entry in the tables presents the result of at least 500 mutual matches between two algorithms from the perspective of the one in the row header. The values in the brackets are the size of half of the 95\% confidence interavals centered in the presented mean. If it is not specified othewise, OOS was run with IST for Goofspiel and PST for the other games, targeting $\delta=0.9$ and exploration $\epsilon=0.4$.
 
-Table~\ref{GS-matches-small} presents the results for the smaller Goofspiel and $0.1$ second of computation per move. Even though the game is balances, the results of ISMCTS are strongly biased towards the first player. The secons player has generally larger infomration sets and needs to better approximate the correct beliefs to choose a good move. OOS does not have this problem in the smaller game. It is the only algorithm that managed to prevent ISMCTS from exploiting it.
+Figure~\ref{fig:GS-matches-small} presents the results for the smaller Goofspiel and $0.1$ second of computation per move. Even though the game is balances, the results of ISMCTS are strongly biased towards the first player. The secons player has generally larger infomration sets and needs to better approximate the correct beliefs to choose a good move. OOS does not have this problem in the smaller game. It is the only algorithm that managed to prevent ISMCTS from exploiting it.
 In both positions, the algorithm won approximately 50\% of matches, which corresponds to the value of the game.
 On the other hand, the first line in the table shows that OOS did not exploit the weaker play of ISMCTS, even though it is possible. This is a common disadvantage of Nash equilibrium play \cite{} and can be overcome for the cost of partially loosing the guarantees \cite{RNR}.
+In the large variant of Goofspiel (see Figure~\cite{fig:GS-matches-small}) with one second of computation per move, the situation is different. OOS dost not manage to converge sufficienly close to the equlibrium and ISMCTS isl able to exploit from both positions to a similar extent. Increasing the computation time to 5 seconds per move helps OOS to win 35\% matches against UCT, but it would likely need a substantially longer time to reach the actual equilibrium.
 
-In the large variant of Goofspiel (see Table~\cite{GS-matches-small}) with one second of computation per move, the situation is different. OOS dost not manage to converge sufficienly close to the equlibrium and ISMCTS isl able to exploit from both positions to a similar extent. Increasing the computation time to 5 seconds per move helps OOS to win 35\% matches against ISMCTS(UCT), but it would likely need a substantially longer time to reach the actual equilibrium.
+The results on Liar's Dice are even more promissing for OOS. In the smaller game with $0.1$ second of computation per move (Figure~\ref{fig:LD-matches-small}), OOS statistically significantly wins over both variants of ISMCTS form at least one position. This is not the case for the larger variant of the game and 1 second of computation per move, where OOS already wins only 45\% and 40\% of matches against UCT and RM from the first position and looses 69\% and 66\% from the second position. 
+However, with 5 seconds per move (Figure~\ref{fig:LD-matches-large}) and the exploration parameter set to $\gamma=0.8$ to balance the need for exploring a large number of actions in this game, OOS again wins over UCT and ties with RM.
 
-The results on Liar's Dice are even more promissing for OOS. In the smaller game with $0.1$ second of computation per move (see Table~\cite{LD-matches-small}), OOS statistically significantly wins over both variants of ISMCTS form at least one position. This is not the case for the larger variant of the game and 1 second of computation per move, where OOS already looses. However, with 5 seconds per move and the exploration parameter set to $\gamma=0.8$ to balance the need for exploring a large number of actions in this game, OOS again wins over ISMCTS(UCT) and ties with ISMCTS(RM).
-
-As indicated by the exploitability results, OOS performs the worst against ISMCTS on the Poker domain...
-
+As indicated by the exploitability results, OOS performs the worst against ISMCTS in the Poker domain. In the smaller variant (Figure~\ref{fig:GP-matches-small}), it is loosing against both variants from both positions. The result of OOS from the first position against UCT improves to -0.54 with 5 seconds per move and -0.28 with 25 seconds, but even more time would be required to tie. From the first (generally more dificult) position, the situation is similar also in the larger Poker variant (Figure~\ref{fig:GP-matches-large}). It is already not the case for the second position, were OOS is able to tie with both ISMCTS variants.
 
 % Removing this so I know how much trimming needs to be done.
 %\begin{itemize}
