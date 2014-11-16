@@ -398,17 +398,18 @@ We also use $\pi^{\sigma}_i(h,z)$ and $\pi^{\sigma}(h,z)$ to refer to the produc
 of only the probabilities of actions along the sequence from the end of $h$ to the end of $z$, where $h \sqsubset z$.
 Define $\Sigma_i$ to be the set of behavioral strategies for player $i$. 
 As is convention, $\sigma_{-i}$ and $\pi_{-i}^\sigma$ refer to player $i$'s opponent strategy and products of the opponent's and chance's actions.
+
 An \defword{$\epsilon$-Nash equilibrium}, $\sigma$, is a set of $\sigma_i$ for $i \in N$ such that the benefit of switching to some 
 alternative $\sigma_i'$ is limited by $\epsilon$, i.e.,
-\begin{equation}
-  \label{eq:ne}
-  \max_{\sigma_i' \in \Sigma_i} u_i(\sigma_i', \sigma_{-i}) - u_i(\sigma) \le \epsilon
-\end{equation}
+%\begin{equation}
+%\label{eq:ne}
+$\max_{\sigma_i' \in \Sigma_i} u_i(\sigma_i', \sigma_{-i}) - u_i(\sigma) \le \epsilon$,
 holds for each player $i \in N$. When $\epsilon = 0$, the profile is simply called a Nash equilibrium. 
 When $|N| = 2$ and $u_1(z) + u_2(z) = k$ for all $z \in Z$, then the game is a two-player zero-sum game; these 
 games form an important subset of extensive-form games due to their worst-case guarantees: different equilibrium strategies result in 
-the same expected payoff against any arbitrary opponent equilibrium strategy and at least the same payoff for any opponent strategy at all. In this paper, we  define the \defword{exploitability} of a profile to be the sum of both distances from Eq.~\ref{eq:ne}, 
-$\epsilon_{\sigma} = \max_{\sigma_1' \in \Sigma_1} u_1(\sigma_1', \sigma_2) + \max_{\sigma_2' \in \Sigma_1} u_2(\sigma_1, \sigma_2')$.
+the same expected payoff against any arbitrary opponent equilibrium strategy and at least the same payoff for any opponent strategy. 
+In such games, the \defword{exploitability} of a profile $\sigma$ is the sum of distances from both players, $\epsilon_{\sigma} =  
+\max_{\sigma_1' \in \Sigma_1} u_1(\sigma_1', \sigma_2) + \max_{\sigma_2' \in \Sigma_1} u_2(\sigma_1, \sigma_2')$.
 
 % Merge-Nov15: Did you move this paragraph out of this section? 
 In a \defword{match} (online game), each player is allowed little or no preparation time before playing (preventing the offline advance computation of approximate equilibria solutions).
