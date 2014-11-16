@@ -363,7 +363,7 @@ small imperfect information games like Biased Rock-Paper-Scissors and Kuhn poker
 Our results show that, convergence is not only prevented, but can {\it diverge away} from the equilibrium strategies.
 
 A little more promising are the MCTS approaches that use alternative selection functions, such as Exp3 or Regret Matching \cite{Lisy14selection}. 
-Variants of MCTS with these selection functions have been shown both formally and empirically \cite{Lisy13nips,Lanctot13smmcts} to converge to Nash equilibrium in games with simultaneous moves, which are the simplest subclass of imperfect information games. However, we show that even these selection functions cannot help to overcome the problem of non-locality, if the search is initiated form the current state of the game, as done by all existing search algorithms.
+Variants of MCTS with these selection functions have been shown both formally and empirically \cite{Lisy13nips,Lanctot13smmcts} to converge to Nash equilibrium in games with simultaneous moves, which are the simplest subclass of imperfect information games. However, we show that even these selection functions cannot help to overcome the problem of non-locality, if the search is initiated from the current state of the game, as done by all existing search algorithms.
 
 \subsection{Extensive-Form Games}
 
@@ -489,7 +489,7 @@ In this case, the uniform probability of being in each state of $I$ corresponds 
 Note that this is a simple example; in larger games, this problem could occur over much longer paths or in many times in different parts of the game.
 
 %To overcome this problem, we propose a new approach. Instead of adapting perfect information search techniques to imperfect information games, we present online variants of Monte Carlo equilibrium approximation algorithms that have been successful in the offline setting.
-OOS overcomes this problem by starting each sample form the root of the game. If the computed strategy tends to come closer to the uniform strategy in $I$ ,the updates in the maximizing player's information set will modify the strategy to choose left more often. It will cause the following samples to reach $I$ more often at the state on the left and consequently modifying the strategy in $I$ in the right direction in the following iterations.
+OOS overcomes this problem by starting each sample from the root of the game. If the computed strategy tends to come closer to the uniform strategy in $I$ ,the updates in the maximizing player's information set will modify the strategy to choose left more often. It will cause the following samples to reach $I$ more often at the state on the left and consequently modifying the strategy in $I$ in the right direction in the following iterations.
 
 To the best of our knowledge, OOS is the first online search algorithm that solves this problem. As suggested by the analysis in~\cite{Long10Understanding}, the effect may be critical in games with low {\it disambiguation factor}, where private information is very slowly (or never) revealed throughout a match.
 
@@ -570,7 +570,7 @@ Plain outcome sampling would continue to sample from the root of the game (not t
 disregarding the region of the game space that the match has headed toward. 
 Hence, the second modification we propose is directing the search towards the histories that are more likely to occur during the match currently played.
 Note that the complete history is typically unknown to the players, who know only their information sets.
-Furthermore, unlike in ISMCTS, OOS always runs samples form the root of the game tree, even with non-empty match history.
+Furthermore, unlike in ISMCTS, OOS always runs samples from the root of the game tree, even with non-empty match history.
 
 We now describe two specific targeting methods.
 
