@@ -349,20 +349,20 @@ can be overcome by imposing the proper information constraints during
 search~\cite{Frank98Finding,Ciancarini10Kriegspiel,Ponsen11Computing,Lisy12peg,Cowling12ISMCTS}. 
 
 Non-locality occurs due to optimal payoffs not being recursively defined over subgames as  
-in perfect information games. As such, guarantees normally provided by search algorithms built upon 
-subgame decomposition, \eg minimax and MCTS, no longer hold. This problem will be discussed in detail in Section~\ref{sec:nonlocality}.  
+in perfect information games. As a result, guarantees normally provided by search algorithms built on 
+subgame decomposition no longer hold. Non-locality is discussed further in Section~\ref{sec:nonlocality}.  
 
 % Merge-Nov15; I kept all this (minor modifications)
-The last complication, sometimes disregarded %by the algorithms for search in games, 
-is the need for randomized strategies in imperfect information games. In many games, any deterministic strategy that can be predicted by the opponent can lead to arbitrarily large losses.
-In order to overcome this problem, MCTS algorithms sometimes use the empirical frequencies of sampling individual actions as the randomized strategies.
-Evidence suggests that this modification of MCTS will not converge to the optimal solution even in very
+The last problem, %sometimes disregarded by the algorithms for search in games, 
+is the need for randomized strategies in imperfect information games. In many games, any deterministic 
+strategy that can be predicted by the opponent can lead to arbitrarily large losses.
+To overcome this problem, MCTS algorithms sometimes randomizes by sampling actions from its empirical frequency counts.
+Evidence suggests that the resulting strategies will not converge to the optimal solution even in very
 small imperfect information games like Biased Rock-Paper-Scissors and Kuhn poker~\cite{Shafiei09,Ponsen11Computing}.
-Our results show that, in some cases, convergence is not jusy prevented and can eventually
-{\it diverge away} from the equilibrium strategies.
+Our results show that, convergence is not only prevented, but can {\it diverge away} from the equilibrium strategies.
 
-A little more promising are the MCTS approaches using alternative selection functions, such as Exp3 or Regret Matching \cite{Lisy14selection}. 
-Variants of MCTS with these selection functions have been shown both formally and empirically \cite{Lisy13nips,Lanctot13smmcts} to converge to Nash equilibrium in games with simultaneous moves, which are the simplest subclass of imperfect information games. However, we show that even these selection functions cannot help to overcome the problem of non-locality, if the search is initiated form the current state of the game, as suggested by all existing search algorithms.
+A little more promising are the MCTS approaches that use alternative selection functions, such as Exp3 or Regret Matching \cite{Lisy14selection}. 
+Variants of MCTS with these selection functions have been shown both formally and empirically \cite{Lisy13nips,Lanctot13smmcts} to converge to Nash equilibrium in games with simultaneous moves, which are the simplest subclass of imperfect information games. However, we show that even these selection functions cannot help to overcome the problem of non-locality, if the search is initiated form the current state of the game, as done by all existing search algorithms.
 
 \subsection{Extensive-Form Games}
 
