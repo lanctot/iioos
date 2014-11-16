@@ -269,7 +269,7 @@ Paper XXX
 Online search in games has been a core interest of artificial intelligence. 
 %Advances made in search for perfect information games 
 %have led to AI capable of defeating the world's top human experts. 
-Search in imperfect information games is particularly challenging due to 
+Search in imperfect information games (\eg Poker, Bridge, Skat) is particularly challenging due to 
 the complexities introduced by hidden information.  
 In this paper, we present Online Outcome Sampling, 
 an online search variant of Monte Carlo Counterfactual Regret Minimization, which preserves its convergence to Nash equilibrium.
@@ -332,7 +332,7 @@ The results show that OOS, unlike ISMCTS, consistently converges close to NE str
 % classic work: PIMC and its successes
 \section{Background and Related Work}
 
-Most imperfect information search algorithms are built upon perfect information search algorithm, such as minimax or Monte Carlo tree search (MCTS).  
+Most imperfect information search algorithms are built upon perfect information search algorithms, such as minimax or Monte Carlo tree search (MCTS).  
 One of the first popular applications of imperfect information search was Ginsberg's Bridge-playing program~\cite{Ginsberg96Partition,Ginsberg01} GIB. 
 In GIB, perfect information search is performed on a {\it determinized} instance of the game: one where all players can see usually hidden information. 
 This approach has also performed well in other games like Scrabble~\cite{Sheppard02World}, 
@@ -351,11 +351,12 @@ in perfect information games. As such, guarantees normally provided by search al
 subgame decomposition, \eg minimax and MCTS, no longer hold. This problem will be discussed in detail in Section~\ref{sec:nonlocality}.  
 
 % Merge-Nov15; I kept all this (minor modifications)
-The last complication, sometimes disregarded by the algorithms for search in games, is the need for randomized strategies in imperfect information games. In many games, any deterministic strategy that can be predicted by the opponent can lead to arbitrarily large losses.
+The last complication, sometimes disregarded %by the algorithms for search in games, 
+is the need for randomized strategies in imperfect information games. In many games, any deterministic strategy that can be predicted by the opponent can lead to arbitrarily large losses.
 In order to overcome this problem, MCTS algorithms sometimes use the empirical frequencies of sampling individual actions as the randomized strategies.
 Evidence suggests that this modification of MCTS will not converge to the optimal solution even in very
 small imperfect information games like Biased Rock-Paper-Scissors and Kuhn poker~\cite{Shafiei09,Ponsen11Computing}.
-Our results show that in some cases, convergence is not just but can eventually
+Our results show that, in some cases, convergence is not jusy prevented and can eventually
 {\it diverge away} from the equilibrium strategies.
 
 A little more promising are the MCTS approaches using alternative selection functions, such as Exp3 or Regret Matching \cite{Lisy14selection}. 
