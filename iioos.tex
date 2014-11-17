@@ -274,7 +274,7 @@ Search in imperfect information games (\eg Poker, Bridge, Skat) is particularly 
 the complexities introduced by hidden information.  
 In this paper, we present Online Outcome Sampling, 
 an online search variant of Monte Carlo Counterfactual Regret Minimization, which preserves its convergence to Nash equilibrium.
-We show that OOS can overcome the problem of non-locality encountered by previous search algorithms and perform well against its worst case opponents.
+We show that OOS can overcome the problem of non-locality encountered by previous search algorithms and perform well against its worst-case opponents.
 We show that exploitability of the strategies played by OOS decreases as
 the amount of search time increases, and that Information Set Monte Carlo tree search can remain exploitable or get more exploitable over time.
 In head-to-head play, OOS outperforms ISMCTS in games where non-locality plays a significant role, given a sufficient computation time per move.
@@ -307,7 +307,7 @@ Computer Poker \cite{Johanson07Msc,Gilpin09,Sandholm10The,Rubin11Poker,Johanson1
 %and it is also prevalent used in the security applications~\cite{XXX} \mlnote{Citation needed; also, we may be appealing a bit too much to the security domain given the content of the rest of the paper.. maybe just remove this?}. Removed for now.
 However, the preparation time is often very limited. The model of the game may become known only shortly before acting is necessary, such as in general game-playing, search or pursuit in a previously unknown environment, and general-purpose robotics. In these circumstances, creating and solving an abstract representation of the problem may not be possible. In these cases, agents must {\it decide online}: make initial decisions quickly and then spend effort to improve their strategy while the interaction is taking place.
 
-In this paper, we propose a search algorithm that can compute an approximate Nash equilibrium (NE) strategy in two-player zero-sum games {\it online}, in a previously unknown game, with a very limited computation time. 
+In this paper, we propose a search algorithm that can compute an approximate Nash equilibrium (NE) strategy in two-player zero-sum games {\it online}, in a previously unknown game, and with a very limited computation time. 
 We introduce Online Outcome Sampling (OOS), a simulation-based algorithm based on Monte Carlo Counterfactual Regret Minimization~(MCCFR)~\cite{Lanctot09Sampling}. 
 % (not sure we need this, and I'm sure reviewers already know) a popular offline equilibrium solving algorithm for this class of games. 
 %In order to use computational time and space efficiently,
@@ -341,26 +341,24 @@ In GIB, perfect information search is performed on a {\it determinized} instance
 This approach has also performed well in other games like Scrabble~\cite{Sheppard02World}, 
 Hearts~\cite{Sturtevant08An}, and Skat~\cite{Buro09Improving}. 
 
-Several problems that have been identified with techniques based on determinization, such as Perfect Information Monte Carlo
+Several problems have been identified with techniques based on determinization, such as Perfect Information Monte Carlo
 (PIMC)~\cite{Long10Understanding}. 
 Two commonly reported problems are {\it strategy fusion} and {\it non-locality}~\cite{Frank98Finding}.
-Strategy fusion occurs when actions are recommended in different states that the player 
-should not be able to distinguish due to the imperfect information, which
-can be overcome by imposing the proper information constraints during 
-search~\cite{Frank98Finding,Ciancarini10Kriegspiel,Ponsen11Computing,Lisy12peg,Cowling12ISMCTS}. 
+Strategy fusion occurs when distinct actions are recommended in states that the player is not able to distinguish due to the imperfect information.
+I can be overcome by imposing the proper information constraints during search~\cite{Frank98Finding,Ciancarini10Kriegspiel,Ponsen11Computing,Lisy12peg,Cowling12ISMCTS}.
 
 Non-locality occurs due to optimal payoffs not being recursively defined over subgames as  
 in perfect information games. As a result, guarantees normally provided by search algorithms built on 
 subgame decomposition no longer hold. Non-locality is discussed further in Section~\ref{sec:nonlocality}.  
-
 % Merge-Nov15; I kept all this (minor modifications)
-The last problem, %sometimes disregarded by the algorithms for search in games, 
+
+The last problem %, sometimes disregarded by the algorithms for search in games, 
 is the need for randomized strategies in imperfect information games. In many games, any deterministic 
 strategy that can be predicted by the opponent can lead to arbitrarily large losses.
-To overcome this problem, MCTS algorithms sometimes randomizes by sampling actions from its empirical frequency counts.
+To overcome this problem, MCTS algorithms sometimes randomize by sampling actions from its empirical frequency counts.
 Evidence suggests that the resulting strategies will not converge to the optimal solution even in very
 small imperfect information games like Biased Rock-Paper-Scissors and Kuhn poker~\cite{Shafiei09,Ponsen11Computing}.
-Our results show that, convergence is not only prevented, but can {\it diverge away} from the equilibrium strategies.
+Our results show that, the empirical frequences can {\it diverge away} from the equilibrium strategies.
 
 A little more promising are the MCTS approaches that use alternative selection functions, such as Exp3 or Regret Matching \cite{Lisy14selection}. 
 Variants of MCTS with these selection functions have been shown both formally and empirically \cite{Lisy13nips,Lanctot13smmcts} to converge to Nash equilibrium in games with simultaneous moves, which are the simplest subclass of imperfect information games. However, we show that even these selection functions cannot help to overcome the problem of non-locality, if the search is initiated from the current state of the game, as done by all existing search algorithms.
@@ -368,7 +366,6 @@ Variants of MCTS with these selection functions have been shown both formally an
 \subsection{Extensive-Form Games}
 
 Here, we define the relevant terminology required by our analysis, based on~\cite{OsbRub94}. 
-
 We focus on two-player zero-sum extensive form games, which model sequential decision making of agents called \defword{players} denoted
 $i \in N = \{ 1, 2 \}$. In turn, players choose \defword{actions} leading to sequences called \defword{histories} $h \in H$. 
 A history $z \in Z$, where $Z \subseteq H$, is called a \defword{terminal history} and represents a full game from start to end. 
@@ -387,13 +384,13 @@ $\cI_i$ is a partition over $H_i = \{ h~|~P(h) = i \}$ where each part is call a
 Intuitively, an information set
 $I \in \cI_i$ that belongs to player $i$ represents a state of the game with respect to what player $i$ knows.
 Formally, $I$ is a set of histories that a player cannot tell apart (due to information hidden from that player). For all
-$h,h' \in I$, $A(h) = A(h')$ and $P(h) = P(h')$; hence, often we naturally extend the definition to $A(I)$, $P(I)$, and denote $I(h)$ the information set
+$h,h' \in I$, $A(h) = A(h')$ and $P(h) = P(h')$; hence, we extend the definition to $A(I)$, $P(I)$, and denote $I(h)$ the information set
 containing $h$. 
 
 A \defword{behavioral strategy} for player $i$ is a function mapping each information set $I \in \cI_i$
 to a probability distribution over the actions $A(I)$, denoted by $\sigma_i(I)$. 
 Given a profile $\sigma$, we denote the probability of reaching a terminal history $z$ under $\sigma$ as 
-$\pi^\sigma(z) = \prod_{i \in N} \pi_i(z)$, where each $\pi_i(z) = \prod_{ha \sqsubset z, P(h) = i} \sigma_i(I(h),a)$ 
+$\pi^\sigma(z) = \prod_{i \in N\cup{c}} \pi_i(z)$, where each $\pi_i(z) = \prod_{ha \sqsubset z, P(h) = i} \sigma_i(I(h),a)$ 
 is a product of probabilities of the actions taken by player $i$ along $z$. 
 We also use $\pi^{\sigma}_i(h,z)$ and $\pi^{\sigma}(h,z)$ to refer to the product 
 of only the probabilities of actions along the sequence from the end of $h$ to the end of $z$, where $h \sqsubset z$.
@@ -467,21 +464,23 @@ as needed from $\sigma_c(\ttm)$, and reveals $I(\ttm)$ to $P(\ttm)$ on their tur
 \draw [dashed] (i2_1) -- (i2_2) node[midway, above] {I};
 \end{tikzpicture}
 \end{center}
+\vskip-6mm
 \caption{An extensive-form game demonstrating the problem of non-locality with maximizing $\bigtriangleup$, minimizing $\bigtriangledown$ and chance $\bigcirc$ players.
 \label{fig:coordGame}}
+\vskip-5mm
 \end{figure}
 
 % Merge-Nov15; as far as I can tell I merged in your version with my small addition at the end.
 
-We demonstrate the problem of non-locality on the game depicted in Figure~\ref{fig:coordGame}. The game starts with a decision of chance $\bigcirc$ which leads to to nodes than cannot be distinguished by the maximizing player $\bigtriangleup$. In the one on the left, the game ends after his actions. In the other one, both his actions lead to the information set $I$ of the minimizing player $\bigtriangledown$.
-The optimal (Nash equilibrium) strategy in $I$ depends on the value of the leftmost leaf, even though this outcome of the game cannot be reached once the game entered the information set $I$.
-Because $\bigtriangleup$ does not know at the time of his move if $\bigtriangledown$ will play, he needs to randomize its decision so that $\bigtriangledown$ cannot easily make the move that is more harmful for $\bigtriangleup$. However, he would prefer to play left for the case that $\bigtriangledown$ will not play. Player $\bigtriangledown$ knows that $\bigtriangleup$ has this dilemma and tries to exploit it as much as possible. The uniform strategy at $I$ clearly motivates $\bigtriangleup$ to play left, leading to expected utility $0.5\cdot 1 + 0.5\cdot1.5 = 1.25$, instead of $0.5\cdot 0 + 0.5\cdot1.5 = 0.75$. If $\bigtriangledown$ plays right a little more often, $\bigtriangleup$ is still motivated to play left and $\bigtriangledown$ improves its payoff. This holds until $\bigtriangledown$ plays (left,right) with probabilities ($\frac{1}{3}$,$\frac{2}{3}$). In that case $\bigtriangleup$ has the same expected reward of $1$ for both actions. If $\bigtriangleup$ plays $(\frac{1}{2},\frac{1}{2})$, $\bigtriangledown$ cannot lower the utility anymore and this pair of strategies is a Nash equilibrium. If the leftmost leaf was 2 instead of 1, the optimal strategy in $I$ would be ($\frac{1}{6}$,$\frac{5}{6}$).
+We demonstrate the problem of non-locality on the game in Figure~\ref{fig:coordGame}. It starts with a decision of chance $\bigcirc$ which leads to to nodes than cannot be distinguished by the maximizing player $\bigtriangleup$. On the left, the game ends after his actions. On the right, both his actions lead to information set $I$ of the minimizing player $\bigtriangledown$, whose utility is minus the depicted value.
+The optimal (Nash equilibrium) strategy in $I$ depends on the value of the leftmost leaf, even though this outcome of the game cannot be reached once the game entered information set $I$.
+Because $\bigtriangleup$ does not know at the time of his move if $\bigtriangledown$ will play, he needs to randomize its decision so that $\bigtriangledown$ cannot easily make the move that is more harmful for $\bigtriangleup$. However, he would prefer to play left for the case that $\bigtriangledown$ will not play. Player $\bigtriangledown$ knows that $\bigtriangleup$ has this dilemma and tries to exploit it as much as possible. The uniform strategy at $I$ clearly motivates $\bigtriangleup$ to play left, leading to expected utility $0.5\cdot 1 + 0.5\cdot1.5 = 1.25$, instead of $0.5\cdot 0 + 0.5\cdot1.5 = 0.75$. If $\bigtriangledown$ plays right a little more often, $\bigtriangleup$ is still motivated to play left and $\bigtriangledown$ improves its payoff. This holds until $\bigtriangledown$ plays (left,right) with probabilities ($\frac{1}{3}$,$\frac{2}{3}$). In that case, $\bigtriangleup$ has the same expected reward of $1$ for both actions. If $\bigtriangleup$ plays $(\frac{1}{2},\frac{1}{2})$, $\bigtriangledown$ cannot lower the utility anymore and this pair of strategies is a Nash equilibrium. If the leftmost leaf was 2 instead of 1, the optimal strategy in $I$ would be ($\frac{1}{6}$,$\frac{5}{6}$).
 
 %The optimal (Nash equilibrium) strategy for the game on the right is obtained by solving $\max_{\sigma_1 \in \Sigma_1} \min_{\sigma_2 \in \Sigma_2} u_1(\sigma_1, \sigma_2)$, which gives $\bigtriangleup$ to play $(\frac{1}{2},\frac{1}{2})$ and for $\bigtriangledown$ to play (left,right) with probabilities ($\frac{1}{3}$,$\frac{2}{3}$). The expected value of the game is $1$.
 
 Current approaches, after reaching the information set $I$, will repeatedly sample and search one of subtrees of states in $I$, aggregating the information collected to make a final recommendation.
 %When hidden information is revealed for search, Russel and Norvig refer to this technique as ``averaging over clairvoyance''~\cite{russellnorvig}.
-However, even if the information structure is kept intact and information is aggregated during the searches, such as in Information Set Monte Carlo tree search (ISMCTS)~\cite{Cowling12ISMCTS}, the problem still occurs. If subtrees of $I$ are sampled equally often, a searching player will not have any preference between left and right and will recommend $(\frac{1}{2},\frac{1}{2})$, which is suboptimal.
+However, even if the information structure is kept intact, such as in Information Set Monte Carlo tree search (ISMCTS)~\cite{Cowling12ISMCTS}, the problem still occurs. If subtrees of $I$ are sampled equally often, a searching player will not have any preference between left and right and will recommend $(\frac{1}{2},\frac{1}{2})$, which is suboptimal.
 % However, mixing uniformly at $I$ is not part of an equilibrium in this game. The payoff to $\bigtriangleup$ for playing right would be $\frac{1}{2}\cdot 0 + \frac{1}{2} \cdot \frac{3}{2} = \frac{3}{4}$, which would give $\bigtriangleup$ incentive to switch to play left more often (since its expected value is $\frac{5}{4}$), in turn giving $\bigtriangledown$ incentive to deviate. 
 In this case, the uniform probability of being in each state of $I$ corresponds to the distribution over the states given the optimal play, so the problem occurs even if subtrees are sampled from the proper belief distribution. 
 % this is mentioned later (after the proof)
@@ -489,7 +488,7 @@ In this case, the uniform probability of being in each state of $I$ corresponds 
 Note that this is a simple example; in larger games, this problem could occur over much longer paths or in many times in different parts of the game.
 
 %To overcome this problem, we propose a new approach. Instead of adapting perfect information search techniques to imperfect information games, we present online variants of Monte Carlo equilibrium approximation algorithms that have been successful in the offline setting.
-OOS overcomes this problem by starting each sample from the root of the game. If the computed strategy tends to come closer to the uniform strategy in $I$ ,the updates in the maximizing player's information set will modify the strategy to choose left more often. It will cause the following samples to reach $I$ more often at the state on the left and consequently modifying the strategy in $I$ in the right direction in the following iterations.
+OOS overcomes this problem by starting each sample from the root of the game. If the computed strategy tends to come closer to the uniform strategy in $I$, the updates in the maximizing player's information set will modify the strategy to choose left more often. The following samples will reach $I$ more often at the left state and consequently modifying the strategy in $I$ in the right direction.
 
 To the best of our knowledge, OOS is the first online search algorithm that solves this problem. As suggested by the analysis in~\cite{Long10Understanding}, the effect may be critical in games with low {\it disambiguation factor}, where private information is very slowly (or never) revealed throughout a match.
 
@@ -541,10 +540,10 @@ The algorithm updates the regret in the information sets visited along $z$ using
 \end{array} \right.
 \end{equation*}
 where $q(z)$ is the probability of sampling $z$. 
-As long as every $z \in Z$ has non-zero probability of being sampled, $\tilde{v}_i(I,\sigma)$ is an unbiased estimate of $v(I,\sigma)$ 
+If every $z \in Z$ has non-zero probability of being sampled, $\tilde{v}_i(I,\sigma)$ is an unbiased estimate of $v(I,\sigma)$ 
 due to the importance sampling correction ($1/q(z)$). For this reason, applying CFR updates using these sampled counterfactual values 
 on the sampled information sets values also eventually converges to the approximate equilibrium of the game with high probability. 
-The required number of iterations for convergence is much larger, but each iteration is much faster.
+%The required number of iterations for convergence is much larger, but each iteration is much faster.
 
 %In Poker, CFR and MCCFR have been used with much success as offline methods 
 %for pre-computing approximate equilibria in abstract games~\cite{CFR,Johanson12CFRBR}; the same general 
@@ -553,26 +552,24 @@ The required number of iterations for convergence is much larger, but each itera
 \section{Online Outcome Sampling}
 
 When outcome sampling is used in the offline setting, data structures for all information sets are allocated and created 
-before the first iteration starts. In each iteration, every information set that is sampled gets updated. 
-We make two essential modifications to adapt outcome sampling to the online search setting.
+before the first iteration. In each iteration, all sampled information sets get updated. 
+We make two essential modifications to adapt outcome sampling to the online setting.
 
 {\bf Incremental Game Tree Building.} Before the match begins, only the very first (root) information set is added to memory. 
 In each iteration, a single information set (at most) is added to the information set tree (memory) each iteration.
 In particular, when an information set is reached that is not in memory, it is added to memory and then a default 
 playout policy (\eg uniform random) takes over for the remainder of the simulation.
 Along the playout portion (tail) of the simulation, information sets are not added to memory nor updated.
-Along the tree portion (head) of simulation, information sets are updated as normal. 
+Along the tree portion (head), information sets are updated as normal. 
 This way, only the relevant information sets will be stored in the memory.
 
 {\bf In-Match Search Targeting.}
 Suppose several moves have been played since the start of the match leading to $\ttm$. 
-Plain outcome sampling would continue to sample from the root of the game (not the current match history $\ttm$), entirely 
-disregarding the region of the game space that the match has headed toward. 
+Plain outcome sampling would continue to sample from the root of the game (not the current match history $\ttm$), rarely reaching the region of the game space that the match has headed toward. 
 Hence, the second modification we propose is directing the search towards the histories that are more likely to occur during the match currently played.
 Note that the complete history is typically unknown to the players, who know only their information sets.
 Furthermore, unlike in ISMCTS, OOS always runs samples from the root of the game tree, even with non-empty match history.
-
-We now describe two specific targeting methods.
+We now describe two specific targeting methods demonstrated in Figure~\ref{fig:targeting}.
 
 \subsection{Information Set Targeting (IST)}
 
@@ -580,7 +577,7 @@ Suppose the match history is $\ttm$. IST samples histories reaching the current 
 i.e., $(h,z) \in Z_{I(\ttm)}$, with higher probability than other histories.
 The intuition is that these histories are particularly 
 relevant since the searching player {\it knows} that one of these $z$ will describe the match at its completion. 
-However, focusing {\it only} on these histories may cause problems because of the non-locality and the convergence guarantees are lost.
+However, focusing {\it only} on these histories may cause problems because of the non-locality and the convergence guarantees would be lost.
 
 Consider again the game in Figure~\ref{fig:coordGame}. 
 If the minimizing player knows it is in the information set $I$ and focuses all its search only to this information set for sufficiently long, she computes the suboptimal uniform strategy.
@@ -603,19 +600,19 @@ $I_2$ contains a single unique action (the unobserved ones taken by the first pl
 Given a history $h$, let $p(h)$ be the sequence of public actions along $h$ in the same order that they were taken in $h$. 
 Define the \defword{public subgame} induced by $I$ to be the one whose terminal history set is
 \[Z_{p,I(h)} = \{(h',z)~|~z \in Z, h' \in H, p(h') = p(h), h' \sqsubset z \}.\]
-Now, suppose the match history is $\ttm$.
-Public subgame targeting samples $z \in Z_{p,I(\ttm)}$ with higher probability than terminal histories outside this set.
+With match history is $\ttm$, PST samples $z \in Z_{p,I(\ttm)}$ with higher probability than terminal histories outside this set.
 
-A public subgame then, contains all the terminal histories consistent with the public actions played over the match and
-each combination of private chance events for both players. So, in a game of two-player limit Texas Hold'em poker, suppose the nature decides on the private cards of the players,
+A public subgame contains all the terminal histories consistent with the public actions played over the match and
+each combination of private chance events for both players. So, in a game of two-player limit Texas Hold'em poker, suppose the chance decides on the private cards of the players,
 the first player bets one chip and the second player calls. At this point, the public actions are: bet one chip and call. 
 The public subgame described by $Z_{p,I(h)}$ contains every terminal history (including every combination of private chance 
 outcomes for all players) with at least two public actions, whose first two public actions are: bet one chip and call.  
 
 \begin{figure}[t]
 \begin{center}
-\includegraphics[scale=1.1]{fig/targeting}
+\includegraphics[scale=1]{fig/targeting}
 \end{center}
+\vskip-5mm
 \caption{Example subgames targeted by IST (left) and PST (right). All histories $\{~h~|~h \in I' \cup I'' \cup I(\ttm_2)~\}$ 
 share a common public action sequence ($p(\ttm_2)$). \label{fig:targeting}}
 \end{figure}
@@ -722,13 +719,13 @@ update player histories, while average strategy tables at opponent histories. \\
 
 Now we explain the role of the weighting factor $w_T$. Note that on lines 22 and 28, the regret and strategy updates are multiplied by the reciprocal of the probability of sampling the sample leaf and the current state. 
 Consider the updates in the current information set of the game $I_\ttm$. In the initial samples of the algorithm with empty match history, this information set was on average sampled with a very low probability $s_0$. Let's say that out of $10^6$ samples started from the root, 1000 samples reached this particular information set. In that case, $s_0=0.001$ and the regret updates caused by each of these samples were multiplied by $\frac{1}{s_0}=1000$.
-Now the game has actually reached the history $\ttm$ and due to targeting, half of the next $10^6$ samples reach $I_\ttm$. It means that  $s'_0=0.5$ and the regrets will be multiplied only by 2.
+Now the game has actually reached the history $\ttm$ and due to targeting, half of the next $10^6$ samples reach $I_\ttm$. It means that  $s_\ttm=0.5$ and the regrets will be multiplied only by 2.
 As a results, the updated of the first (generally less precise) 1000 samples are all together weighted the same as the $5\times 10^5$ later samples, which makes it almost impossible to compensate for the initial errors.
 In order to prevent this effect, we add the weighting factor $w_T$ to compensate the change of targeting and make each of the samples have similar weight. 
-In our example, $w_T=\frac{s'_0}{s_0}$. More formally, when running the iterations from match history $\ttm$, we define the weighting factor as the probability of reaching $I(\ttm)$ without any targeting divided by the probability of reaching $I(\ttm)$ with the current targeting, assuming the players play according to the current mean strategy profile $\bar{\pi}$:
+In our example, $w_T=\frac{s_\ttm}{s_0}$. More formally, when running the iterations from match history $\ttm$, we define the weighting factor as the probability of reaching $I(\ttm)$ without any targeting divided by the probability of reaching $I(\ttm)$ with the current targeting, assuming the players play according to the current mean strategy profile $\bar{\pi}$:
 \[\frac{1}{w_T(\ttm)} =  (1-\delta) + \delta\frac{\sum_{(h,z)\in I(\ttm)} \bar{\pi}(h)}{\sum_{z\in Z_{sub(\ttm)}} \bar{\pi}(z)}.\]
 
-OOS would quickly stop improving a strategy in information sets that are below an irrational move of the opponent ($\pi_{-i}=0$). This can not be avoided even if all samples are targeted to the information set. Therefore, we use a more explorative regret matching, 
+OOS would quickly stop improving a strategy in information sets that are below an irrational move of the opponent ($\pi_{-i}=0$). This cannot be avoided even if most samples are targeted to the information set. Therefore, we use a more explorative regret matching, 
 $\sigma^{T+1}_\gamma(I,a) = \gamma/|A(I)| + (1-\gamma) \sigma^{T+1}(I,a)$, with $\gamma = 0.01$. 
 This affects the worst-case regret bound at most by $\epsilon$ (due to the linearity of the expected utility), but allows for much better play.
 
@@ -852,9 +849,9 @@ All actions in this game are public. The only hidden information is caused by ch
 
 
 \textbf{Generic Poker} GP($T,C,R,B$) is a simplified poker game inspired by Leduc Hold'em. First, both players are required to put one chip in the pot.
-Next, Nature deals a single private card to each player, and the betting round begins.
+Next, chance deals a single private card to each player, and the betting round begins.
 A player can either \emph{fold} (the opponent wins the pot), \emph{check} (let the opponent make the next move), \emph{bet} (add some amount of chips, as first in the round), \emph{call} (add the amount of chips equal to the last bet of the opponent into the pot), or \emph{raise} (match and increase the bet of the opponent).
-If no further raise is made by any of the players, the betting round ends, Nature deals one public card on the table, and a second betting round with the same rules begins.
+If no further raise is made by any of the players, the betting round ends, chance deals one public card on the table, and a second betting round with the same rules begins.
 After the second betting round ends, the outcome of the game is determined --- a player wins if: (1) her private card matches the table card and the opponent's card does not match, or (2) none of the players' cards matches the table card and her private card is higher than the private card of the opponent. If no player wins, the game is a draw and the pot is split.
 The parameters of the game are the number of types of the cards ($T$), the number of cards of each type ($C$), the maximum length of sequence of raises in a betting round ($R$), and the number of different sizes of bets (i.e., amount of chips added to the pot) for \emph{bet}/\emph{raise} actions.
 This game is similar to Liar's Dice in having only public actions. However, it includes additional chance nodes later in the game, which reveal part of the information not available before. Moreover, it has integer results and not just win/draw/loss.
@@ -1069,7 +1066,6 @@ This could be because Poker playing requires low-variance updates since the game
 %\begin{itemize}
 %\item Without enough time for convergence, OOS has a lot of  (uniform) noise in the results. Focussing on top 3 actions with the corresponding probabilities may work better. In contrast ISMCTS with much more samples can easily get zeros at really bad actions. This could be solved by playing according to the current strategy!!! The expected strategy is optimal, but we do not even have to store the mean strategy!!! However, this may require some correct weighting (i.e., belief) that may not be available.
 %\end{itemize}
-
 
 
 \section{Conclusion}
