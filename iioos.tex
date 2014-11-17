@@ -1081,7 +1081,8 @@ In order to achive this, we do not modify a perfect information search algorithm
 We rather start from an offline equilibrium computation method and adapt it to make the most of the limited time it has by using the information about the current position in the match.
 Besides incremental tree building, we propose two methods for targeting relevant parts of the game based on the current match history.
 In empirical evaluation, we show that a player using ISMCTS can suffer almost arbitrarly large loss when the opponent knows the algorithm she uses. 
-The expected loss of using OOS decreases close to its minimum with additional search time.
+The expected worst-case loss of using OOS decreases close to its minimum with additional search time.
+Furthermore, even with this guarantees, we can achieve comparable game playing performance to ISMCTS in mutual matches.
 
 In future work, we hope to investigate more and larger games and the effect of informed playout policies. 
 We hope to compare practical performance against other baseline algorithms such as 
