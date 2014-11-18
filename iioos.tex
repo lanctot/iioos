@@ -721,15 +721,19 @@ update player histories, while average strategy tables at opponent histories. \\
 
 Now we explain the role of the weighting factor $w_T$. Note that on lines 22 and 28, the regret and strategy updates are multiplied by the reciprocal of the probability of sampling the sample leaf and the current state. 
 Consider the updates in the current information set of the game $I_\ttm$. In the initial samples of the algorithm with empty match history, this information set was on average sampled with a very low probability $s_0$. Let's say that out of $10^6$ samples started from the root, 1000 samples reached this particular information set. In that case, $s_0=0.001$ and the regret updates caused by each of these samples were multiplied by $\frac{1}{s_0}=1000$.
-Now the game has actually reached the history $\ttm$ and due to targeting, half of the next $10^6$ samples reach $I_\ttm$. It means that $s_\ttm=0.5$ and the regrets will be multiplied only by 2.
-As a results, the updated of the first (generally less precise) 1000 samples are all together weighted the same as the $5\times 10^5$ later samples, which makes it almost impossible to compensate for the initial errors.
-In order to prevent this effect, we add the weighting factor $w_T$ to compensate the change of targeting and make each of the samples have similar weight. 
+Now the game has actually reached the history $\ttm$ and due to targeting, half of the next $10^6$ samples reach $I(\ttm)$. It means that $s_\ttm=0.5$ and the regrets will be multiplied only by 2.
+As a results, the updates of the first (generally less precise) 1000 samples are all together weighted the same as the $5\times 10^5$ later samples, which makes it almost impossible to compensate for the initial errors.
+In order to prevent this effect, we add the weighting factor $w_T$ to compensate the change of targeting and make each of the samples have similar weight at $I(\ttm)$. 
 In our example, $w_T=\frac{s_\ttm}{s_0}$. More formally, when running the iterations from match history $\ttm$, we define the weighting factor as the probability of reaching $I(\ttm)$ without any targeting divided by the probability of reaching $I(\ttm)$ with the current targeting, assuming the players play according to the current mean strategy profile $\bar{\pi}$:
-\[\frac{1}{w_T(\ttm)} = (1-\delta) + \delta\frac{\sum_{(h,z)\in I(\ttm)} \bar{\pi}(h)}{\sum_{z\in Z_{sub(\ttm)}} \bar{\pi}(z)}.\]
+
+\vskip-6mm
+\begin{equation}
+\frac{1}{w_T(\ttm)} = (1-\delta) + \delta\frac{\sum_{(h,z)\in I(\ttm)} \bar{\pi}(h)}{\sum_{z\in Z_{sub(\ttm)}} \bar{\pi}(z)}.
+\end{equation}
 
 OOS would quickly stop improving a strategy in information sets that are below an irrational move of the opponent ($\pi_{-i}=0$). This cannot be avoided even if most samples are targeted to the information set. Therefore, we use a more explorative regret matching, 
 $\sigma^{T+1}_\gamma(I,a) = \gamma/|A(I)| + (1-\gamma) \sigma^{T+1}(I,a)$, with $\gamma = 0.01$. 
-This affects the worst-case regret bound at most by $\epsilon$ (due to the linearity of the expected utility), but allows for much better play.
+This affects the worst-case regret bound at most by $\gamma$ (due to the linearity of the expected utility), but allows for much better play.
 
 
 
