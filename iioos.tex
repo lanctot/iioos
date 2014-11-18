@@ -182,7 +182,7 @@ ch/.style = {draw, treenode, circle, minimum width=2mm, black}
 % e-mail address with \email.
 % 1st. author
 \alignauthor
-Paper XXX
+Paper 486
 %Ben Trovato\titlenote{Dr.~Trovato insisted his name be first.}\\
 % \affaddr{Institute for Clarity in Documentation}\\
 % \affaddr{1932 Wallamaloo Lane}\\
@@ -1061,7 +1061,7 @@ In the large variant of Goofspiel (see Figure~\ref{fig:GS-matches-small}) with o
 The results on Liar's Dice are even more promising for OOS. In the smaller game with $0.1$ second per move (Figure~\ref{fig:LD-matches-small}), OOS statistically significantly wins over both variants of ISMCTS form at least one position. This is not the case for the larger game and 1 second per move, where OOS already wins only 45\% and 40\% of matches against UCT and RM from the first position and loses 69\% and 66\% from the second position. 
 However, with 5 seconds and the exploration parameter set to $\epsilon=0.8$ to balance the need for exploring a large number of actions in this game, OOS again wins over UCT and ties with RM (Figure~\ref{fig:LD-matches-large}).
 
-As indicated by the exploitability results, OOS performs the worst against ISMCTS in the Poker domain. In the smaller variant (Figure~\ref{fig:GP-matches-small}), it is losing from both positions. The result of OOS from the first position against UCT improves to ??? with 5 seconds per move and -0.28 with 25 seconds, but even more time would be required to tie. From the first (generally more difficult) position, the situation is similar also in the larger Poker (Figure~\ref{fig:GP-matches-large}). It is already not the case for the second position, where OOS is able to tie both ISMCTS variants. 
+As indicated by the exploitability results, OOS performs the worst against ISMCTS in the Poker domain. In the smaller variant (Figure~\ref{fig:GP-matches-small}), it is losing from both positions. The result of OOS from the first position against UCT improves to -0.22 with 5 seconds per move, but even more time would be required to tie. From the first (generally more difficult) position, the situation is similar also in the larger Poker (Figure~\ref{fig:GP-matches-large}). It is already not the case for the second position, where OOS is able to tie both ISMCTS variants. 
 This could be because Poker playing requires low-variance updates since the game itself already has high variance. 
 
 
