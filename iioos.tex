@@ -348,7 +348,10 @@ I can be overcome by imposing the proper information constraints during search~\
 
 Non-locality occurs due to optimal payoffs not being recursively defined over subgames as 
 in perfect information games. As a result, guarantees normally provided by search algorithms built on 
-subgame decomposition no longer hold. Non-locality is discussed further in Section~\ref{sec:nonlocality}. 
+subgame decomposition no longer hold. 
+Some previous work has been done for accelerating offline equilibrium computation by solving or approximately solving subgames, particularly 
+in end-game situations~\cite{Gilpin06Competitive,Gilpin07Better,Ganzfried13Endgame}. While these techniques tend to help in practice, 
+non-locality prevents these methods from producing equilibrium strategies in general; we discuss this further in Section~\ref{sec:nonlocality}. 
 % Merge-Nov15; I kept all this (minor modifications)
 
 The last problem %, sometimes disregarded by the algorithms for search in games, 
@@ -567,7 +570,7 @@ Suppose several moves have been played since the start of the match leading to $
 Plain outcome sampling would continue to sample from the root of the game (not the current match history $\ttm$), rarely reaching the region of the game space that the match has headed toward. 
 Hence, the second modification we propose is directing the search towards the histories that are more likely to occur during the match currently played.
 Note that the complete history is typically unknown to the players, who know only their information sets.
-Furthermore, unlike in ISMCTS, OOS always runs samples from the root of the game tree, even with non-empty match history.
+Unlike in ISMCTS, OOS always runs samples from the root of the game tree, even with non-empty match history.
 We now describe two specific targeting methods demonstrated in Figure~\ref{fig:targeting}.
 
 \subsection{Information Set Targeting (IST)}
@@ -751,7 +754,8 @@ consistency.
 
 \section{Empirical Evaluation}
 
-We now compare the exploitability and head-to-head performance
+We now compare the exploitability and head-to-head 
+performance
 of OOS and ISMCTS on three fundamentally different imperfect games. % with different sources of imperfect information. 
 
 
@@ -767,7 +771,7 @@ In the online setting, however, since the tree is built incrementally, only part
 are produced. 
 We are unaware of any methods for assessing the worst-case exploitability of strategies 
 produced by an online search algorithm. 
-We therefore propose two new methods to approximate the exploitability of the produced strategies. 
+%We therefore propose two new methods to approximate the exploitability of the produced strategies. 
 
 % "full stitching" 
 %\begin{table}
@@ -807,7 +811,7 @@ We therefore propose two new methods to approximate the exploitability of the pr
 %However, since the it requires constantly saving and reloading memory states and running both sides separately to avoid 
 %bias from the opponent's algorithm, the experiment took several days and is impractical for larger games.
 
-There is a brute-force method that runs the algorithms to reach each information set and computes exploitability of a strategy composed form strategies commuted for these information sets. However, it requires $O(t |I|)$ seconds for a single run and multiple runs are required for statistically significant results.
+There is a brute-force approach that runs the search at each information set and computes exploitability of a strategy composed from strategies computed for these information sets. However, it requires $O(t |I|)$ seconds for a single run and multiple runs are required for statistically significant results.
 Instead, we propose an approximate multi-match \defword{aggregate method}. 
 It creates a global (accumulating) strategy data structure for each player.
 Then, it runs a fixed number of matches (500 in our experiments) of the search algorithm against a random opponent. In each information set reached in the match, the information computed (visit counts in ISMCTS, $s_I$ in OOS) is added into the global strategy of the player who searched.
@@ -1011,13 +1015,13 @@ The OOS in this graphs is run with the information set targeting and the paramet
 The x-axis denotes the amount of computation per move.
 In Goofspiel (b), both ISMCTS variants produce a more exploitable strategy with more computation time per move.
 For any of the evaluated time settings, OOS is substantially less exploitable.
-In Liar's Dice (e), ISMCTS does not seem to get worse with additional computation time, but it improves marginally with more than $0.4$ second per move.
+In Liar's Dice (e), ISMCTS does not seem to get worse with additional computation time, but it improves marginally with more than $0.4$ seconds per move.
 OOS steadily approaches the equilibrium.
 In Poker (i), the exploitability is lower for ISMCTS variants than for OOS with the default settings.
 With the limited computation time, having more iterations to avoid bad moves seems to be more important than guessing and hiding the private information of the players.
 
 The remaining plots in Figures~\ref{fig:small} present how the exploitability of the strategies produced by OOS depends on the selected targeting scheme and parameters: the amount of targeting shown by color and the amount of exploration shown by point shapes. Figures \ref{fig:small}(c,f,j) show the information set targeting and \ref{fig:small}(g,k) show the public subgame targeting. Overall, OOS produces strategies closer to the equilibrium as the computation time per move increases. The only exception is IST with full targeting ($\delta=1$) in Liar's Dice (Figure~\ref{fig:LD-IST-oos}). This confirms that sampling the histories that will certainly not occur in the game anymore is necessary to converge to the optimal strategy in LD.
-In the other two games, full targeting produces the least exploitable strategies with very short computation times. This indicates that sophisticated modeling of hidden information can be counterproductive with very short computation times. With more time per move, weaker targeting performs as good as the stronger targeting or even better in case of PST.
+In the other two games, full targeting produces the least exploitable strategies with very short computation times. This indicates that sophisticated modeling of hidden information can be counterproductive with very short computation times. With more time per move, weaker targeting performs as well as the stronger targeting or even better in case of PST.
 
 \vlnote{the next paragraph can be removed to save space}
 %With short computation times, IST converges closer to the equilibrium, but with more computation, PST eventually dominates, with the exception of $\delta=1$ in Poker.
@@ -1048,16 +1052,16 @@ This value is practically the same for both evaluated sizes of the game.
 For clarity, we present the difference between this game value and the mean reward obtained by the players in the matches. A value 0.1 in the tables means that the row player on average wins 0.1 more than the game value from the column player per match.
 Each entry in the tables presents the result of at least 500 mutual matches between two algorithms from the perspective of the one in the row header. The values in the brackets are the size of half of the 95\% confidence intervals centered in the presented mean. If it is not specified otherwise, OOS was run with IST for Goofspiel and PST for the other games, targeting $\delta=0.9$ and exploration $\epsilon=0.4$.
 
-Figure~\ref{fig:GS-matches-small} presents the results for the smaller Goofspiel and $0.1$ second of computation per move. Even though the game is balances, the results of ISMCTS are strongly biased towards the first player. The second player has generally larger information sets and needs to better evaluate the hidden information to choose a good move. OOS does not have this problem in the smaller game. It is the only algorithm that managed to prevent ISMCTS from exploiting it.
+Figure~\ref{fig:GS-matches-small} presents the results for the smaller Goofspiel and $0.1$ second of computation per move. Even though the game is balanced, the results of ISMCTS are strongly biased towards the first player. The second player has generally larger information sets and needs to better evaluate the hidden information to choose a good move. OOS does not have this problem in the smaller game. It is the only algorithm that managed to prevent ISMCTS from exploiting it.
 In both positions, the algorithm won approximately 50\% of matches, which corresponds to the value of the game.
 On the other hand, the first line in the table shows that OOS did not exploit the weaker play of ISMCTS, even though it is possible. This is a common disadvantage of Nash equilibrium play. % quite well known ..? do we need a cite? \cite{}
 One simple way to overcome this would be to trade a bit of exploitability to gain some exploitation; computing a restricted Nash response using MCRNR~\cite{Ponsen11Computing} (a minor modification of MCCFR) allows the best possible trade-off for a given importance between exploitability and exploitation. 
 In the large variant of Goofspiel (see Figure~\ref{fig:GS-matches-small}) with one second per move, the situation is different. OOS does not manage to converge sufficiently close to the equilibrium and ISMCTS exploits it from both positions to a similar extent. Increasing the computation time to 5 seconds per move helps OOS to win 35\% matches against UCT, but it would likely need a substantially longer time to reach the equilibrium.
 
-The results on Liar's Dice are even more promising for OOS. In the smaller game with $0.1$ second per move (Figure~\ref{fig:LD-matches-small}), OOS statistically significantly wins over both variants of ISMCTS form at least one position. This is not the case for the larger game and 1 second per move, where OOS already wins only 45\% and 40\% of matches against UCT and RM from the first position and looses 69\% and 66\% from the second position. 
+The results on Liar's Dice are even more promising for OOS. In the smaller game with $0.1$ second per move (Figure~\ref{fig:LD-matches-small}), OOS statistically significantly wins over both variants of ISMCTS form at least one position. This is not the case for the larger game and 1 second per move, where OOS already wins only 45\% and 40\% of matches against UCT and RM from the first position and loses 69\% and 66\% from the second position. 
 However, with 5 seconds and the exploration parameter set to $\epsilon=0.8$ to balance the need for exploring a large number of actions in this game, OOS again wins over UCT and ties with RM (Figure~\ref{fig:LD-matches-large}).
 
-As indicated by the exploitability results, OOS performs the worst against ISMCTS in the Poker domain. In the smaller variant (Figure~\ref{fig:GP-matches-small}), it is losing from both positions. The result of OOS from the first position against UCT improves to ??? with 5 seconds per move and -0.28 with 25 seconds, but even more time would be required to tie. From the first (generally more difficult) position, the situation is similar also in the larger Poker (Figure~\ref{fig:GP-matches-large}). It is already not the case for the second position, were OOS is able to tie with both ISMCTS variants. 
+As indicated by the exploitability results, OOS performs the worst against ISMCTS in the Poker domain. In the smaller variant (Figure~\ref{fig:GP-matches-small}), it is losing from both positions. The result of OOS from the first position against UCT improves to ??? with 5 seconds per move and -0.28 with 25 seconds, but even more time would be required to tie. From the first (generally more difficult) position, the situation is similar also in the larger Poker (Figure~\ref{fig:GP-matches-large}). It is already not the case for the second position, where OOS is able to tie both ISMCTS variants. 
 This could be because Poker playing requires low-variance updates since the game itself already has high variance. 
 
 
@@ -1073,11 +1077,11 @@ This could be because Poker playing requires low-variance updates since the game
 We have introduced Online Outcome Sampling, the first online game playing algorithm for imperfect information games that is guaranteed to produce 
 approximate equilibrium strategies as search time per move increases.
 In order to achieve this, we do not modify a perfect information search algorithm to avoid the main problems caused by imperfect information, as in previous work.
-We rather start from an offline equilibrium computation method and adapt it to make the most of the limited time it has by using the information about the current position in the match.
+We instead start from an offline equilibrium computation method and adapt it to make the most of the limited time it has by using the information about the current position in the match.
 Besides incremental tree building, we propose two methods for targeting relevant parts of the game based on the current match history.
 In empirical evaluation, we show that a player using ISMCTS can suffer almost arbitrarily large loss when the opponent knows the algorithm she uses. 
 The expected worst-case loss of using OOS decreases close to its minimum with additional search time.
-Furthermore, even with this guarantees, we can achieve comparable game playing performance to ISMCTS in mutual matches.
+Furthermore, even with these guarantees, we can achieve comparable game playing performance to ISMCTS in mutual matches.
 
 In future work, we hope to investigate more and larger games and the effect of informed playout policies. 
 We hope to compare practical performance against other baseline algorithms such as 
