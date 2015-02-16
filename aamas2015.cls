@@ -1276,9 +1276,10 @@
 \bibindent=0em
 \def\thebibliography#1{% 
 \ifnum\addauflag=0\addauthorsection\global\addauflag=1\fi
-     \section[References]{%    <=== OPTIONAL ARGUMENT ADDED HERE
-        {References} % was uppercased but this affects pdf bookmarks (SP/GM October 2004)
-          {\vskip -9pt plus 1pt} % GM Nov. 2006 / GM July 2000 (for somewhat tighter spacing) 
+%     \section[References]{%    <=== OPTIONAL ARGUMENT ADDED HERE
+     \section*{%                <=== OPTIONAL ARGUMENT REMOVED as it doesn't work with \section* (RHB Nov 2015)
+        {REFERENCES} % was uppercased but this affects pdf bookmarks (SP/GM October 2004) %% Uppercase again (RHB Nov 2015)
+          %{\vskip -9pt plus 1pt} % GM Nov. 2006 / GM July 2000 (for somewhat tighter spacing) %% commented out (RHB Nov 2015)
          \@mkboth{{\refname}}{{\refname}}%
      }%
      \list{[\arabic{enumi}]}{%
@@ -1422,11 +1423,13 @@
 % acr July 24 altered for 2010
 \newtoks\copyrightetc
 \global\boilerplateBefore={{\bf Appears in:} }
-\global\boilerplateAfter={{\it Proceedings of the 14th International
-Conference on Autonomous Agents and Multiagent Systems (AAMAS 2015), 
-Bordini, Elkind, Weiss, Yolum (eds.), May, 4--8, 2015, Istanbul, Turkey.}}
+\global\boilerplateAfter={{\it Proceedings of the 14th International \\
+Conference on Autonomous Agents and Multiagent  \\
+Systems (AAMAS 2015), Bordini, Elkind, Weiss, Yolum \\
+(eds.), May 4--8, 2015, Istanbul, Turkey.}}
 \global\copyrightetc{Copyright \copyright\ \the\copyrtyr , 
-International Foundation for Autonomous Agents and Multiagent Systems (www.ifaamas.org). All rights reserved.}
+International Foundation for Autonomous Agents \\
+and Multiagent Systems (www.ifaamas.org). All rights reserved.}
 
 %\toappear{\the\boilerplate\par
 %{\confname{\the\conf}} \the\confinfo\par \the\copyrightetc.}
