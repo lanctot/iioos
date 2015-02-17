@@ -109,7 +109,7 @@ ch/.style = {draw, treenode, circle, minimum width=2mm, black}
 \newcommand{\BR}{\mbox{BR}}
 \newcommand{\defword}[1]{\textbf{\boldmath{#1}}}
 \newcommand{\ie}{{\it i.e.}~}
-\newcommand{\eg}{{\it e.g.}~}
+\newcommand{\eg}{{\it e.g.}}
 \newtheorem{definition}{Definition}
 \newtheorem{fact}{Fact}
 \newtheorem{theorem}{Theorem}
@@ -269,7 +269,7 @@ Michael Bowling\\
 Online search in games has been a core interest of artificial intelligence. 
 %Advances made in search for perfect information games 
 %have led to AI capable of defeating the world's top human experts. 
-Search in imperfect information games (\eg Poker, Bridge, Skat) is particularly challenging due to 
+Search in imperfect information games (\eg, Poker, Bridge, Skat) is particularly challenging due to 
 the complexities introduced by hidden information. 
 In this paper, we present Online Outcome Sampling, 
 an online search variant of Monte Carlo Counterfactual Regret Minimization, which preserves its convergence to Nash equilibrium.
@@ -499,7 +499,7 @@ It does it by starting each sample from the root of the game. If the computed st
 
 \subsection{Offline Equilibrium Approximation}
 
-There are many algorithms for computing approximate equilibrium strategies offline~\cite{Sandholm10The}. We focus on a popular choice among Poker researchers due to its sampling variants.
+There are multiple algorithms for computing approximate equilibrium strategies offline~\cite{Sandholm10The}. We focus on a popular choice among Poker researchers due to its sampling variants.
 
 Counterfactual Regret (CFR) is a notion of regret at the information set level for extensive-form games~\cite{CFR}. 
 The CFR algorithm iteratively learns strategies in self-play, converging to an equilibrium. 
@@ -513,8 +513,8 @@ where $Z_I = \{ (h,z)~|~z \in Z, h \in I, h \sqsubset z \}$.
 Suppose, at time $t$, player $i$ plays with strategy $\sigma^t_i$. 
 Define $\sigma^t_{I \rightarrow a}$ as identical to $\sigma^t$ except at $I$ action $a$ is taken with probability $1$. 
 The counterfactual regret of not taking $a \in A(I)$ at time $t$ is $r^t(I,a) = v_i(I,\sigma^t_{I \rightarrow a}) - v_i(I,\sigma^t)$. 
-The algorithm maintains the cumulative regret $R^T(I,a) = \sum_{t=1}^T r^t(I,a)$, for every action at every information set of every player. 
-Then, the distribution at each information set for the next iteration $\sigma^{T+1}(I)$ is obtained individually using 
+The algorithm maintains the cumulative regret $R^T(I,a) = \sum_{t=1}^T r^t(I,a)$, for every action at every information set. 
+Then, the distribution at each information set for the next iteration $\sigma^{T+1}(I)$ is obtained using 
 regret-matching~\cite{Hart00}. The distribution is proportional to the positive portion of the individual actions' regret:
 \begin{equation*}
 \label{eq:rm}
@@ -556,17 +556,16 @@ on the sampled information sets values also eventually converges to the approxim
 
 \section{Online Outcome Sampling}
 
-When outcome sampling is used in the offline setting, data structures for all information sets are allocated and created 
-before the first iteration. In each iteration, all sampled information sets get updated. 
+When outcome sampling is used in the offline setting, data structures for all information sets are allocated before the first iteration. In each iteration, all sampled information sets get updated. 
 We make two essential modifications to adapt outcome sampling to the online setting.
 
 {\bf Incremental Game Tree Building.} Before the match begins, only the very first (root) information set is added to memory. 
-In each iteration, a single information set (at most) is added to the information set tree (memory) each iteration.
+In each iteration, a single information set (at most) is added to memory.
 In particular, when an information set is reached that is not in memory, it is added to memory and then a default 
-playout policy (\eg uniform random) takes over for the remainder of the simulation.
+playout policy (\eg, uniform random) takes over for the remainder of the simulation.
 Along the playout portion (tail) of the simulation, information sets are not added to memory nor updated.
 Along the tree portion (head), information sets are updated as normal. 
-This way, only the relevant information sets will be stored in the memory.
+This way, only the relevant information sets are stored in the memory.
 
 {\bf In-Match Search Targeting.}
 Suppose several moves have been played since the start of the match leading to $\ttm$. 
@@ -575,6 +574,15 @@ Hence, the second modification we propose is directing the search towards the hi
 Note that the complete history is typically unknown to the players, who know only their information sets.
 Unlike in ISMCTS, OOS always runs samples from the root of the game tree, even with non-empty match history.
 We now describe two specific targeting methods demonstrated in Figure~\ref{fig:targeting}.
+
+\begin{figure}[t]
+\begin{center}
+\includegraphics[scale=1]{fig/targeting}
+\end{center}
+\vskip-5mm
+\caption{Example subgames targeted by IST (left) and PST (right). All histories $\{~h~|~h \in I' \cup I'' \cup I(\ttm_2)~\}$ 
+share a common public action sequence ($p(\ttm_2)$). \label{fig:targeting}}
+\end{figure}
 
 \subsection{Information Set Targeting (IST)}
 
@@ -585,18 +593,18 @@ relevant since the searching player {\it knows} that one of these $z$ will descr
 However, focusing {\it only} on these histories may cause problems because of the non-locality and the convergence guarantees would be lost.
 
 Consider again the game in Figure~\ref{fig:coordGame}. 
-If the minimizing player knows it is in the information set $I$ and focuses all its search only to this information set for sufficiently long, she computes the suboptimal uniform strategy.
-Any fixed non-zero probability of sampling the left chance action will 
-eventually solve the problem. The regrets are multiplied by the reciprocal of the sampling probability; hence, they influence the strategy 
+If the minimizing player knows it is in the information set $I$ and focuses all its search to this information set, she computes the suboptimal uniform strategy.
+Any fixed non-zero probability of sampling the left chance action 
+eventually solves the problem. The regrets are multiplied by the reciprocal of the sampling probability; hence, they influence the strategy 
 in the information set proportionally stronger if the samples are rare.
 
-Note that previous methods, such as PIMC and ISMCTS, {\it always} target $I(\ttm)$, \ie with probability 1, and do not 
-update predecessors of $I(\ttm)$. In contrast, in IST {\it all} information sets in memory reached during each iteration requires updating 
-to ensure eventual convergence to an equilibrium.
+Note that previous methods, such as PIMC and ISMCTS, {\it never} update any information sets, which are not reachable from $I(\ttm)$. In contrast, in IST {\it all} information sets in memory have positive probability of being reached and updated.
+
 
 \subsection{Public Subgame Targeting (PST)}
 
-A \defword{public action} is an action in the ``public tree'' defined in \cite{12aamas-pcs}. Informally, an action is said to be public if it is observable by all players (e.g., bids in Liar's Dice and bets in Poker are public). Formally, an action $a$ is public, iff 
+IST may ``reveal'' information about the current information set available to only one of the players affecting the computed strategy (this vanishes in the limit due to consistency but could have a short-term effect). PST only uses information available to both players to target the search to prevent this effect.
+A \defword{public action} is an action in the ``public tree'' defined in \cite{12aamas-pcs} and commonly used in offline CFR. Informally, an action is said to be public if it is observable by all players (e.g., bids in Liar's Dice and bets in Poker are public). Formally, an action $a$ is public, iff 
 $\forall i, \forall I \in \cI_i, \forall h_1,h_2\in I: a\in h_1 \Leftrightarrow a\in h_2$.
 For example, the extensive-form version of Rock, Paper, Scissors has two information 
 sets $I_1 = \emptyset$ and $I_2 = \{ r, p, s \}$; it has no public actions, because each history in 
@@ -604,23 +612,17 @@ $I_2$ contains a single unique action (the unobserved ones taken by the first pl
 
 Given a history $h$, let $p(h)$ be the sequence of public actions along $h$ in the same order that they were taken in $h$. 
 Define the \defword{public subgame} induced by $I$ to be the one whose terminal history set is
-\[Z_{p,I(h)} = \{(h',z)~|~z \in Z, h' \in H, p(h') = p(h), h' \sqsubset z \}.\]
-With match history is $\ttm$, PST samples $z \in Z_{p,I(\ttm)}$ with higher probability than terminal histories outside this set.
+\begin{equation*}
+Z_{p,I(h)} = \{(h',z)~|~z \in Z, h' \in H, p(h') = p(h), h' \sqsubset z \}.
+\end{equation*}
+With match history $\ttm$, PST samples $z \in Z_{p,I(\ttm)}$ with higher probability than terminal histories outside this set.
 
-A public subgame contains all the terminal histories consistent with the public actions played over the match and
-each combination of private chance events for both players. So, in a game of two-player limit Texas Hold'em poker, suppose the chance decides on the private cards of the players,
+In a game of poker, suppose the chance decides on the private cards of the players,
 the first player bets one chip and the second player calls. At this point, the public actions are: bet one chip and call. 
-The public subgame described by $Z_{p,I(h)}$ contains every terminal history (including every combination of private chance 
-outcomes for all players) with at least two public actions, whose first two public actions are: bet one chip and call. 
+The public subgame $Z_{p,I(h)}$ contains every terminal history (including every combination of private chance 
+outcomes for all players) whose first two public actions are: bet one chip and call. 
 
-\begin{figure}[t]
-\begin{center}
-\includegraphics[scale=1]{fig/targeting}
-\end{center}
-\vskip-5mm
-\caption{Example subgames targeted by IST (left) and PST (right). All histories $\{~h~|~h \in I' \cup I'' \cup I(\ttm_2)~\}$ 
-share a common public action sequence ($p(\ttm_2)$). \label{fig:targeting}}
-\end{figure}
+
 
 \subsection{Algorithm}
 
@@ -671,17 +673,19 @@ $s_I[a'] \gets s_I[a'] + \frac{1}{\delta s_1 + (1-\delta)s_2} \pi_{-i} \sigma(I,
 \caption{Online Outcome Sampling. \label{alg}}
 \end{algorithm2e}
 
-The algorithm is iterative and samples a single trajectory from the root $\emptyset$ to a 
-terminal history. At each information set in memory, $I$, there are two tables maintained: $r_I$ stores cumulative 
+The algorithm iteratively samples a single trajectory from the root $\emptyset$ to a 
+terminal history. At each information set in memory, $I$, it maintains two tables: $r_I$ stores cumulative 
 regret for each action $a \in A(I)$, and $s_I$ stores the cumulative average strategy probability of each 
 action. 
 
-Depending on the targeting method that is chosen (IST or PST), $Z_{sub}$ is one of $Z_{I(\ttm)}$ or $Z_{p,I(\ttm)}$. 
+Depending on the targeting method (IST or PST), $Z_{sub}$ is one of $Z_{I(\ttm)}$ or $Z_{p,I(\ttm)}$. 
 The pseudo-code is presented as Algorithm~\ref{alg}. 
 Each iteration is represented by two calls of OOS where the update player $i \in \{1,2\}$ is alternated. 
 Before each iteration, a {\it scenario} is decided: 
 with probability $\delta$ the iteration targets the subgame and chooses $z \in Z_{sub}$
 and with probability $(1-\delta)$ the usual OS sampling determines $z \in Z$. 
+As a result, OOS with $\delta=0$ becomes MCCFR with incremental tree building.
+
 The first parameter of OOS is the current history. 
 The next two are strategy's reach probabilities for the update player $i$ and the opponent. 
 The third and fourth parameters are initially the overall probabilities that the current sample is generated, one for each scenario: first the targeted and then the untargeted.
@@ -691,7 +695,7 @@ For the return values, $x$ is a suffix/tail reach probability for both players,
 $l$ is the root-to-leaf sample probability, and $u$ is the payoff of the trajectory in view 
 of the update player. 
 
-In outcome sampling, an $\epsilon$-on-policy sampling distribution used at each information set
+The $\epsilon$-on-policy sampling distribution used at each information set
 is defined as 
 \begin{equation*}
 \label{eq:ossample}
@@ -707,7 +711,7 @@ The sampling at chance's choices on line~\ref{alg:chancesample} depends on the m
 
 A critical part of the algorithm is the action chosen and sample reach updates on line~\ref{alg:sample}. If $I$ is not in memory, then an action is sampled uniformly. Otherwise, in the targeted scenario, the current history $h$ is always in the targeted part of the game and an action from $\{a~|~\exists z\in Z \; (ha,z)\in Z_{sub}\}$ is selected using the distribution $\Phi(I(h),i)$ normalized to one on this subset of actions. If we define $sum=\sum_{(ha,z)\in Z_{sub}}\Phi(I,i,a)$ then $s_1' = s_1\Phi(I,i,a)/sum$. In the untargeted scenario, any action $a \sim \Phi(I,i)$ can be sampled. If the action is not leaving the targeted part of the game (i.e., $(ha,z)\in Z_{sub}$) then $s_1' = s_1\Phi(I,i,a)/sum$ otherwise $s_1'=0$. In all cases $s_2' = \Phi(I,i,a) s_2$.
 
-These sample reach probabilities are combined into one at a terminal history on line~\ref{alg:terminal}, 
+These sample reach probabilities are combined into one at a terminal history on line~3, %\ref{alg:terminal} 
 start of the playout on line~\ref{alg:playout}, and when updating the average 
 strategy on line~\ref{alg:avgstrat}. 
 
@@ -722,7 +726,7 @@ update player histories, while average strategy tables at opponent histories. \\
 
 % I am fine with not giving this a title, just a single line of whitespace
 
-Now we explain the role of the weighting factor $w_T$. Note that on lines 22 and 28, the regret and strategy updates are multiplied by the reciprocal of the probability of sampling the sample leaf and the current state. 
+Now we explain the role of the weighting factor $w_T$. Note that on lines 23 and 29, the regret and strategy updates are multiplied by the reciprocal of the probability of sampling the sample leaf and the current state. 
 Consider the updates in the current information set of the game $I_\ttm$. In the initial samples of the algorithm with empty match history, this information set was on average sampled with a very low probability $s_0$. Let's say that out of $10^6$ samples started from the root, 1000 samples reached this particular information set. In that case, $s_0=0.001$ and the regret updates caused by each of these samples were multiplied by $\frac{1}{s_0}=1000$.
 Now the game has actually reached the history $\ttm$ and due to targeting, half of the next $10^6$ samples reach $I(\ttm)$. It means that $s_\ttm=0.5$ and the regrets will be multiplied only by 2.
 As a results, the updates of the first (generally less precise) 1000 samples are all together weighted the same as the $5\times 10^5$ later samples, which makes it almost impossible to compensate for the initial errors.
@@ -734,7 +738,7 @@ In our example, $w_T=\frac{s_\ttm}{s_0}$. More formally, when running the iterat
 \frac{1}{w_T(\ttm)} = (1-\delta) + \delta\frac{\sum_{(h,z)\in I(\ttm)} \bar{\pi}(h)}{\sum_{z\in Z_{sub(\ttm)}} \bar{\pi}(z)}.
 \end{equation}
 
-OOS would quickly stop improving a strategy in information sets that are below an irrational move of the opponent ($\pi_{-i}=0$). This cannot be avoided even if most samples are targeted to the information set. Therefore, we use a more explorative regret matching, 
+OOS would quickly stop improving a strategy in information sets that are below an irrational move of the opponent ($\pi_{-i}=0$). This cannot be avoided even if many samples are targeted to the information set. Therefore, we use a more explorative regret matching, 
 $\sigma^{T+1}_\gamma(I,a) = \gamma/|A(I)| + (1-\gamma) \sigma^{T+1}(I,a)$, with $\gamma = 0.01$. 
 This affects the worst-case regret bound at most by $\gamma$ (due to the linearity of the expected utility), but allows for much better play.
 
@@ -743,38 +747,35 @@ This affects the worst-case regret bound at most by $\gamma$ (due to the lineari
 \subsubsection{Consistency}
 
 \begin{theorem}
-Let $\bar{\sigma}^t_m(\delta,\ttm)$ be a strategy produced by OOS with scheme 1$m \in \{ \mbox{IST}, \mbox{PST} \}$ 
-using $\delta < 1$ started from $\ttm$ run for $t$ iterations, with exploration $\epsilon > 0$. 
+Let $\bar{\sigma}^t_m(\delta,\ttm)$ be a strategy produced by OOS with scheme IST or PST using $\delta < 1$ started from $\ttm$ run for $t$ iterations, with exploration $\epsilon > 0$. 
 For any $p \in (0, 1], \varepsilon > 0$ there exists $t < \infty$ such that with 
 probability $1-p$ the strategy $\bar{\sigma}^t_m(\delta,\ttm)$ is a $\varepsilon$-equilibrium strategy. 
 \label{thm:consistency}
 \end{theorem}
 \begin{proof}(Sketch) Each terminal history has nonzero probability of being sampled, eventually every information 
 set will be contained in memory. The algorithm then becomes MCCFR with a non-uniform sampling scheme.
-By \cite[Theorem 5]{Lanctot09Sampling} OOS minimizes regret with high probability. The additional weighting of all updates of the algorithm by the same constant has no influence on the computed average strategy and the strategies computed by regret matching, because it considers only relative proportions of the regrets.
+By \cite[Theorem 5]{Lanctot09Sampling} OOS minimizes regret with high probability. The additional weighting of all updates of the algorithm by the same constant has no influence on the computed average strategy and the strategies computed by regret matching, because it uses only relative proportions of the regrets.
 \end{proof}
 
-Note that due to non-locality, this consistency property cannot hold generally for any search 
-algorithm that does not modify $\sigma(I)$ at previous $I(h)$ such that $h \sqsubset \ttm$. However, 
-it is an open question as to whether any of the previous algorithms could be modified to ensure 
-consistency.
+%Note that due to non-locality, this consistency property cannot hold generally for any search algorithm that does not modify $\sigma(I)$ at previous $I(h)$ such that $h \sqsubset \ttm$.
+%However, it is an open question as to whether any of the previous algorithms could be modified to ensure consistency.
 
 \section{Empirical Evaluation}
 
 We now compare the exploitability and head-to-head 
 performance
-of OOS and ISMCTS on three fundamentally different imperfect games. % with different sources of imperfect information. 
+of OOS and ISMCTS. % on three fundamentally different imperfect games.  with different sources of imperfect information. 
 
 
 \subsection{Information Set Monte Carlo Tree Search}
-We compare to Information Set Monte Carlo tree search implemented in the same framework with similar data representations as OOS. ISMCTS runs MCTS samples as in a perfect information game, but uses common statistics computed for the whole information set and not individual states to select the next move. When initiated from non-empty match history, it starts samples uniformly from the states in the current information set. We use two selection functions in our experiments. First, the commonly used UCT as suggested in \cite{Cowling12ISMCTS}. We use two time the maximal game outcome as the exploration parameter $C$. In matches, we select the action with the highest number of iterations. For evaluating convergence, this would often have the maximum possible exploitability in the evaluated games. Therefore, we use the distribution given by the empirical frequencies for this part of evaluation. Second, we use Regret Matching (RM) as the selection strategy, because it has been shown to empirically perform better in many games \cite{Lisy14selection} and because it is based on the same principles that are behind CFR. For RM, we use exploration $0.2$, the mean strategy for evaluating exploitability and the samples from this strategy in head to head matches. In the following, we refer to ISMCTS with the corresponding selection function by only UCT/RM.
+We have implemented ISMCTS in the same framework with similar data representations as OOS. ISMCTS runs MCTS samples as in a perfect information game, but uses common statistics computed for the whole information set and not individual states in the selection phase. When initiated from a non-empty match history, it starts samples uniformly from the states in the current information set. We use two selection functions in our experiments. First, the commonly used UCT as suggested in \cite{Cowling12ISMCTS}. We use two times the maximal game outcome as the exploration parameter $C$. In matches, we select the action with the highest number of iterations. For evaluating convergence, this would often have the maximum possible exploitability in the evaluated games. Therefore, we use the distribution given by the empirical frequencies for this part of evaluation. Second, we use Regret Matching (RM) as the selection strategy, because it has been shown to empirically perform better in many games \cite{Lisy14selection} and because it is based on the same principles that are behind CFR. For RM, we use exploration $0.2$, the mean strategy for evaluating exploitability and samples from this strategy in head to head matches. In the following, we refer to ISMCTS with the corresponding selection function by only UCT/RM.
 
 \subsection{Evaluating Performance}\label{sec:evaluating}
 
 In games like Poker and Liar's Dice, it is often critical to play in such a way that the opponent 
-cannot easily infer the private information. This explains partly why CFR-based methods have 
-enjoyed so much success in the offline approach. 
-In the online setting, however, since the tree is built incrementally, only partial strategies
+cannot easily infer the private information. This explains partly 
+the success of CFR-based methods in the offline setting. 
+In the online setting, since the tree is built incrementally, only partial strategies
 are produced. 
 We are unaware of any methods for assessing the worst-case exploitability of strategies 
 produced by an online search algorithm. 
@@ -823,7 +824,7 @@ Instead, we propose an approximate multi-match \defword{aggregate method}.
 It creates a global (accumulating) strategy data structure for each player.
 Then, it runs a fixed number of matches (500 in our experiments) of the search algorithm against a random opponent. In each information set reached in the match, the information computed (visit counts in ISMCTS, $s_I$ in OOS) is added into the global strategy of the player who searched.
 Besides the information in the current information set, the information computed in all successor information sets is also added with a weight proportional to the number of visits of the information set.
-If an information set is never reached directly, this gives at least some estimate of how the strategy would behave there. If it is, the number of samples in the information set out-weights the less precise estimates from the cases where it does not. In the information sets not added to the global strategy, a fixed random action is selected. The result is the exploitability of the global strategy.
+If an information set is never reached directly, this gives at least some estimate of how the strategy would behave there. If it is, the number of samples in the information set out-weights the less precise estimates from the cases where it is not. In the information sets not added to the global strategy, a fixed random action is selected. The result is the exploitability of the global strategy.
 
 %For a fair comparison, the first $I$ reached along each $m$ aggregates all the information gained in the search 
 %but for future $I'$, only the information collected in each $I''$ reachable by $I'$ is aggregated.
@@ -834,14 +835,14 @@ If an information set is never reached directly, this gives at least some estima
 \subsection{Domains}
 \vlnote{comment on domain sizes}
 
-\textbf{Imperfect Information Goofspiel II-GS($N$)} each player is
+\textbf{Imperfect Information Goofspiel} In II-GS($N$), each player is
 given a private hand of bid cards with values $0$ to $N-1$. A different
 deck of $N$ point cards is placed face up in a stack.
 On their turn, each player bids for the top point card by secretly choosing a single card in their hand. 
 The highest bidder gets the point card and adds the point total to their score, discarding
 the points in the case of a tie. 
 This is repeated $N$ times and the player with the highest score wins.
-In, II-Goofspiel the players only discover who won or lost a bid, but not the bid cards played.
+In II-Goofspiel, the players only discover who won or lost a bid, but not the bid cards played.
 Also, we assume the point-stack is strictly increasing: 0, 1, $\ldots N-1$.
 This way the game does not have non-trivial chance nodes, all actions are private and information sets have various sizes.
 
@@ -934,13 +935,13 @@ No public subgame
 
 \subsection{Results}
 
-We first focus on LD(1,1), II-GS(6), and GP(3,3,2,2). While these games are considered small by search algorithm standards, it is still possible to compute the exact worst case counterstrategies (i.e., best response) to measure exploitability. After analyzing the convergence, we proceed to performance in head-to-head matches with ISMCTS.
+We first focus on LD(1,1), II-GS(6), and GP(3,3,2,2). While these games are considered small by search algorithm standards, it is still possible to compute the exact worst case counterstrategies (i.e., best response) to measure exploitability. After analyzing the convergence, we proceed to performance in head-to-head matches also in larger variants of the games.
 
 \subsubsection{Convergence at the root}
 
 First we evaluate the speed of convergence of the proposed algorithm when run in the root of the games. The strategy in the information sets, which are not included in the tree yet, is assumed to be a fixed random action identical for all algorithms. The impact of the exploration parameters of the algorithms is not very strong here and we set it to $0.6$ for OOS. The results are in Figures~\ref{fig:small}(a,d,h). OOS clearly converges the fastest in all games, eventually converging to the exact equilibrium. The exact convergence is not surprising, because the algorithm run from the root is MCCFR, only with incremental tree building.
 
-In all three games, the empirical action frequencies in UCT first converge quite quickly towards less exploitable strategies, but they always start to become more exploitable at some point. This does not happen with RM, but its initial convergence rate is smaller.
+In all three games, the empirical action frequencies in UCT first converge quite quickly towards less exploitable strategies, but they always start to become more exploitable at some point. This does not happen with RM, but its initial convergence is slower.
 
 \begin{figure*}[t]
 \subfigure[II Goofspiel (6)]{\label{fig:GS-matches-small}
@@ -1011,20 +1012,24 @@ RND&-3.25(0.43)&-3.91(0.27)&-4.12(0.31)&2.51(0.51)\\
 \hline
 \end{tabular}
 \end{scriptsize}}
-\caption{Head-to-head matches in small (a-c) and large (d-f) variants of the games. Computation time per move is indicated in top left corner and half of 95\% confidence intervals in the brackets.}\label{fig:matches}
+\vspace{-3mm}
+\caption{Head-to-head matches in small (a-c) and large (d-f) game variants. 
+%Computation time per move is indicated in top left corner and half of 95\% confidence intervals in the brackets. 
+The top left corner indicates the computation time per move and the brackets show 95\% confidence intervals.
+OOS run with IST for II-GS and PST for the other games, targeting $\delta=0.9$ and exploration $\epsilon=0.4$; UCT with $C=2\cdot\max$; RM with $\gamma=0.2$.}\label{fig:matches}
 \end{figure*}
 
 
 \subsubsection{Aggregated strategy exploitability}
 
-Figures~\ref{fig:small}(b,e,i) present the exploitability of the strategies computed by different algorithms estimated by the aggregate method.% explained in Section~\ref{sec:evaluating}.
-The OOS in this graphs is run with the information set targeting and the parameters $\gamma=0.4$ for exploration and $\delta=0.5$ for targeting.
+Figures~\ref{fig:small}(b,e,i) present the exploitability of the strategies computed by different algorithms estimated by the aggregate method. % explained in Section~\ref{sec:evaluating}.
+The OOS in this graphs is run with IST, $\gamma=0.4$ for exploration and $\delta=0.5$ for targeting.
 The x-axis denotes the amount of computation per move.
-In Goofspiel (b), both ISMCTS variants produce a more exploitable strategy with more computation time per move.
+In Goofspiel 3(b), both ISMCTS variants produce a more exploitable strategy with more computation time per move.
 For any of the evaluated time settings, OOS is substantially less exploitable.
-In Liar's Dice (e), ISMCTS does not seem to get worse with additional computation time, but it improves marginally with more than $0.4$ seconds per move.
+In Liar's Dice 3(e), ISMCTS does not seem to get worse with additional computation time, but it improves marginally with more than $0.4$ seconds per move.
 OOS steadily approaches the equilibrium.
-In Poker (i), the exploitability is lower for ISMCTS variants than for OOS with the default settings.
+In Poker 3(i), the exploitability is lower for ISMCTS variants than for OOS with the default settings.
 With the limited computation time, having more iterations to avoid bad moves seems to be more important than guessing and hiding the private information of the players.
 
 The remaining plots in Figures~\ref{fig:small} present how the exploitability of the strategies produced by OOS depends on the selected targeting scheme and parameters: the amount of targeting shown by color and the amount of exploration shown by point shapes. Figures \ref{fig:small}(c,f,j) show the information set targeting and \ref{fig:small}(g,k) show the public subgame targeting. Overall, OOS produces strategies closer to the equilibrium as the computation time per move increases. The only exception is IST with full targeting ($\delta=1$) in Liar's Dice (Figure~\ref{fig:LD-IST-oos}). This confirms that sampling the histories that will certainly not occur in the game anymore is necessary to converge to the optimal strategy in LD.
@@ -1044,7 +1049,8 @@ In the other two games, full targeting produces the least exploitable strategies
 \subsubsection{Head-to-head performance}
 
 After we confirmed that we achieved the goal of creating an online game playing algorithm that converges close to Nash equilibrium, we evaluate its game playing performance in head-to-head matches with ISMCTS.
-For each game, we focus on two sizes. The smaller variant, for which we analyzed the exploitability in the previous section and a substantially larger variant that is closer to the size of the domains where online search algorithms are typically applied. 
+For each game, we focus on two sizes. The smaller variant, for which we analyzed the exploitability in the previous section and a substantially larger variant that is closer to the size of the domains where online search algorithms are typically applied.
+The largest domain is II-GS(13) with approximately $3.8\times10^{19}$ terminal histories.
 
 %Game values
 %LD611 -0.02713178294573644
@@ -1053,23 +1059,23 @@ For each game, we focus on two sizes. The smaller variant, for which we analyzed
 %GP 4 4 4 6 -0.11123854182232012
 
 The results are summarized in Figure~\ref{fig:matches}.
-For Goofspiel and Liar's Dice, we present the win-rate, where a tie is considered half win half loss. GS is perfectly balanced for both players. In LD, the first player has a slight disadvantage corresponding to approximately 1\% \mlnote{...?} in the win rate and we do not compensate for that.
+For Goofspiel and Liar's Dice, we present the win-rate, where a tie is considered half win half loss. II-GS is perfectly balanced for both players. In LD, the first player has a slight disadvantage corresponding to approximately 1\% \mlnote{...?} in the win rate and we do not compensate for that.
 Poker is not balanced. If both players play the optimal strategy, the first player loses 0.11 chips on average.
 This value is practically the same for both evaluated sizes of the game.
 For clarity, we present the difference between this game value and the mean reward obtained by the players in the matches. A value 0.1 in the tables means that the row player on average wins 0.1 more than the game value from the column player per match.
-Each entry in the tables presents the result of at least 500 mutual matches between two algorithms from the perspective of the one in the row header. The values in the brackets are the size of half of the 95\% confidence intervals centered in the presented mean. If it is not specified otherwise, OOS was run with IST for Goofspiel and PST for the other games, targeting $\delta=0.9$ and exploration $\epsilon=0.4$.
+Each entry in the tables presents the result of at least 500 mutual matches between two algorithms from the perspective of the one in the row header. The values in the brackets are the size of half of the 95\% confidence intervals centered in the presented mean. If it is not specified otherwise, OOS was run with IST for II-Goofspiel and PST for the other games, targeting $\delta=0.9$ and exploration $\epsilon=0.4$.
 
 Figure~\ref{fig:GS-matches-small} presents the results for the smaller Goofspiel and $0.1$ second of computation per move. Even though the game is balanced, the results of ISMCTS are strongly biased towards the first player. The second player has generally larger information sets and needs to better evaluate the hidden information to choose a good move. OOS does not have this problem in the smaller game. It is the only algorithm that managed to prevent ISMCTS from exploiting it.
 In both positions, the algorithm won approximately 50\% of matches, which corresponds to the value of the game.
 On the other hand, the first line in the table shows that OOS did not exploit the weaker play of ISMCTS, even though it is possible. This is a common disadvantage of Nash equilibrium play. % quite well known ..? do we need a cite? \cite{}
 One simple way to overcome this would be to trade a bit of exploitability to gain some exploitation; computing a restricted Nash response using MCRNR~\cite{Ponsen11Computing} (a minor modification of MCCFR) allows the best possible trade-off for a given importance between exploitability and exploitation. 
-In the large variant of Goofspiel (see Figure~\ref{fig:GS-matches-small}) with one second per move, the situation is different. OOS does not manage to converge sufficiently close to the equilibrium and ISMCTS exploits it from both positions to a similar extent. Increasing the computation time to 5 seconds per move helps OOS to win 35\% matches against UCT, but it would likely need a substantially longer time to reach the equilibrium.
+In the large variant of Goofspiel (see Figure~\ref{fig:GS-matches-large}) with one second per move, the situation is different. OOS does not manage to converge sufficiently close to the equilibrium and ISMCTS exploits it from both positions to a similar extent. Increasing the computation time to 5 seconds per move helps OOS to win 35\% matches against UCT, but it would likely need a substantially longer time to reach the equilibrium.
 
 The results on Liar's Dice are even more promising for OOS. In the smaller game with $0.1$ second per move (Figure~\ref{fig:LD-matches-small}), OOS statistically significantly wins over both variants of ISMCTS form at least one position. This is not the case for the larger game and 1 second per move, where OOS already wins only 45\% and 40\% of matches against UCT and RM from the first position and loses 69\% and 66\% from the second position. 
 However, with 5 seconds and the exploration parameter set to $\epsilon=0.8$ to balance the need for exploring a large number of actions in this game, OOS again wins over UCT and ties with RM (Figure~\ref{fig:LD-matches-large}).
 
-As indicated by the exploitability results, OOS performs the worst against ISMCTS in the Poker domain. In the smaller variant (Figure~\ref{fig:GP-matches-small}), it is losing from both positions. The result of OOS from the first position against UCT improves to -0.22 with 5 seconds per move, but even more time would be required to tie. From the first (generally more difficult) position, the situation is similar also in the larger Poker (Figure~\ref{fig:GP-matches-large}). It is already not the case for the second position, where OOS is able to tie both ISMCTS variants. 
-This could be because Poker playing requires low-variance updates since the game itself already has high variance. 
+As indicated by the exploitability results, OOS performs the worst against ISMCTS in the Poker domain. In the smaller variant (Figure~\ref{fig:GP-matches-small}), it is losing from both positions. The result of OOS from the first position against UCT improves to -0.22 with 5 seconds per move, but even more time would be required to tie. From the first (generally more difficult) position, the situation is similar also in the larger Poker (Figure~\ref{fig:GP-matches-large}). It is not the case for the second position, where OOS is able to tie both ISMCTS variants. 
+This could be because Poker games have very high variance. 
 
 
 % Removing this so I know how much trimming needs to be done.
