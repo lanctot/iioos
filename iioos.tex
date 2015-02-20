@@ -1,4 +1,4 @@
-% This is "aamas2015_sample.tex", a revised version of aamas2014_sample.tex
+%This is "aamas2015_sample.tex", a revised version of aamas2014_sample.tex
 % This file should be compiled with "aamas2015.cls" 
 % This example file demonstrates the use of the 'aamas2015.cls'
 % LaTeX2e document class file. It is intended for those submitting
@@ -124,6 +124,7 @@ ch/.style = {draw, treenode, circle, minimum width=2mm, black}
 \newcommand{\breturn}{{\bf return}\xspace}
 \pdfpagewidth=8.5truein
 \pdfpageheight=11truein
+
 
 \begin{document}
 
@@ -294,7 +295,7 @@ In head-to-head play, OOS outperforms ISMCTS in games where non-locality plays a
 
 %Keywords are your own choice of terms you would like the paper to be indexed by.
 
-\keywords{Imperfect informations games; online search; Nash equilibrium; Monte Carlo tree search; regret minimization}
+\keywords{Imperfect information games; online search; Nash equilibrium; Monte Carlo tree search; regret minimization}
 
 \section{Introduction}
 
@@ -327,10 +328,10 @@ The results show that OOS, unlike ISMCTS, consistently converges close to NE str
 % Merge-Nov15
 % I merged in my modified intro of the text from above.
 % My personal opinion is that these kind of paragraphs just waste space (if you name headings appropriately and the flow is structured properly, you don't need to explain the flow like this)
-%In this section, we first overview the related work on search in imperfect information games and explain why none of the existing algorithms is guaranteed to converge to Nash equilibrium over time. Then we formally define extensive form games and explain in detail the problem of non-locality of optimal strategies in these games that prevent convergence of the existing search algorithms. We conclude this section by introducing Monte Carlo Counterfactual Regret Minimization, the offline equilibriium computation algorithm that is the basis of OOS.
+%In this section, we first overview the related work on search in imperfect information games and explain why none of the existing algorithms is guaranteed to converge to Nash equilibrium over time. Then we formally define extensive form games and explain in detail the problem of non-locality of optimal strategies in these games that prevent convergence of the existing search algorithms. We conclude this section by introducing Monte Carlo Counterfactual Regret Minimization, the offline equilibrium computation algorithm that is the basis of OOS.
 
 % Merge-Nov15
-% I prefer the title "Background and related work", and I made it a full section so we could follow with the mackground
+% I prefer the title "Background and related work", and I made it a full section so we could follow with the background
 %\subsection{Search in Imperfect Information Games}
 
 % classic work: PIMC and its successes
@@ -408,7 +409,7 @@ When $\epsilon = 0$, the profile is called a Nash equilibrium.
 When $|N| = 2$ and $u_1(z) + u_2(z) = k$ for all $z \in Z$, then the game is a  zero-sum game.
 In these games, different equilibrium strategies result in 
 the same expected payoff against any arbitrary opponent equilibrium strategy and at least the same payoff for any opponent strategy. 
-The \defword{exploitability} of a profile $\sigma$ is the sum of strategies' distances form an equilibrium, $\epsilon_{\sigma} = 
+The \defword{exploitability} of a profile $\sigma$ is the sum of strategies' distances from an equilibrium, $\epsilon_{\sigma} = 
 \max_{\sigma_1' \in \Sigma_1} u_1(\sigma_1', \sigma_2) + \max_{\sigma_2' \in \Sigma_1} u_2(\sigma_1, \sigma_2')$.
 
 In a \defword{match} (online game), each player is allowed little or no preparation time before playing (preventing the offline computation of approximate equilibria solutions).
@@ -610,7 +611,7 @@ For example, the extensive-form version of Rock, Paper, Scissors has two informa
 sets $I_1 = \emptyset$ and $I_2 = \{ r, p, s \}$; it has no public actions, because each history in 
 $I_2$ contains a single unique action (the unobserved ones taken by the first player). 
 
-Given a history $h$, let $p(h)$ be the sequence of public actions along $h$ in the same order that they were taken in $h$. 
+Given a history $h$, let $p(h)$ be the sequence of public actions along $h$ in the same order that they were taken in $h$.
 Define the \defword{public subgame} induced by $I$ to be the one whose terminal history set is
 \begin{equation*}
 Z_{p,I(h)} = \{(h',z)~|~z \in Z, h' \in H, p(h') = p(h), h' \sqsubset z \}.
@@ -1049,7 +1050,7 @@ In the other two games, full targeting produces the least exploitable strategies
 \subsubsection{Head-to-head performance}
 
 After we confirmed that we achieved the goal of creating an online game playing algorithm that converges close to Nash equilibrium, we evaluate its game playing performance in head-to-head matches with ISMCTS.
-For each game, we focus on two sizes. The smaller variant, for which we analyzed the exploitability in the previous section and a substantially larger variant that is closer to the size of the domains where online search algorithms are typically applied.
+For each game, we focus on two sizes: the smaller variant, for which we analyzed the exploitability in the previous section and a substantially larger variant that is closer to the size of the domains where online search algorithms are typically applied.
 The largest domain is II-GS(13) with approximately $3.8\times10^{19}$ terminal histories.
 
 %Game values
@@ -1071,7 +1072,7 @@ On the other hand, the first line in the table shows that OOS did not exploit th
 One simple way to overcome this would be to trade a bit of exploitability to gain some exploitation; computing a restricted Nash response using MCRNR~\cite{Ponsen11Computing} (a minor modification of MCCFR) allows the best possible trade-off for a given importance between exploitability and exploitation. 
 In the large variant of Goofspiel (see Figure~\ref{fig:GS-matches-large}) with one second per move, the situation is different. OOS does not manage to converge sufficiently close to the equilibrium and ISMCTS exploits it from both positions to a similar extent. Increasing the computation time to 5 seconds per move helps OOS to win 35\% matches against UCT, but it would likely need a substantially longer time to reach the equilibrium.
 
-The results on Liar's Dice are even more promising for OOS. In the smaller game with $0.1$ second per move (Figure~\ref{fig:LD-matches-small}), OOS statistically significantly wins over both variants of ISMCTS form at least one position. This is not the case for the larger game and 1 second per move, where OOS already wins only 45\% and 40\% of matches against UCT and RM from the first position and loses 69\% and 66\% from the second position. 
+The results on Liar's Dice are even more promising for OOS. In the smaller game with $0.1$ second per move (Figure~\ref{fig:LD-matches-small}), OOS statistically significantly wins over both variants of ISMCTS from at least one position. This is not the case for the larger game and 1 second per move, where OOS already wins only 45\% and 40\% of matches against UCT and RM from the first position and loses 69\% and 66\% from the second position. 
 However, with 5 seconds and the exploration parameter set to $\epsilon=0.8$ to balance the need for exploring a large number of actions in this game, OOS again wins over UCT and ties with RM (Figure~\ref{fig:LD-matches-large}).
 
 As indicated by the exploitability results, OOS performs the worst against ISMCTS in the Poker domain. In the smaller variant (Figure~\ref{fig:GP-matches-small}), it is losing from both positions. The result of OOS from the first position against UCT improves to -0.22 with 5 seconds per move, but even more time would be required to tie. From the first (generally more difficult) position, the situation is similar also in the larger Poker (Figure~\ref{fig:GP-matches-large}). It is not the case for the second position, where OOS is able to tie both ISMCTS variants. 
